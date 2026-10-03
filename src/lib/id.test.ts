@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isUuid, newId, userFoodId, uuidV5 } from './id'
+import { favoriteId, isUuid, newId, systemFoodId, userFoodId, uuidV5 } from './id'
 
 describe('ids', () => {
   it('generates random v4 UUIDs', () => {
@@ -21,6 +21,13 @@ describe('ids', () => {
     expect(await userFoodId('user-a', 'usda', '171477')).toBe(first)
     expect(await userFoodId('user-b', 'usda', '171477')).not.toBe(first)
     expect(isUuid(first)).toBe(true)
+  })
+
+  it('derives deterministic favorite and system food ids', async () => {
+    expect(await favoriteId('u1', 'f1')).toBe(await favoriteId('u1', 'f1'))
+    expect(await favoriteId('u1', 'f1')).not.toBe(await favoriteId('u2', 'f1'))
+    expect(await systemFoodId('banana')).toBe(await systemFoodId('banana'))
+    expect(await systemFoodId('banana')).not.toBe(await systemFoodId('apple'))
   })
 
   it('rejects non-UUID strings', () => {

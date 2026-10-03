@@ -44,3 +44,13 @@ export async function uuidV5(name: string, namespace: string = FOOD_ID_NAMESPACE
 export function userFoodId(userId: string, source: string, externalId: string): Promise<string> {
   return uuidV5(`${userId}:${source}:${externalId}`)
 }
+
+/** Deterministic favorite id: favoriting the same food twice (even offline on two devices) is idempotent. */
+export function favoriteId(userId: string, foodId: string): Promise<string> {
+  return uuidV5(`favorite:${userId}:${foodId}`)
+}
+
+/** Deterministic id for a bundled system food (must match supabase/migrations seed). */
+export function systemFoodId(slug: string): Promise<string> {
+  return uuidV5(`system:${slug}`)
+}
