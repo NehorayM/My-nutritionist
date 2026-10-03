@@ -38,3 +38,6 @@ playwright-report
 test-results
 blob-report
 *.tsbuildinfo
+
+# Local research artifacts (not part of the app)
+.research-cache
