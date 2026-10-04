@@ -108,20 +108,23 @@ user id (saved provider foods re-derive their ids and references are remapped), 
 cleared only after every mutation is acknowledged. Nothing is discarded silently.
 
 ## Food data
-See docs/FOOD_DATA_SOURCES.md. Providers: local catalog (bundled USDA-sourced seed + user foods), Open Food Facts
-(browser-direct, no key), USDA FoodData Central via the `food-search` Edge Function (API key stays server-side; only in
-cloud mode). `FoodSearchService` debounces upstream (UI 350 ms), caches (LRU+TTL), times out (8 s), paginates, and
-returns partial results with per-provider errors.
+See docs/FOOD_DATA_SOURCES.md. Providers: local catalog (bundled USDA-sourced seed + user foods; instant,
+search-as-you-type with a 350 ms UI debounce), USDA FoodData Central via the `food-search` Edge Function (API key stays
+server-side; cloud mode only; normalization shared in `supabase/functions/_shared/usda/normalize.ts`), and Open Food Facts
+browser-direct (keyless, CORS `*`) for **barcode lookup** and an **explicit "Search packaged products" action** — never
+search-as-you-type, because OFF allows 10 searches/min per IP. `FoodSearchService` caches (LRU+TTL), times out (8 s),
+paginates, rate-limits OFF client-side, and returns partial results with per-provider errors.
 
 ## Decisions
 | Decision | Reason |
 |---|---|
+| No manual chunking; React.lazy routes split recharts | Vite 8 (Rolldown) manual groups pulled React into the charts chunk and loaded it eagerly |
 | Hash-based tab navigation, no router library | 4 tabs + auth callback; keeps bundle small; deep links & refresh work |
 | IndexedDB (idb) over localStorage | multi-year logs exceed localStorage quotas; async, indexed queries |
 | Client-generated UUIDs | idempotent retries, offline creation, no temp-id remapping |
 | Snapshot nutrients in meal logs | history stays correct when provider data changes |
 | Stale-write trigger in DB | conflict rule enforced where the data lives; simple for single-user app |
-| USDA through Edge Function, OFF direct | USDA needs an API key (secret); OFF is keyless and CORS-enabled |
+| USDA through Edge Function, OFF direct (explicit search only) | USDA needs an API key (secret); OFF is keyless and CORS-enabled, but per-IP limits (10 searches/min) rule out search-as-you-type and proxying (shared egress IP) |
 | Radix Dialog for sheets/dialogs | accessible focus management with tiny footprint; no full component kit needed |
 | oxlint (template default) instead of ESLint | official create-vite template; typescript-eslint doesn't support TS 7 track |
 | TypeScript 6.0 (template pin) | TS 7 native compiler is new and unsupported by lint tooling |

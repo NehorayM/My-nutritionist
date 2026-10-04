@@ -11,16 +11,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        // Keep the charting library out of the main chunk; it is only needed on the Progress tab.
-        manualChunks(id: string) {
-          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-')) return 'charts'
-          if (id.includes('node_modules/@supabase')) return 'supabase'
-          return undefined
-        },
-      },
-    },
-  },
+  // No manual chunking: heavy screens (recharts on Progress) are split by React.lazy routes.
+  // Manual groups pulled React into the charts chunk and made it load eagerly (verified with Vite 8 / Rolldown).
 })
