@@ -1,7 +1,24 @@
 import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
 
-/** Compose class names, letting later Tailwind utilities override earlier ones. */
+/**
+ * Custom theme scales from index.css, so tailwind-merge resolves conflicts correctly: without them
+ * `text-display` is mistaken for a color (and dropped next to `text-text`) and `rounded-card` never
+ * yields to a `rounded-full` override.
+ */
+const merge = extendTailwindMerge({
+  extend: {
+    theme: {
+      text: ['2xs', 'title', 'display'],
+      radius: ['field', 'card', 'card-lg', 'sheet', 'frame'],
+      shadow: ['thumb', 'card', 'raised', 'frame'],
+      ease: ['out-soft'],
+      animate: ['fade-in', 'fade-out', 'sheet-in', 'sheet-out', 'pop-in', 'pop-out', 'screen-in'],
+    },
+  },
+})
+
+/** Compose class names; later Tailwind utilities override earlier ones (theme-aware). */
 export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs))
+  return merge(clsx(inputs))
 }
