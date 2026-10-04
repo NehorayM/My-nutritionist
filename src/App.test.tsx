@@ -14,7 +14,7 @@ describe('App', () => {
   it('composes the routed shell, the notification area and the document theme', async () => {
     installMatchMedia({ '(prefers-color-scheme: dark)': true })
     render(<App />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Meals' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Meals' })).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
     expect(document.documentElement.dataset.theme).toBe('dark')
 
