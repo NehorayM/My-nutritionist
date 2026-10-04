@@ -1,4 +1,4 @@
-import type { MealType, NutrientKey, NutrientTotal, NutrientTotals } from '@/types'
+import type { MealEntry, MealType, NutrientKey, NutrientTotal, NutrientTotals, Profile } from '@/types'
 
 /** goal = aim to reach (protein, fiber, micronutrients); limit = stay under (sodium, sat. fat, sugars); energy = calories. */
 export type TargetKind = 'energy' | 'goal' | 'limit'
@@ -92,4 +92,39 @@ export interface MicronutrientCoverage {
   overall: number | null
   /** Share of logged items that report ALL tracked micronutrients (0–1); null when nothing logged. */
   dataCompleteness: number | null
+}
+
+/** Profile fields the Daily Target Engine reads (a full `Profile` satisfies this). */
+export type TargetProfile = Pick<
+  Profile,
+  | 'birthDate'
+  | 'sex'
+  | 'heightCm'
+  | 'currentWeightKg'
+  | 'targetWeightKg'
+  | 'activityLevel'
+  | 'goal'
+  | 'goalPace'
+  | 'dietType'
+>
+
+export interface DailyTargetsInput {
+  /** null before onboarding → general targets. */
+  profile: TargetProfile | null
+  /** Local date (YYYY-MM-DD) the targets apply to; used to derive age. */
+  date: string
+  /** Latest weigh-in (kg); falls back to `profile.currentWeightKg` when null/omitted. */
+  latestWeightKg?: number | null
+}
+
+export interface RemainingInput {
+  targets: DailyTargets
+  /** Totals for `date` (e.g. `aggregateDay(date, entries).totals`). */
+  totals: NutrientTotals
+  /** Entries logged for `date`; entries of other dates are ignored. */
+  entries: ReadonlyArray<Pick<MealEntry, 'date' | 'mealType'>>
+  /** Current instant; its local date and time decide which meal slots remain. */
+  now: Date
+  /** Local date (YYYY-MM-DD) being evaluated. */
+  date: string
 }

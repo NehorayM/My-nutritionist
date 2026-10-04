@@ -1,4 +1,6 @@
-/** One value per local day, chosen by the same-day rule (see weightEngine). */
+import type { GoalPace, WellnessGoal } from '@/types'
+
+/** One value per local day, chosen by the same-day rule (see selectDailyWeights). */
 export interface DailyWeight {
   date: string
   weightKg: number
@@ -35,3 +37,67 @@ export interface WeightStats {
   trendRateKgPerWeek: number | null
   measurementDays: number
 }
+
+/** One calendar day of the trailing moving average (see movingAverage). */
+export interface MovingAveragePoint {
+  date: string
+  /** Mean of the daily values inside the window; null when the window holds none. */
+  trendKg: number | null
+  /** Number of daily values inside the window. */
+  sampleCount: number
+}
+
+export interface WeightStatsOptions {
+  targetWeightKg: number | null
+  /** Local date key (YYYY-MM-DD); measurements dated after it are ignored. */
+  today: string
+}
+
+/** Goal settings that decide whether a target trajectory is shown. */
+export interface WeightGoalInput {
+  targetKg: number | null
+  goal: WellnessGoal
+  goalPace: GoalPace
+  /** Caller-derived (profile age ≥ 18). Minors never get a trajectory. */
+  isAdult: boolean
+}
+
+export interface TrajectoryInput extends WeightGoalInput {
+  currentKg: number | null
+  /** Local date key the trajectory starts from (usually today). */
+  startDate: string
+}
+
+export interface TrajectoryPoint {
+  date: string
+  targetKg: number
+}
+
+export interface WeightTrajectory {
+  /** Signed planned rate in kg/week (negative while losing, positive while gaining). */
+  ratePerWeekKg: number
+  /** First local date on which the planned line reaches the target. */
+  estimatedGoalDate: string
+  /** Whole weeks until estimatedGoalDate (rounded up) — for "about N weeks" copy rather than a date promise. */
+  estimatedWeeks: number
+  startDate: string
+  startKg: number
+  targetKg: number
+  /** Weekly waypoints from startDate; the last point is estimatedGoalDate at targetKg. */
+  points: TrajectoryPoint[]
+}
+
+export interface WeightChartOptions {
+  range: WeightRange
+  /** Local date key (YYYY-MM-DD) the chart ends on; later measurements are ignored. */
+  today: string
+  /**
+   * Goal settings for the forward projection, or null for none. A full TrajectoryInput is accepted too;
+   * its currentKg/startDate are ignored because the projection is anchored at today's trend.
+   */
+  trajectory: WeightGoalInput | null
+  /** Days to project past today; defaults per range (see DEFAULT_PROJECTION_DAYS). */
+  projectDays?: number
+}
+
+export type WeightChartGranularity = 'day' | 'week'

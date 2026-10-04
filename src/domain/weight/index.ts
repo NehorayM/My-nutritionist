@@ -1,0 +1,11 @@
+/** Weight / progress engine — pure and deterministic; `today` is always passed in as a date key. */
+export * from './types'
+export * from './constants'
+export { selectDailyWeights, dailyWeightsThrough } from './daily'
+export { movingAverage } from './movingAverage'
+export { weeklyChangeKg, trendWeeklyChangeKg, rawWeeklyChangeKg } from './weeklyChange'
+export { trendRateKgPerWeek, trendDirection } from './trendRate'
+export { computeWeightStats } from './stats'
+export { calculateTrajectory, isWeightChangeGoal, safeWeeklyRateKg, trajectoryWeightOn } from './trajectory'
+export { weightGoalInput } from './goal'
+export { buildWeightChart, weightChartGranularity } from './chart'
