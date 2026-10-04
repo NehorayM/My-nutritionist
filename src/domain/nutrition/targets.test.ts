@@ -56,6 +56,13 @@ describe('calculateDailyTargets — personalized adults', () => {
     expect(result.assumptions).toContain('Includes a moderate deficit of 470 kcal/day toward your weight goal.')
   })
 
+  it('uses older-adult reference intakes from age 51 and 71', () => {
+    const at = (birthDate: string, sex: 'female' | 'male') =>
+      calculateDailyTargets({ profile: adultProfile({ birthDate, sex }), date: TODAY }).targets
+    expect(at('1966-01-01', 'female')).toMatchObject({ iron: { amount: 8 }, calcium: { amount: 1200, max: 2000 } })
+    expect(at('1950-01-01', 'male')).toMatchObject({ vitaminD: { amount: 20 }, calcium: { amount: 1200 }, vitaminC: { amount: 90 } })
+  })
+
   it('averages the equations and uses the higher reference intakes when sex is unspecified', () => {
     const profile = adultProfile({ sex: 'unspecified', heightCm: 170, activityLevel: 'sedentary', goal: 'general_wellness' })
     const result = calculateDailyTargets({ profile, date: TODAY })

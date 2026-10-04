@@ -130,13 +130,13 @@ describe('catchUpMessage', () => {
 
   it('explains deferred sessions supportively', () => {
     expect(catchUpMessage('limited', counts({ needed: 3, placed: 0, deferred: 3, shown: 0, freeDays: 0 }))).toBe(
-      'No free days are left this week. The remaining three sessions can carry over to next week — rest is part of the plan.',
+      "No free days are left this week for the remaining three sessions, and that's okay — rest days are part of the plan.",
     )
     expect(catchUpMessage('limited', counts({ needed: 1, placed: 0, deferred: 1, shown: 0, freeDays: 1 }))).toBe(
-      "The days left this week don't leave enough recovery time. The remaining session can carry over to next week — rest is part of the plan.",
+      "The days left this week don't leave enough recovery time for the remaining session, and that's okay — rest days are part of the plan.",
     )
     expect(catchUpMessage('limited', counts({ needed: 3, placed: 1, deferred: 2, shown: 1 }))).toBe(
-      'One of the three remaining sessions fits safely this week. The other two can carry over to next week — rest is part of the plan.',
+      'One of the three remaining sessions fits safely this week. Leaving out the other two is okay — rest days are part of the plan.',
     )
     expect(catchUpMessage('limited', counts({ needed: 4, placed: 2, deferred: 2, shown: 2 }))).toContain('Two of the four remaining sessions fit safely')
   })

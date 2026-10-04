@@ -1,0 +1,93 @@
+/* Custom utilities (safe areas, bottom bar surface, hit areas, backdrop, scroll edge). */
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility px-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Bottom bar only: translucent blur where supported, solid surface otherwise. */
+@utility bar-surface {
+  background-color: var(--color-surface);
+
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    background-color: color-mix(in oklab, var(--color-surface) 80%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Expands the pointer target of a small control to at least 44 × 44 px without changing its layout. */
+@utility hit-area {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    translate: -50% -50%;
+  }
+}
+
+/* Soft oat backdrop with faint evergreen/apricot glows behind the framed app (≥ sm only). */
+@utility app-backdrop {
+  background-color: var(--color-bg);
+
+  @media (width >= 40rem) {
+    background-color: var(--color-backdrop);
+    background-image:
+      radial-gradient(60rem 40rem at 12% 8%, color-mix(in oklab, var(--color-primary) 10%, transparent), transparent 70%),
+      radial-gradient(50rem 36rem at 92% 96%, color-mix(in oklab, var(--color-accent) 16%, transparent), transparent 70%);
+    background-attachment: fixed;
+  }
+}
+
+/* Over-target tail of a progress bar: surface-colored diagonal hatching over the tone fill. */
+@utility stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, var(--color-surface) 72%, transparent) 0 2.5px,
+    transparent 2.5px 5.5px
+  );
+}
+
+/* Sticky header edge that appears once its scroll container has scrolled (progressive enhancement:
+   scroll-driven animations; browsers without them simply show no edge). */
+@utility scroll-edge {
+  @supports (animation-timeline: scroll()) {
+    animation: scroll-edge linear both;
+    animation-timeline: scroll(nearest block);
+    animation-range: 0 1.5rem;
+  }
+}
+
+@keyframes scroll-edge {
+  from {
+    box-shadow: 0 1px 0 transparent;
+  }
+  to {
+    box-shadow: 0 1px 0 var(--color-border), 0 10px 18px -16px var(--shadow-tint-strong);
+  }
+}
+
+/* Thin, token-colored scrollbars for the framed desktop column. */
+@utility scrollbar-soft {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-text) 22%, transparent) transparent;
+}

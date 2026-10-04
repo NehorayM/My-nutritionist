@@ -41,14 +41,14 @@ picks the mode, builds repositories, calls `services/runtime.setRepositories()`,
 - `targets.ts` — **Daily Target Engine**: `calculateDailyTargets({ profile, date, latestWeightKg }): DailyTargets`.
   Separates physiological estimate (Mifflin-St Jeor BMR × activity factor) → product goal (moderate, capped
   adjustment; none for minors / incomplete profiles / general wellness) → nutrient targets (macros by diet pattern,
-  fiber 14 g/1000 kcal, micronutrient RDA/AI by age & sex, limits for sodium/sat. fat/sugars). Constants in `constants.ts` with sources.
+  fiber 14 g/1000 kcal, micronutrient RDA/AI by age & sex, limits for sodium and saturated fat; total sugars are display-only because guidelines limit *added* sugars, which food data can't distinguish). Constants in `constants.ts` with sources.
 - `portion.ts` — **Food Nutrient Calculation Engine**: `scaleNutrients(per100g, grams)`, `portionNutrients(portion)`,
   `gramsForQuantity(quantity, servingGrams)`. `nutrient = per100g × grams / 100`; null stays null.
 - `aggregation.ts` — **Nutrient Aggregation Engine**: `sumNutrientProfiles(profiles)`, `totalsForPortions(portions)`,
   `aggregateDay(date, entries): DayTotals`, `totalsToProfile(totals)`.
 - `remaining.ts` — **Remaining Nutrition Engine**: `calculateRemaining({ targets, totals, entries, now, date }): RemainingNutrition`
   (statuses, gaps, surpluses, remaining meal slots).
-- `coverage.ts` — `micronutrientCoverage(targets, totals): MicronutrientCoverage` (transparent about missing data).
+- `coverage.ts` — `micronutrientCoverage(targets, totals, items?): MicronutrientCoverage` (transparent about missing data).
 
 `domain/adaptive/` — **Adaptive Nutrition Engine** (`engine.ts: buildAdaptivePlan(input: AdaptiveInput): AdaptivePlan`)
 - `diets.ts` diet-pattern rules (compatibility + macro emphasis), extensible per `DietType`.
@@ -59,10 +59,10 @@ picks the mode, builds repositories, calls `services/runtime.setRepositories()`,
   micronutrients, preference, practicality, variety). Never ranks on a single nutrient.
 - `builder.ts` composes 1–3 food meal options per style with realistic portions; `explanations.ts` neutral one-liners.
 
-`domain/weight/weightEngine.ts`: `selectDailyWeights(entries)` (same-day rule: **earliest measurement of the local day** —
+`domain/weight/` (barrel `index.ts`): `selectDailyWeights(entries)` (same-day rule: **earliest measurement of the local day** —
 the morning weigh-in — ties broken by id), `movingAverage(daily, windowDays)`, `computeWeightStats(entries, { targetWeightKg, today })`,
-`buildWeightChart(entries, { range, today, targetWeightKg, trajectory })`, `calculateTrajectory(...)` (only for adult,
-safe-rate goals).
+`weightGoalInput(profile, today)`, `calculateTrajectory(...)` (adults only, safe capped rates), and
+`buildWeightChart(entries, { range, today, trajectory: WeightGoalInput | null, projectDays? })` (projection only for a safe goal).
 
 `domain/activity/`: `getWeekWindow(today, weekStartsOn)`, `categoryOf(type)`, `computeWeeklyProgress({ workouts, plan, today })`,
 `planCatchUp({ progress, recentWorkouts, scheduled, preferredMinutes, dismissedIds, variant })` (**Smart Catch-Up**:

@@ -84,3 +84,37 @@ export interface AdaptivePlan {
   /** Neutral, supportive summary sentence for the section header. */
   message: string
 }
+
+/** Why a food was left out of the candidate pool. Each excluded food counts once, under the first rule it fails. */
+export const EXCLUSION_REASONS = [
+  'incomplete_nutrition',
+  'no_energy',
+  'allergen_unknown',
+  'allergen',
+  'diet',
+  'dislike',
+  'meal_type',
+  'prep_time',
+  'cooking_skill',
+] as const
+export type ExclusionReason = (typeof EXCLUSION_REASONS)[number]
+
+export interface CandidateResult {
+  candidates: FoodItem[]
+  /** Number of excluded foods per reason (every reason present, 0 when unused). */
+  excluded: Record<ExclusionReason, number>
+}
+
+/**
+ * normal:  room for a regular meal;
+ * light:   little energy left today — the next meal becomes a light-meal allowance;
+ * surplus: intake is already above the energy range — light allowance, emphasis on fiber, protein and micronutrients.
+ */
+export type EnergyState = 'normal' | 'light' | 'surplus'
+
+export interface MealAllocation {
+  budget: MealBudget
+  /** Share of what remains of the day assigned to the target meal (0–1). */
+  share: number
+  energyState: EnergyState
+}

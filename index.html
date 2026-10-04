@@ -1,12 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>My-nutritionist</title>
+    <meta
+      name="description"
+      content="Log real meals, see today's nutrition, get practical suggestions for the rest of the day, and track weight and weekly activity. Works offline."
+    />
+    <meta name="theme-color" content="#faf6ef" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111814" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-title" content="My-nutritionist" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vt</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script>
+      // Apply the saved theme before first paint (no light flash in dark mode).
+      // Mirrors useApplyTheme: localStorage 'mn.ui' → { state: { theme: 'system' | 'light' | 'dark' } }.
+      ;(function () {
+        var theme = 'system'
+        try {
+          var saved = JSON.parse(localStorage.getItem('mn.ui') || 'null')
+          var value = saved && saved.state && saved.state.theme
+          if (value === 'light' || value === 'dark') theme = value
+        } catch (error) {
+          theme = 'system'
+        }
+        var dark =
+          theme === 'dark' ||
+          (theme === 'system' && !!window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        var resolved = dark ? 'dark' : 'light'
+        document.documentElement.dataset.theme = resolved
+        var color = dark ? '#111814' : '#faf6ef'
+        var metas = document.querySelectorAll('meta[name="theme-color"]')
+        for (var i = 0; i < metas.length; i += 1) metas[i].setAttribute('content', color)
+      })()
+    </script>
   </head>
   <body>
+    <noscript>My-nutritionist needs JavaScript to run.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -48,8 +48,16 @@ describe('calculateDailyTargets — general mode', () => {
     expect(result.mode).toBe('personalized')
   })
 
+  it('falls back to the profile weight when the latest weigh-in is implausible', () => {
+    const fromProfile = calculateDailyTargets({ profile: adultProfile(), date: TODAY })
+    const badWeighIn = calculateDailyTargets({ profile: adultProfile(), date: TODAY, latestWeightKg: 5 })
+    expect(badWeighIn.mode).toBe('personalized')
+    expect(badWeighIn.estimate).toEqual(fromProfile.estimate)
+    expect(badWeighIn.targets.protein?.amount).toBe(84)
+  })
+
   it('treats implausible values as missing', () => {
-    const tinyWeight = calculateDailyTargets({ profile: adultProfile(), date: TODAY, latestWeightKg: 5 })
+    const tinyWeight = calculateDailyTargets({ profile: adultProfile({ currentWeightKg: 500 }), date: TODAY, latestWeightKg: 5 })
     expect(tinyWeight.mode).toBe('general')
     expect(tinyWeight.assumptions[0]).toBe('Add your weight for personalized targets.')
 

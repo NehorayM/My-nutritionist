@@ -60,14 +60,14 @@ describe('planCatchUp status', () => {
     expect(dates(result.suggestions)).toEqual([SAT, SUN])
     expect(result.suggestions.map((suggestion) => suggestion.category).sort()).toEqual(['cardio', 'strength'])
     expect(result.message).toBe(
-      'Two of the three remaining sessions fit safely this week. The other one can carry over to next week — rest is part of the plan.',
+      'Two of the three remaining sessions fit safely this week. Leaving out the other one is okay — rest days are part of the plan.',
     )
   })
 
   it('defers everything on the last day when a workout is already logged', () => {
     const result = catchUpFor(SUN, plan(2, 2), [workout(SUN, 'walk')])
     expect(result).toMatchObject({ status: 'limited', suggestions: [], alternatives: [], deferredSessions: 3 })
-    expect(result.message).toMatch(/^No free days are left this week\./)
+    expect(result.message).toMatch(/^No free days are left this week for the remaining three sessions/)
   })
 
   it('uses the last day when it is still free', () => {

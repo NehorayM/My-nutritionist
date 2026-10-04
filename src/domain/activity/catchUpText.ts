@@ -124,17 +124,21 @@ function dismissalNote(counts: MessageCounts): string {
     : ' Suggestions you dismissed stay hidden.'
 }
 
+/**
+ * Deferred sessions are simply left out: they are not moved to next week or added to later sessions,
+ * so the copy never frames them as something to make up.
+ */
 function limitedMessage(counts: MessageCounts): string {
-  const carryOver = 'can carry over to next week — rest is part of the plan.'
+  const reassurance = 'rest days are part of the plan.'
   if (counts.placed === 0) {
     const reason =
       counts.freeDays === 0
-        ? 'No free days are left this week.'
-        : "The days left this week don't leave enough recovery time."
-    return `${reason} ${capitalize(remainingPhrase(counts.deferred))} ${carryOver}`
+        ? 'No free days are left this week'
+        : "The days left this week don't leave enough recovery time"
+    return `${reason} for ${remainingPhrase(counts.deferred)}, and that's okay — ${reassurance}`
   }
   const verb = counts.placed === 1 ? 'fits' : 'fit'
-  return `${capitalize(countWord(counts.placed))} of the ${countWord(counts.needed)} remaining sessions ${verb} safely this week. The other ${countWord(counts.deferred)} ${carryOver}`
+  return `${capitalize(countWord(counts.placed))} of the ${countWord(counts.needed)} remaining sessions ${verb} safely this week. Leaving out the other ${countWord(counts.deferred)} is okay — ${reassurance}`
 }
 
 /** Summary line shown above the suggestions. */

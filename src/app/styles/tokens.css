@@ -1,0 +1,151 @@
+/* ---------------------------------------------------------------------------
+ * Design tokens (light values). Dark overrides live in the base layer below.
+ * Contrast (WCAG): text/bg 14.6, text-muted/bg 6.3, primary-foreground/primary 6.8,
+ * semantic colors on surface ≥ 4.9. Nutrient hues are graphic colors; pair them with
+ * numbers, and use the *-ink variants for small text.
+ * ------------------------------------------------------------------------- */
+@theme {
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  --color-backdrop: oklch(0.925 0.02 78);
+  --color-bg: oklch(0.975 0.011 85);
+  --color-surface: oklch(0.995 0.004 85);
+  --color-surface-2: oklch(0.953 0.016 82);
+  --color-border: oklch(0.895 0.018 80);
+  --color-text: oklch(0.255 0.022 155);
+  --color-text-muted: oklch(0.47 0.022 140);
+  --color-ring: oklch(0.5 0.1 160);
+
+  --color-primary: oklch(0.45 0.085 162);
+  --color-primary-foreground: oklch(0.985 0.01 85);
+  --color-accent: oklch(0.8 0.12 62);
+  --color-accent-foreground: oklch(0.3 0.06 45);
+
+  --color-success: oklch(0.52 0.12 150);
+  --color-warning: oklch(0.55 0.12 62);
+  --color-danger: oklch(0.53 0.17 28);
+  --color-danger-foreground: oklch(0.985 0.01 85);
+  --color-info: oklch(0.5 0.12 245);
+
+  --color-energy: oklch(0.66 0.16 48);
+  --color-protein: oklch(0.52 0.16 277);
+  --color-carbs: oklch(0.65 0.145 68);
+  --color-fat: oklch(0.63 0.17 8);
+  --color-fiber: oklch(0.6 0.14 148);
+  --color-micro: oklch(0.6 0.1 195);
+
+  /* Text-safe "ink" variants: the hue mixed toward the text color (works in both themes). */
+  --color-accent-ink: color-mix(in oklab, var(--color-accent) 50%, var(--color-text));
+  --color-energy-ink: color-mix(in oklab, var(--color-energy) 58%, var(--color-text));
+  --color-protein-ink: color-mix(in oklab, var(--color-protein) 80%, var(--color-text));
+  --color-carbs-ink: color-mix(in oklab, var(--color-carbs) 55%, var(--color-text));
+  --color-fat-ink: color-mix(in oklab, var(--color-fat) 62%, var(--color-text));
+  --color-fiber-ink: color-mix(in oklab, var(--color-fiber) 62%, var(--color-text));
+  --color-micro-ink: color-mix(in oklab, var(--color-micro) 62%, var(--color-text));
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-title: 1.75rem;
+  --text-title--line-height: 2.125rem;
+  --text-title--letter-spacing: -0.02em;
+  --text-display: 2.5rem;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+
+  --radius-field: 0.875rem;
+  --radius-card: 1.25rem;
+  --radius-card-lg: 1.5rem;
+  --radius-sheet: 1.75rem;
+  --radius-frame: 2.25rem;
+
+  --shadow-card: 0 1px 2px var(--shadow-tint), 0 8px 24px -12px var(--shadow-tint-strong);
+  --shadow-raised: 0 2px 6px var(--shadow-tint), 0 18px 40px -14px var(--shadow-tint-strong);
+  --shadow-frame: 0 40px 90px -40px var(--shadow-tint-strong), 0 12px 32px -18px var(--shadow-tint-strong);
+  --shadow-thumb: 0 1px 2px var(--shadow-tint), 0 2px 8px -2px var(--shadow-tint-strong);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-in: fade-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-out: fade-out 140ms ease-in forwards;
+  --animate-sheet-in: sheet-in 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-sheet-out: sheet-out 220ms ease-in forwards;
+  --animate-pop-in: pop-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-pop-out: pop-out 150ms ease-in forwards;
+  --animate-screen-in: screen-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+  }
+  @keyframes fade-out {
+    to { opacity: 0; }
+  }
+  @keyframes sheet-in {
+    from { transform: translateY(100%); }
+  }
+  @keyframes sheet-out {
+    to { transform: translateY(100%); }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.96); }
+  }
+  @keyframes pop-out {
+    to { opacity: 0; transform: scale(0.97); }
+  }
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(6px); }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --shadow-tint: oklch(0.35 0.03 70 / 0.06);
+    --shadow-tint-strong: oklch(0.35 0.04 70 / 0.16);
+
+    /* Shell geometry (AppShell, BottomNav, Toaster). */
+    --nav-height: 4.5rem;
+    --frame-max-height: 56rem;
+    --toast-offset: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 0.75rem);
+  }
+
+  /* ≥ sm the app sits in a centered frame; keep toasts just above the frame's bottom bar. */
+  @media (width >= 40rem) {
+    :root {
+      --toast-offset: calc(max(1.5rem, (100dvh - var(--frame-max-height)) / 2) + var(--nav-height) + 0.75rem);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --shadow-tint: oklch(0 0 0 / 0.3);
+    --shadow-tint-strong: oklch(0 0 0 / 0.5);
+
+    --color-backdrop: oklch(0.155 0.01 160);
+    --color-bg: oklch(0.2 0.013 160);
+    --color-surface: oklch(0.235 0.015 160);
+    --color-surface-2: oklch(0.275 0.017 160);
+    --color-border: oklch(0.33 0.017 160);
+    --color-text: oklch(0.95 0.012 85);
+    --color-text-muted: oklch(0.76 0.015 100);
+    --color-ring: oklch(0.8 0.11 162);
+
+    --color-primary: oklch(0.79 0.1 162);
+    --color-primary-foreground: oklch(0.2 0.03 162);
+    --color-accent: oklch(0.8 0.12 62);
+    --color-accent-foreground: oklch(0.25 0.05 45);
+
+    --color-success: oklch(0.77 0.13 150);
+    --color-warning: oklch(0.8 0.12 75);
+    --color-danger: oklch(0.72 0.15 25);
+    --color-danger-foreground: oklch(0.2 0.03 25);
+    --color-info: oklch(0.75 0.11 245);
+
+    --color-energy: oklch(0.78 0.13 55);
+    --color-protein: oklch(0.72 0.13 277);
+    --color-carbs: oklch(0.82 0.13 78);
+    --color-fat: oklch(0.74 0.14 8);
+    --color-fiber: oklch(0.76 0.14 148);
+    --color-micro: oklch(0.77 0.1 195);
+  }
+}

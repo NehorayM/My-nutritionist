@@ -1,6 +1,6 @@
 import type { MealEntry, MealType, NutrientKey, NutrientTotal, NutrientTotals, Profile } from '@/types'
 
-/** goal = aim to reach (protein, fiber, micronutrients); limit = stay under (sodium, sat. fat, sugars); energy = calories. */
+/** goal = aim to reach (protein, fiber, micronutrients); limit = stay under (sodium, sat. fat); energy = calories. Sugars have no target. */
 export type TargetKind = 'energy' | 'goal' | 'limit'
 
 export interface NutrientTarget {

@@ -41,11 +41,13 @@ function resolveAge(birthDate: string | null, date: string): number | null {
 /**
  * Validate and normalize the profile for target calculation. Implausible values (outside database
  * bounds, or a birth date after `date`) are treated as missing rather than trusted.
+ * Weight: the latest weigh-in, falling back to the profile weight when there is none (or it is implausible).
  */
 export function resolveTargetContext({ profile, date, latestWeightKg }: DailyTargetsInput): TargetContext {
   const ageYears = resolveAge(profile?.birthDate ?? null, date)
   const minor = ageYears !== null && ageYears < ADULT_AGE
-  const weightKg = inRange(latestWeightKg ?? profile?.currentWeightKg, PLAUSIBLE_INPUTS.weightKg)
+  const weightKg =
+    inRange(latestWeightKg, PLAUSIBLE_INPUTS.weightKg) ?? inRange(profile?.currentWeightKg, PLAUSIBLE_INPUTS.weightKg)
   const heightCm = inRange(profile?.heightCm, PLAUSIBLE_INPUTS.heightCm)
   const requestedDiet = profile?.dietType ?? 'balanced'
 
