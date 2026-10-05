@@ -1,7 +1,8 @@
 # Implementation plan
 
 Each phase lists dependencies and acceptance criteria. A phase is done only when its tests pass, the build passes,
-and behavior was exercised (unit/integration/browser as relevant).
+and behavior was exercised (unit/integration/browser as relevant). **Status: all phases A–O complete** (see
+docs/TESTING.md for what was verified and how).
 
 | # | Phase | Depends on | Acceptance criteria |
 |---|---|---|---|

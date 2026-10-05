@@ -57,6 +57,8 @@ Code: `src/services/food/` and `supabase/functions/_shared/usda/` (USDA mapping 
   is available and the trimmed query has ≥ 2 characters. Local results come first; remote results that duplicate
   a food already shown (same barcode ignoring leading zeros, same provider record — including the USDA record a
   catalog food was built from — or same normalized name + brand such as "Cheese, cheddar" ≡ "Cheddar cheese") are dropped. Remote duplicates of earlier local pages are dropped too.
+- `onPartial` (option of `search`): called once with the local results while USDA is still answering (USDA status
+  `pending`), so catalog and personal foods appear instantly in signed-in mode; "Load more" waits for the full result.
 - `searchPackaged(text, { page, signal })`: Open Food Facts only, 15 per page, explicit user action.
 - `lookupBarcode(code)`: user's saved products and the catalog first, then OFF. Results: `found` (with provider),
   `not_found`, `incomplete` (product exists but lacks a name or nutrition facts), `invalid_code`, `error`.

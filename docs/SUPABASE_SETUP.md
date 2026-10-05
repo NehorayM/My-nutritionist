@@ -32,7 +32,8 @@ publishable (or legacy anon) key may ever be put there.
 
 ## 2. Behaviour without credentials
 
-- `VITE_SUPABASE_URL` or the key missing → **Offline/Local mode**: no crash, no network calls to Supabase, all data
+- `VITE_SUPABASE_URL` or the key missing → **Offline/Local mode**: no crash, no network calls to Supabase (supabase-js and
+  the sync code are not even downloaded — they are lazy chunks), all data
   stays on the device, Profile shows "Running in Offline/Local Mode". USDA search is unavailable (it needs an account);
   the bundled catalog and Open Food Facts still work.
 - A malformed URL or a secret/service-role key → the app logs why, ignores the configuration and stays in Offline/Local mode.
