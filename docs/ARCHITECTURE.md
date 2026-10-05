@@ -130,7 +130,7 @@ paginates, rate-limits OFF client-side, and returns partial results with per-pro
 ## Decisions
 | Decision | Reason |
 |---|---|
-| No manual chunking; React.lazy routes split recharts | Vite 8 (Rolldown) manual groups pulled React into the charts chunk and loaded it eagerly |
+| Lazy loading: Progress/Activity/Profile routes, supabase-js + cloud services only when configured; no manual chunking | Vite 8 (Rolldown) manual groups pulled React into the charts chunk and loaded it eagerly |
 | Hash-based tab navigation, no router library | 4 tabs + auth callback; keeps bundle small; deep links & refresh work |
 | IndexedDB (idb) over localStorage | multi-year logs exceed localStorage quotas; async, indexed queries |
 | Client-generated UUIDs | idempotent retries, offline creation, no temp-id remapping |

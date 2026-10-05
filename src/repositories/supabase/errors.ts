@@ -1,4 +1,4 @@
-import { isAuthError, isAuthRetryableFetchError } from '@supabase/supabase-js'
+import { isAuthError, isAuthRetryableFetchError } from '@/lib/authErrorGuards'
 import { RepositoryError } from '@/repositories/types'
 
 /**

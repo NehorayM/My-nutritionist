@@ -5,7 +5,7 @@ import {
   isAuthRetryableFetchError,
   isAuthSessionMissingError,
   isAuthWeakPasswordError,
-} from '@supabase/supabase-js'
+} from '@/lib/authErrorGuards'
 import type { AuthErrorCode, AuthFailure } from './authTypes'
 
 /** Neutral, supportive messages shown to the user for each failure kind. */

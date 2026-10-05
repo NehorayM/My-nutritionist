@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger'
-import { browserTimers, type Timers } from '@/services/sync/timers'
 import { AUTH_MESSAGES, describeAuthFailure, toAuthFailure } from './authErrors'
+export { deferAuthWork } from './defer'
 import {
   AUTH_EVENTS,
   type AuthClientLike,
@@ -47,17 +47,6 @@ function hasUnusedAuthCode(currentUrl: string): boolean {
   }
 }
 
-/**
- * Runs auth follow-up work (loading data, swapping repositories, other Supabase calls) after the
- * auth callback has returned. Never await Supabase calls inside an `onAuthStateChange` listener.
- */
-export function deferAuthWork(task: () => Promise<void> | void, timers: Timers = browserTimers): void {
-  timers.setTimeout(() => {
-    Promise.resolve()
-      .then(task)
-      .catch((error: unknown) => logger.error('auth', 'Deferred auth work failed', error))
-  }, 0)
-}
 
 /**
  * Supabase Auth wrapper with app-shaped sessions and friendly, neutral errors. The client must be the

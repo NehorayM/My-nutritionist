@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger'
-import { deferAuthWork, type AuthEvent, type AuthResult, type AuthSession } from '@/services/auth'
+import type { AuthEvent, AuthResult, AuthSession } from '@/services/auth'
+import { deferAuthWork } from '@/services/auth/defer'
 import { setRepositories } from '@/services/runtime'
 import { resetUserStores } from '@/stores/registry'
 import { useSessionStore } from '@/stores/sessionStore'

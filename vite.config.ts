@@ -11,6 +11,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  // No manual chunking: heavy screens (recharts on Progress) are split by React.lazy routes.
-  // Manual groups pulled React into the charts chunk and made it load eagerly (verified with Vite 8 / Rolldown).
+  // No manual chunking: heavy screens (recharts on Progress) are split by React.lazy routes, and supabase-js plus
+  // the cloud-only services load only when Supabase is configured. Manual groups pulled React into the charts
+  // chunk and made it load eagerly (verified with Vite 8 / Rolldown).
+  build: {
+    // The entry chunk (≈700 kB, ≈215 kB gzip) is React DOM, Zod and the Meals home tab — all needed for the
+    // first screen. Warn only if it grows beyond that.
+    chunkSizeWarningLimit: 750,
+  },
 })
