@@ -1,6 +1,7 @@
 import { HardDrive, Leaf } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AppShell } from '@/app/AppShell'
+import { hashFor, parseHash } from '@/app/routes'
 import { Button, Card, CardContent } from '@/components/ui'
 import { AuthForm } from '@/features/profile/components/AuthForm'
 import { session } from '@/services/session'
@@ -10,6 +11,13 @@ import { useSyncStore } from '@/stores/syncStore'
 export function WelcomeScreen() {
   const notice = useSyncStore((s) => s.authNotice)
   const [starting, setStarting] = useState(false)
+
+  // A new session starts on the home tab, not on the tab the previous session ended on.
+  useEffect(() => {
+    if (parseHash(window.location.hash).kind === 'route') {
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}${hashFor('meals')}`)
+    }
+  }, [])
 
   return (
     <AppShell>

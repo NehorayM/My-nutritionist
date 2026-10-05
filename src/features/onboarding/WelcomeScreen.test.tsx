@@ -49,6 +49,18 @@ describe('WelcomeScreen', () => {
     expect(screen.queryByText('That link has expired. Request a new one.')).not.toBeInTheDocument()
   })
 
+  it('starts the next session on the Meals tab', () => {
+    window.history.replaceState(null, '', '/#/profile')
+    render(<WelcomeScreen />)
+    expect(window.location.hash).toBe('#/meals')
+  })
+
+  it('leaves non-route fragments (auth callbacks) untouched', () => {
+    window.history.replaceState(null, '', '/#error=access_denied')
+    render(<WelcomeScreen />)
+    expect(window.location.hash).toBe('#error=access_denied')
+  })
+
   it('continues as a guest with local storage', async () => {
     const user = userEvent.setup()
     render(<WelcomeScreen />)
