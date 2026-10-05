@@ -80,7 +80,8 @@ export async function storedEntries(date = TODAY): Promise<MealEntry[]> {
 
 /** Renders the Meals screen (with a test food service) and waits until the day has loaded. */
 export async function renderMeals(service: FoodSearchService = testFoodService()) {
-  const user = userEvent.setup()
+  // No artificial pause between keystrokes: typing-heavy form flows stay fast under parallel/coverage load.
+  const user = userEvent.setup({ delay: null })
   render(
     <FoodServiceContext value={service}>
       <MealsScreen />
