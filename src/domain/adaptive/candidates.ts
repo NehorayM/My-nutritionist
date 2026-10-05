@@ -1,6 +1,6 @@
 import type { Allergen, FoodItem, MealType } from '@/types'
 import { isKnownAmount } from '../nutrition'
-import { BEGINNER_MAX_PREP_MINUTES } from './constants'
+import { BEGINNER_MAX_PREP_MINUTES, OCCASIONAL_RULES } from './constants'
 import { dietRule } from './diets'
 import { containsPhrase, resolvePreferences, type AdaptivePreferences } from './preferences'
 import { EXCLUSION_REASONS, type CandidateResult, type ExclusionReason } from './types'
@@ -10,6 +10,8 @@ export interface CandidateOptions {
   profile: AdaptivePreferences | null
   /** Meal slot the foods must suit; null = any slot. */
   mealType: MealType | null
+  /** Favorited foods stay eligible even when they are occasional foods. */
+  favoriteFoodIds?: readonly string[]
 }
 
 const CORE_NUTRIENTS = ['protein', 'carbs', 'fat'] as const
@@ -43,12 +45,26 @@ interface Rules {
   prefs: AdaptivePreferences
   avoided: Set<Allergen>
   mealType: MealType | null
+  favorites: ReadonlySet<string>
 }
 
-function exclusionReason(food: FoodItem, { prefs, avoided, mealType }: Rules): ExclusionReason | null {
+/** Fast food, sweets, sugary drinks and fatty low-fiber snacks (see OCCASIONAL_RULES). */
+export function isOccasionalFood(food: Pick<FoodItem, 'category' | 'per100g'>): boolean {
+  const { category, per100g } = food
+  if (category === null) return false
+  if ((OCCASIONAL_RULES.categories as readonly string[]).includes(category)) return true
+  if (category === 'beverage') return (per100g.sugars ?? 0) >= OCCASIONAL_RULES.beverageSugarsG
+  if (category === 'snack') {
+    return (per100g.fat ?? 0) >= OCCASIONAL_RULES.snackFatG && (per100g.fiber ?? 0) < OCCASIONAL_RULES.snackFiberG
+  }
+  return false
+}
+
+function exclusionReason(food: FoodItem, { prefs, avoided, mealType, favorites }: Rules): ExclusionReason | null {
   const { calories } = food.per100g
   if (!isKnownAmount(calories) || !CORE_NUTRIENTS.every((key) => isKnownAmount(food.per100g[key]))) return 'incomplete_nutrition'
   if (calories <= 0) return 'no_energy'
+  if (isOccasionalFood(food) && !favorites.has(food.id)) return 'occasional'
   if (avoided.size > 0) {
     if (food.allergens === null) return 'allergen_unknown'
     if (food.allergens.some((allergen) => avoided.has(allergen))) return 'allergen'
@@ -73,6 +89,7 @@ export function emptyExclusions(): Record<ExclusionReason, number> {
  * Recommendation Candidate Engine: the foods that may appear in suggestions, in input order.
  * Rules, in order (an excluded food counts once, under the first rule it fails):
  * 1. calories, protein, carbohydrate and fat must be known; energy must be above 0;
+ *    occasional foods (fast food, sweets, sugary drinks, chips) are only suggested when favorited;
  * 2. allergies: with any allergy set, unknown allergen information excludes the food; any overlap excludes it
  *    (a gluten allergy also excludes wheat);
  * 3. diet: vegetarian/vegan need the flag to be explicitly true;
@@ -83,7 +100,12 @@ export function emptyExclusions(): Record<ExclusionReason, number> {
  */
 export function filterCandidates(foods: readonly FoodItem[], options: CandidateOptions): CandidateResult {
   const prefs = resolvePreferences(options.profile)
-  const rules: Rules = { prefs, avoided: avoidedAllergens(prefs.allergies), mealType: options.mealType }
+  const rules: Rules = {
+    prefs,
+    avoided: avoidedAllergens(prefs.allergies),
+    mealType: options.mealType,
+    favorites: new Set(options.favoriteFoodIds ?? []),
+  }
   const excluded = emptyExclusions()
   const candidates: FoodItem[] = []
   const seen = new Set<string>()

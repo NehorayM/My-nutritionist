@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { SYSTEM_FOODS } from '@/data/systemFoods'
 import type { Profile } from '@/types'
 import { food, profile, systemFood } from './__fixtures__/adaptive'
-import { effectivePrepMinutes, emptyExclusions, filterCandidates } from './candidates'
+import { effectivePrepMinutes, emptyExclusions, filterCandidates, isOccasionalFood } from './candidates'
 import { EXCLUSION_REASONS } from './types'
 
 function filter(foods: Parameters<typeof filterCandidates>[0], overrides: Partial<Profile> = {}, mealType: Parameters<typeof filterCandidates>[1]['mealType'] = 'lunch') {
@@ -70,9 +70,39 @@ describe('filterCandidates', () => {
     const fastFood = food({ name: 'Burger', category: 'fast_food' })
     const eggplant = food({ name: 'Eggplant salad' })
     const homemade = food({ name: 'Olive tapenade', category: null })
-    const result = filter([olives, fish, fastFood, eggplant, homemade], { dislikes: ['Olive', 'FISH', 'fast food', 'egg'] })
+    // The burger is a favorite, so the occasional-food rule doesn't apply and the dislike decides.
+    const result = filterCandidates([olives, fish, fastFood, eggplant, homemade], {
+      profile: profile({ dislikes: ['Olive', 'FISH', 'fast food', 'egg'] }),
+      mealType: 'lunch',
+      favoriteFoodIds: [fastFood.id],
+    })
     expect(result.candidates).toEqual([eggplant])
     expect(result.excluded.dislike).toBe(4)
+  })
+
+  it('suggests occasional foods (fast food, sweets, sugary drinks, chips) only when favorited', () => {
+    const burger = food({ name: 'Burger', category: 'fast_food' })
+    const chocolate = food({ name: 'Chocolate', category: 'sweet' })
+    const cola = food({ name: 'Cola', category: 'beverage', per100g: { calories: 42, protein: 0, carbs: 10.6, fat: 0.3, sugars: 9.9 } })
+    const water = food({ name: 'Sparkling water', category: 'beverage', per100g: { calories: 1, protein: 0, carbs: 0, fat: 0, sugars: 0 } })
+    const chips = food({ name: 'Potato chips', category: 'snack', per100g: { calories: 532, protein: 6.4, carbs: 53, fat: 34, fiber: 3.1 } })
+    const popcorn = food({ name: 'Popcorn', category: 'snack', per100g: { calories: 387, protein: 12.9, carbs: 78, fat: 4.5, fiber: 14.5 } })
+    const lentils = food({ name: 'Lentils', category: 'legume' })
+    const all = [burger, chocolate, cola, water, chips, popcorn, lentils]
+    expect(all.filter((item) => isOccasionalFood(item)).map((item) => item.name)).toEqual(['Burger', 'Chocolate', 'Cola', 'Potato chips'])
+    expect(isOccasionalFood({ category: null, per100g: lentils.per100g })).toBe(false)
+    // Unknown sugar/fat/fiber never makes a food "occasional" on its own.
+    const unknownDrink = food({ category: 'beverage', per100g: { calories: 40, protein: 0, carbs: 10, fat: 0, sugars: null } })
+    const unknownSnack = food({ category: 'snack', per100g: { calories: 450, protein: 8, carbs: 60, fat: null, fiber: null } })
+    expect(isOccasionalFood(unknownDrink)).toBe(false)
+    expect(isOccasionalFood(unknownSnack)).toBe(false)
+    expect(isOccasionalFood({ ...chips, per100g: { ...chips.per100g, fiber: null } })).toBe(true)
+
+    const result = filterCandidates(all, { profile: profile(), mealType: null })
+    expect(result.candidates).toEqual([water, popcorn, lentils])
+    expect(result.excluded.occasional).toBe(4)
+    const withFavorite = filterCandidates(all, { profile: profile(), mealType: null, favoriteFoodIds: [chocolate.id] })
+    expect(withFavorite.candidates).toContain(chocolate)
   })
 
   it('keeps foods for the meal slot, foods listing no slot, and everything when no slot is given', () => {

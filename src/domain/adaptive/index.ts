@@ -11,7 +11,7 @@ export {
 } from './constants'
 export { DIET_RULES, dietRule, netCarbsPer100g, proteinEnergyShare, type DietRule } from './diets'
 export { containsPhrase, resolvePreferences, type AdaptivePreferences } from './preferences'
-export { effectivePrepMinutes, filterCandidates, type CandidateOptions } from './candidates'
+export { effectivePrepMinutes, filterCandidates, isOccasionalFood, type CandidateOptions } from './candidates'
 export {
   allocateMeal,
   allocateMealBudget,

@@ -124,3 +124,17 @@ export const FOLLOW_UP_SIDES = 5
 export const STYLE_RELEVANCE_BONUS = 0.02
 /** Beginner cooks see foods with at most this much preparation. */
 export const BEGINNER_MAX_PREP_MINUTES = 20
+
+/**
+ * "Occasional" foods are logged like any other but not *suggested* for balancing the day (unless the user
+ * favorited them): fast food, sweets, sugary drinks, and fatty low-fiber snacks such as chips.
+ */
+export const OCCASIONAL_RULES = {
+  categories: ['fast_food', 'sweet'],
+  /** Drinks with at least this much sugar per 100 g (soft drinks, juices). */
+  beverageSugarsG: 5,
+  /** Snacks at or above this fat per 100 g and below the fiber threshold (chips, crisps). */
+  snackFatG: 25,
+  snackFiberG: 5,
+} as const
+

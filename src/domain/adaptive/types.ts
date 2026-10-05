@@ -89,6 +89,7 @@ export interface AdaptivePlan {
 export const EXCLUSION_REASONS = [
   'incomplete_nutrition',
   'no_energy',
+  'occasional',
   'allergen_unknown',
   'allergen',
   'diet',

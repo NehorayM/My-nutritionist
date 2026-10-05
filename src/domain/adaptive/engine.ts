@@ -81,7 +81,11 @@ export function buildAdaptivePlan(input: AdaptiveInput): AdaptivePlan {
     favorites: new Set(input.favoriteFoodIds),
     variety: varietySignals(input.entries, input.date, input.foods, input.recentFoodIds),
   }
-  const { candidates } = filterCandidates(input.foods, { profile: input.profile, mealType: targetMeal })
+  const { candidates } = filterCandidates(input.foods, {
+    profile: input.profile,
+    mealType: targetMeal,
+    favoriteFoodIds: input.favoriteFoodIds,
+  })
   const built = buildMealOptions({ candidates, ctx, dismissedIds: new Set(input.dismissedIds), variant: input.variant ?? 0 })
   const empty = built.options.length === 0
   const message: PlanMessageInput = { ...base, status: 'ok', targetMeal, energyState, gaps: remaining.gaps, allDismissed: empty && built.dismissedAny }
