@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { fillPersonalProfile, goToTab, logRun, logWeighIn, trackErrors } from './support/flows'
-import { addFoodInGrams, mealCard } from './support/meals'
+import { fillPersonalProfile, goToTab, logRun, logWeighIn, trackErrors } from './support/flows.ts'
+import { addFoodInGrams, mealCard } from './support/meals.ts'
 
 test.describe('guest mode (no Supabase configuration)', () => {
   test('logs a real day, adapts suggestions, and keeps everything after a refresh', async ({ page }) => {

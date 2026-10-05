@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
-import { fillPersonalProfile, goToTab, logRun, logWeighIn, trackErrors } from './support/flows'
-import { addFoodInGrams, mealCard } from './support/meals'
+import { fillPersonalProfile, goToTab, logRun, logWeighIn, trackErrors } from './support/flows.ts'
+import { addFoodInGrams, mealCard } from './support/meals.ts'
 
 const password = 'e2e-Strong-passw0rd'
 
