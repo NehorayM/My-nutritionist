@@ -11,8 +11,11 @@ import type {
 import type { UsdaProvider } from './providers/usdaProvider'
 import type { UsdaSearchScope } from './normalize/shared'
 
-/** Per-provider outcome of one call: 'skipped' = not queried (unavailable, query too short, not this action). */
-export type ProviderStatus = 'ok' | 'skipped' | FoodProviderErrorKind
+/**
+ * Per-provider outcome of one call: 'skipped' = not queried (unavailable, query too short, not this action);
+ * 'pending' = still answering (only in partial results, see `FoodSearchOptions.onPartial`).
+ */
+export type ProviderStatus = 'ok' | 'skipped' | 'pending' | FoodProviderErrorKind
 export type ProviderStatusMap = Record<FoodProviderId, ProviderStatus>
 
 export interface FoodSearchOptions {
@@ -21,6 +24,12 @@ export interface FoodSearchOptions {
   signal?: AbortSignal
   /** USDA data types to search: generic foods (default) or branded packaged products. */
   usdaScope?: UsdaSearchScope
+  /**
+   * Called once with the local results (remote providers 'pending') as soon as they are ready, before slower
+   * remote providers answer — so local foods appear instantly. Not called when no remote provider is queried
+   * or the search was aborted; the promise still resolves with the complete result.
+   */
+  onPartial?: (partial: FoodSearchResult) => void
 }
 
 export interface FoodSearchResult {

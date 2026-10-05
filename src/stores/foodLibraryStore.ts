@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
-import { systemFoodById } from '@/data/systemFoods'
 import { favoriteId, newId } from '@/lib/id'
 import { favoriteSchema, foodItemSchema, savedMealSchema } from '@/schemas'
 import { getRepositories } from '@/services/runtime'
@@ -8,7 +7,8 @@ import { isUnsavedProviderFood, toSavedProviderFood } from '@/services/food'
 import type { Favorite, FoodItem, FoodPortion, MealType, SavedMeal } from '@/types'
 import { userMessageFor } from './errors'
 import type { LoadStatus, SaveResult } from './profileStore'
-import { toPortion } from './mealsStore'
+import { toPortion } from '@/domain/foodLog'
+import { favoriteFor, newestFirst, resolveFavoriteFoods, savedCopyOf } from './foodLibraryHelpers'
 import { registerUserStoreReset } from './registry'
 
 /** What the user enters for a custom food (everything else is filled in by the store). */
@@ -20,30 +20,6 @@ export interface RemovedCustomFood {
 }
 
 const fail = (message: string) => ({ ok: false, message }) as const
-const newestFirst = <T extends { createdAt: string }>(a: T, b: T) => b.createdAt.localeCompare(a.createdAt)
-const sameProviderRecord = (a: FoodItem, b: FoodItem) => a.source === b.source && a.externalId !== null && a.externalId === b.externalId
-
-/** The user's saved copy of a provider result, if they saved it before. */
-export function savedCopyOf(food: FoodItem, userFoods: readonly FoodItem[]): FoodItem | null {
-  if (!isUnsavedProviderFood(food)) return userFoods.find((own) => own.id === food.id) ?? null
-  return userFoods.find((own) => own.createdBy !== null && sameProviderRecord(own, food)) ?? null
-}
-
-/** The favorite record for a food (also for an unsaved provider result whose saved copy is a favorite). */
-export function favoriteFor(food: FoodItem, favorites: readonly Favorite[], userFoods: readonly FoodItem[]): Favorite | null {
-  const id = isUnsavedProviderFood(food) ? savedCopyOf(food, userFoods)?.id : food.id
-  return id === undefined ? null : (favorites.find((favorite) => favorite.foodId === id) ?? null)
-}
-
-/** Favorites resolved to foods (system catalog or the user's own foods), newest first; dangling ones are skipped. */
-export function resolveFavoriteFoods(favorites: readonly Favorite[], userFoods: readonly FoodItem[]): FoodItem[] {
-  const own = new Map(userFoods.map((food) => [food.id, food]))
-  return [...favorites]
-    .sort(newestFirst)
-    .map((favorite) => own.get(favorite.foodId) ?? systemFoodById(favorite.foodId))
-    .filter((food): food is FoodItem => food !== undefined)
-}
-
 interface FoodLibraryState {
   /** Custom foods and saved provider foods. */
   userFoods: FoodItem[]

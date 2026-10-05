@@ -70,6 +70,8 @@ export function providerStatusMessage(
     case 'skipped':
     case 'aborted':
       return null
+    case 'pending':
+      return `Searching ${name}…`
     case 'network':
       return `${name} couldn’t be reached. Check your connection; foods on this device still work.`
     case 'timeout':

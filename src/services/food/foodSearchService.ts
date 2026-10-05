@@ -75,20 +75,34 @@ export function createFoodSearchService(options: FoodSearchServiceOptions): Food
             timeoutMs,
           )
         : null
-    const [localOutcome, usdaOutcome] = await Promise.all([localTask, usdaTask])
-    throwIfAborted(signal)
-
-    const seenLocal = localOutcome.ok ? localOutcome.value.items : []
-    const localItems = seenLocal.slice((page - 1) * LOCAL_PAGE_SIZE)
-    const remoteItems = usdaOutcome?.ok ? uniqueAgainst(seenLocal, usdaOutcome.value.items, options.linkedRecordKey) : []
-    return {
-      query,
-      page,
-      items: [...localItems, ...remoteItems],
-      hasMore: (localOutcome.ok && localOutcome.value.hasMore) || (usdaOutcome?.ok === true && usdaOutcome.value.hasMore),
-      providerStatus: { local: statusOf(localOutcome), usda: statusOf(usdaOutcome), off: 'skipped' },
-      errors: errorsOf({ local: localOutcome, usda: usdaOutcome }),
+    const build = (
+      localOutcome: Outcome<FoodSearchPage>,
+      usdaOutcome: Outcome<FoodSearchPage> | null,
+      usdaPending: boolean,
+    ): FoodSearchResult => {
+      const seenLocal = localOutcome.ok ? localOutcome.value.items : []
+      const localItems = seenLocal.slice((page - 1) * LOCAL_PAGE_SIZE)
+      const remoteItems = usdaOutcome?.ok ? uniqueAgainst(seenLocal, usdaOutcome.value.items, options.linkedRecordKey) : []
+      return {
+        query,
+        page,
+        items: [...localItems, ...remoteItems],
+        hasMore: (localOutcome.ok && localOutcome.value.hasMore) || (usdaOutcome?.ok === true && usdaOutcome.value.hasMore),
+        providerStatus: { local: statusOf(localOutcome), usda: usdaPending ? 'pending' : statusOf(usdaOutcome), off: 'skipped' },
+        errors: errorsOf({ local: localOutcome, usda: usdaOutcome }),
+      }
     }
+    let complete = false
+    const { onPartial } = searchOptions
+    if (usdaTask !== null && onPartial) {
+      void localTask.then((localOutcome) => {
+        if (!complete && !signal?.aborted) onPartial(build(localOutcome, null, true))
+      })
+    }
+    const [localOutcome, usdaOutcome] = await Promise.all([localTask, usdaTask])
+    complete = true
+    throwIfAborted(signal)
+    return build(localOutcome, usdaOutcome, false)
   }
 
   async function searchPackaged(

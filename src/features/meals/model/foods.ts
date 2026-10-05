@@ -2,7 +2,7 @@ import { isSystemFoodId, systemFoodById } from '@/data/systemFoods'
 import { scaleNutrients } from '@/domain/nutrition'
 import { formatKcal } from '@/lib/format'
 import { isUnsavedProviderFood } from '@/services/food'
-import { foodKey } from '@/stores/mealsStore'
+import { foodKey } from '@/domain/foodLog'
 import type { FoodItem, FoodPortion, NutrientProfile } from '@/types'
 
 /** "73 kcal / 100 g" ("— kcal / 100 g" when unknown). */

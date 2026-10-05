@@ -18,9 +18,11 @@ export interface SearchState {
   /** Latest page's outcome (provider statuses and errors). */
   result: FoodSearchResult | null
   loadingMore: boolean
+  /** Local results are shown while a remote provider is still answering. */
+  partial: boolean
 }
 
-const IDLE: SearchState = { query: '', status: 'idle', items: [], result: null, loadingMore: false }
+const IDLE: SearchState = { query: '', status: 'idle', items: [], result: null, loadingMore: false, partial: false }
 
 function appendUnique(items: readonly FoodItem[], more: readonly FoodItem[]): FoodItem[] {
   const ids = new Set(items.map((item) => item.id))
@@ -31,7 +33,12 @@ function isAbort(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError'
 }
 
-type Runner = (query: string, page: number, signal: AbortSignal) => Promise<FoodSearchResult>
+type Runner = (
+  query: string,
+  page: number,
+  signal: AbortSignal,
+  onPartial?: (partial: FoodSearchResult) => void,
+) => Promise<FoodSearchResult>
 
 /** Paged search state for one query: first page on `start`, more on `loadMore`; stale answers are dropped. */
 function usePagedSearch(run: Runner) {
@@ -47,15 +54,19 @@ function usePagedSearch(run: Runner) {
       }
       const abort = new AbortController()
       controller.current = abort
-      setState((current) => ({ ...current, query, status: 'loading', loadingMore: false }))
-      run(query, 1, abort.signal).then(
+      setState((current) => ({ ...current, query, status: 'loading', loadingMore: false, partial: false }))
+      // Local foods show up immediately; slower remote providers fill in when they answer.
+      const showPartial = (partial: FoodSearchResult) => {
+        if (!abort.signal.aborted) setState({ query, status: 'ready', items: partial.items, result: partial, loadingMore: false, partial: true })
+      }
+      run(query, 1, abort.signal, showPartial).then(
         (result) => {
-          if (!abort.signal.aborted) setState({ query, status: 'ready', items: result.items, result, loadingMore: false })
+          if (!abort.signal.aborted) setState({ query, status: 'ready', items: result.items, result, loadingMore: false, partial: false })
         },
         (error: unknown) => {
           if (abort.signal.aborted || isAbort(error)) return
           logger.warn('meals.search', 'Food search failed', error)
-          setState({ query, status: 'error', items: [], result: null, loadingMore: false })
+          setState({ query, status: 'error', items: [], result: null, loadingMore: false, partial: false })
         },
       )
     },
@@ -63,8 +74,8 @@ function usePagedSearch(run: Runner) {
   )
 
   const loadMore = useCallback(() => {
-    const { query, result, status, loadingMore } = state
-    if (status !== 'ready' || !result?.hasMore || loadingMore) return
+    const { query, result, status, loadingMore, partial } = state
+    if (status !== 'ready' || partial || !result?.hasMore || loadingMore) return
     const abort = new AbortController()
     controller.current = abort
     setState((current) => ({ ...current, loadingMore: true }))
@@ -94,7 +105,7 @@ function usePagedSearch(run: Runner) {
 export function useFoodSearch(text: string) {
   const service = useFoodSearchService()
   const query = useDebouncedValue(text.trim(), SEARCH_DEBOUNCE_MS)
-  const run = useCallback<Runner>((q, page, signal) => service.search(q, { page, signal }), [service])
+  const run = useCallback<Runner>((q, page, signal, onPartial) => service.search(q, { page, signal, onPartial }), [service])
   const { state, start, loadMore } = usePagedSearch(run)
 
   useEffect(() => {

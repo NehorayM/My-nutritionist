@@ -84,7 +84,7 @@ export function SearchTab({ query, onQueryChange, onSelect, onCreateCustom }: Se
               }
             />
           ) : null}
-          {search.result?.hasMore && !busy ? (
+          {search.result?.hasMore && !busy && !search.partial ? (
             <Button variant="secondary" size="sm" fullWidth loading={search.loadingMore} onClick={search.loadMore}>
               Load more
             </Button>

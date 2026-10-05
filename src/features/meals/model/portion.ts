@@ -2,7 +2,7 @@ import { gramsForQuantity } from '@/domain/nutrition'
 import { formatGrams, formatNumber } from '@/lib/format'
 import { isUuid } from '@/lib/id'
 import { isUnsavedProviderFood } from '@/services/food'
-import { portionAmountError } from '@/stores/mealsStore'
+import { portionAmountError } from '@/domain/foodLog'
 import type { FoodItem, FoodPortion, ServingOption } from '@/types'
 
 /** Unit value for grams in unit selectors; servings use `s:<label>`. */
