@@ -6,7 +6,7 @@ suggestions for the rest of the day, track weight and weekly activity. Wellness 
 
 ## Stack
 Vite 8 · React 19 · TypeScript 6 (strict, `noUncheckedIndexedAccess`, `erasableSyntaxOnly`) ·
-Tailwind CSS 4 (`@tailwindcss/vite`, tokens in `src/index.css`) · Zustand 5 · Zod 4 · Recharts 3 ·
+Tailwind CSS 4 (`@tailwindcss/vite`, tokens in `src/app/styles/tokens.css`) · Zustand 5 · Zod 4 · Recharts 3 ·
 lucide-react · Radix Dialog · sonner · idb (IndexedDB) · supabase-js 2 · Vitest 5 + RTL · Playwright.
 Node 24 LTS lives in `~/.local/bin` (no system Node).
 
@@ -25,6 +25,10 @@ Node 24 LTS lives in `~/.local/bin` (no system Node).
 - No `any`, no TODOs, no placeholder handlers, no "coming soon" UI. Files ≲200 lines; split when larger.
 - No enums/namespaces/parameter properties (`erasableSyntaxOnly`). Use `as const` arrays + union types.
 - Imports use the `@/` alias for `src/`.
+- supabase-js and cloud-only code (`services/session/cloudDeps.ts` → auth, sync, migration) load lazily, only when
+  Supabase is configured. Don't import them statically from guest-mode code (check with `npm run build` chunk sizes).
+- Recommendations never suggest "occasional" foods (fast food, sweets, sugary drinks, chips) unless favorited;
+  logging is unaffected (`domain/adaptive/candidates.ts`).
 
 ## Commands
 ```bash
@@ -37,7 +41,19 @@ npm run test:db        # RLS/DB tests against local Supabase (needs `npm run db:
 npm run test:e2e       # Playwright (system Chrome) against dev server
 npm run build          # typecheck + production build
 npm run db:start       # supabase start (Docker)   · npm run db:reset — reapply migrations + seed
+npm run seed:sql       # regenerate supabase/migrations/003_seed_foods.sql from src/data/system-foods.json
 ```
+Local cloud mode: `.env.local` (gitignored; Vitest ignores it via `test.env`) with the local stack's `API_URL` + `PUBLISHABLE_KEY` from
+`npx supabase status -o env`. Delete it to run in guest mode.
+
+## Deployment (GitHub Pages)
+- Repo: https://github.com/NehorayM/My-nutritionist · site: https://nehoraym.github.io/My-nutritionist/
+- `.github/workflows/deploy-pages.yml` runs typecheck, lint and tests, then `npm run build -- --base=/<repo>/`
+  and publishes `dist/` on every push to `main` (or manually via "Run workflow"). Pages source must be "GitHub Actions".
+- Hash routing (`#/meals`…) means no SPA 404 fallback is needed. Public assets must use relative/`base`-aware paths
+  (see `public/manifest.webmanifest`).
+- Optional cloud mode on Pages: repository **variables** `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`
+  (a hosted Supabase project; add the Pages URL to Auth redirect URLs). Never put secret keys there.
 
 ## Supabase
 - Canonical schema = `supabase/migrations/*.sql` (schema → RLS → seed foods). Never change the DB by hand.
@@ -51,3 +67,4 @@ npm run db:start       # supabase start (Docker)   · npm run db:reset — reapp
 - Never weaken/skip tests (`.only`, `.skip`, deleted assertions) to get green. Fix root causes.
 - Before finishing a change: `npm run typecheck && npm run lint && npm test`; for DB changes also `npm run test:db`.
 - Keep docs (README, docs/*) consistent with the actual implementation.
+- Keep this CLAUDE.md up to date with every change to commands, architecture, conventions or deployment.

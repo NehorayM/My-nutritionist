@@ -39,6 +39,15 @@ Only the project URL and the **publishable** key belong in the browser. Secret/s
 must never be in a `VITE_*` variable; the app refuses secret keys. Hosted setup, Auth settings, Edge Function
 deployment and RLS testing are covered in [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md).
 
+## Deploy to GitHub Pages
+
+The workflow `.github/workflows/deploy-pages.yml` builds and publishes the app on every push to `main`.
+One-time setup in the repository: **Settings → Pages → Build and deployment → Source: GitHub Actions** (leave the
+custom domain empty unless you own a domain). The site is then served at `https://<user>.github.io/<repo>/`
+in Offline/Local mode. For accounts, create a hosted Supabase project (see docs/SUPABASE_SETUP.md), add repository
+variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (Settings → Secrets and variables → Actions →
+Variables), and add the Pages URL to Supabase Auth redirect URLs.
+
 ## Scripts
 
 | Command | Purpose |

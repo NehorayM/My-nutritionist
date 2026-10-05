@@ -2,9 +2,9 @@
   "name": "My-nutritionist",
   "short_name": "Nutritionist",
   "description": "Log real meals, see today's nutrition and adapt the rest of your day. Track weight and weekly activity.",
-  "id": "/",
-  "start_url": "/#/meals",
-  "scope": "/",
+  "id": "./",
+  "start_url": "./#/meals",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#faf6ef",
@@ -12,7 +12,7 @@
   "lang": "en",
   "categories": ["health", "food", "lifestyle"],
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
   ]
 }
