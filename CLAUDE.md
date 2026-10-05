@@ -52,8 +52,18 @@ Local cloud mode: `.env.local` (gitignored; Vitest ignores it via `test.env`) wi
   and publishes `dist/` on every push to `main` (or manually via "Run workflow"). Pages source must be "GitHub Actions".
 - Hash routing (`#/meals`…) means no SPA 404 fallback is needed. Public assets must use relative/`base`-aware paths
   (see `public/manifest.webmanifest`).
-- Optional cloud mode on Pages: repository **variables** `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`
-  (a hosted Supabase project; add the Pages URL to Auth redirect URLs). Never put secret keys there.
+- Cloud mode on Pages: repository **variables** `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are set
+  (Settings → Secrets and variables → Actions → Variables). Never put secret keys there.
+
+## Hosted Supabase (production)
+- Project `my-nutritionist`, ref `ucboymoqcfllaoobdcgd` (eu-west-1); the CLI is linked (`npx supabase link`).
+- Schema changes: add a new migration in `supabase/migrations/` (never edit applied ones), test locally
+  (`npm run db:reset && npm run test:db`), then `npx supabase db push --dry-run` and `npx supabase db push`.
+  Check `npx supabase db advisors --linked --type all` afterwards.
+- Edge Function: `npx supabase functions deploy food-search --project-ref ucboymoqcfllaoobdcgd --use-api`.
+  Secret `FDC_API_KEY` is currently USDA's rate-limited `DEMO_KEY` (replace with a real api.data.gov key).
+- Auth: Site URL / redirect URLs point to the Pages URL (+ `http://localhost:5173/**`); email confirmation is set in
+  the dashboard (built-in email only reaches org members — use custom SMTP before inviting others).
 
 ## Supabase
 - Canonical schema = `supabase/migrations/*.sql` (schema → RLS → seed foods). Never change the DB by hand.
