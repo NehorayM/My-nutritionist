@@ -1,16 +1,34 @@
-import { AuthApiError, AuthRetryableFetchError, AuthSessionMissingError, AuthWeakPasswordError } from '@supabase/supabase-js'
-import * as supabase from '@supabase/supabase-js'
+import {
+  AuthApiError,
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+  AuthWeakPasswordError,
+  isAuthError as sbIsAuthError,
+  isAuthImplicitGrantRedirectError as sbImplicitGrant,
+  isAuthPKCECodeVerifierMissingError as sbPkceVerifierMissing,
+  isAuthRetryableFetchError as sbRetryableFetch,
+  isAuthSessionMissingError as sbSessionMissing,
+  isAuthWeakPasswordError as sbWeakPassword,
+} from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
-import * as guards from './authErrorGuards'
+import {
+  isAuthError,
+  isAuthImplicitGrantRedirectError,
+  isAuthPKCECodeVerifierMissingError,
+  isAuthRetryableFetchError,
+  isAuthSessionMissingError,
+  isAuthWeakPasswordError,
+} from './authErrorGuards'
 
-const GUARDS = [
-  'isAuthError',
-  'isAuthRetryableFetchError',
-  'isAuthSessionMissingError',
-  'isAuthWeakPasswordError',
-  'isAuthPKCECodeVerifierMissingError',
-  'isAuthImplicitGrantRedirectError',
-] as const
+type Guard = (error: unknown) => boolean
+const PAIRS: Array<[string, Guard, Guard]> = [
+  ['isAuthError', isAuthError, sbIsAuthError],
+  ['isAuthRetryableFetchError', isAuthRetryableFetchError, sbRetryableFetch],
+  ['isAuthSessionMissingError', isAuthSessionMissingError, sbSessionMissing],
+  ['isAuthWeakPasswordError', isAuthWeakPasswordError, sbWeakPassword],
+  ['isAuthPKCECodeVerifierMissingError', isAuthPKCECodeVerifierMissingError, sbPkceVerifierMissing],
+  ['isAuthImplicitGrantRedirectError', isAuthImplicitGrantRedirectError, sbImplicitGrant],
+]
 
 describe('auth error guards', () => {
   it('agree with the installed supabase-js guards for real error instances and non-errors', () => {
@@ -24,15 +42,15 @@ describe('auth error guards', () => {
       null,
       'AuthError',
     ]
-    for (const name of GUARDS) {
+    for (const [name, ours, theirs] of PAIRS) {
       for (const sample of samples) {
-        expect(guards[name](sample), `${name}(${String(sample)})`).toBe(supabase[name](sample))
+        expect(ours(sample), `${name}(${String(sample)})`).toBe(theirs(sample))
       }
     }
   })
 
   it('exposes weak-password reasons', () => {
     const error = new AuthWeakPasswordError('weak', 422, ['length', 'characters'])
-    expect(guards.isAuthWeakPasswordError(error) && error.reasons).toEqual(['length', 'characters'])
+    expect(isAuthWeakPasswordError(error) && error.reasons).toEqual(['length', 'characters'])
   })
 })
