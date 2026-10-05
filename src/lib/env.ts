@@ -35,10 +35,15 @@ export function isForbiddenBrowserKey(key: string): boolean {
   return decodeJwtRole(key) === 'service_role'
 }
 
+/** Values copied unedited from .env.example count as not configured. */
+function isPlaceholder(url: string, key: string): boolean {
+  return url.includes('your-project-ref') || key.includes('replace_me')
+}
+
 export function readSupabaseConfig(env: SupabaseEnvInput): SupabaseConfig {
   const url = env.VITE_SUPABASE_URL?.trim() ?? ''
   const key = (env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY ?? '').trim()
-  if (!url || !key) return { configured: false, reason: 'missing' }
+  if (!url || !key || isPlaceholder(url, key)) return { configured: false, reason: 'missing' }
   let parsed: URL
   try {
     parsed = new URL(url)

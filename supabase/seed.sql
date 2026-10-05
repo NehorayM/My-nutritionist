@@ -1,0 +1,6 @@
+-- Local seed data, loaded by `supabase db reset` after all migrations ([db.seed] in config.toml).
+--
+-- Intentionally empty: the system food catalog is reference data that every environment needs, so it ships
+-- as migration 003_seed_foods.sql (generated from src/data/system-foods.json by `npm run seed:sql`) and is
+-- applied by `supabase db push` in hosted projects too. User data is never seeded: the DB tests
+-- (`npm run test:db`) create and delete their own users through the Auth admin API.

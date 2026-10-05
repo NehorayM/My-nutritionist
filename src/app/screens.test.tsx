@@ -19,7 +19,8 @@ describe('SCREENS', () => {
           <Component />
         </Suspense>,
       )
-      expect(await screen.findByRole('heading', { level: 1, name: label })).toBeInTheDocument()
+      // Lazy screens load their chunk first (Progress pulls in the charting library), which is slow under full-suite load.
+      expect(await screen.findByRole('heading', { level: 1, name: label }, { timeout: 10_000 })).toBeInTheDocument()
       expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
     },
   )

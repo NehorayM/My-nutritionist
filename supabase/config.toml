@@ -386,6 +386,16 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# USDA FoodData Central proxy (docs/contracts/food-search-function.md).
+# verify_jwt = false: the platform check also lets publishable/secret API keys through, so the function verifies
+# the caller's user JWT itself (supabase-js auth.getClaims) and answers 401 in the contract's JSON shape with
+# CORS headers. Secret: FDC_API_KEY (local: supabase/functions/.env, hosted: `supabase secrets set`).
+[functions.food-search]
+enabled = true
+verify_jwt = false
+import_map = "./functions/food-search/deno.json"
+entrypoint = "./functions/food-search/index.ts"
+
 [analytics]
 enabled = false
 port = 54327

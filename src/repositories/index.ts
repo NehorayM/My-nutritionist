@@ -3,9 +3,12 @@
  * `Repositories` set from `services/runtime`; only bootstrap and the sync layer construct them.
  * - `createLocalRepositories(userId)`: IndexedDB (guest mode, and the local cache in cloud mode).
  * - `createSupabaseRepositories(client, userId)`: direct Supabase access (used by the synced layer).
+ * - `createSyncedRepositories({ userId, client, outbox, engine, connectivity })`: cloud mode — local
+ *   cache + outbox + Supabase (see `services/sync`).
  */
 export { createLocalRepositories } from './local'
 export { createSupabaseRepositories } from './supabase'
+export { createSyncedRepositories, type SyncedRepositoriesOptions } from './synced'
 export {
   RepositoryError,
   type DateRange,

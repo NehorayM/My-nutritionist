@@ -1,7 +1,10 @@
 import '@testing-library/jest-dom/vitest'
 import 'fake-indexeddb/auto'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
+
+// findBy*/waitFor default (1 s) is too tight for lazy chunks and IndexedDB round-trips under parallel load.
+configure({ asyncUtilTimeout: 4000 })
 
 afterEach(() => {
   cleanup()

@@ -16,6 +16,12 @@ describe('readSupabaseConfig', () => {
     })
   })
 
+  it('treats unedited .env.example placeholders as not configured', () => {
+    expect(
+      readSupabaseConfig({ VITE_SUPABASE_URL: 'https://your-project-ref.supabase.co', VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_replace_me' }),
+    ).toEqual({ configured: false, reason: 'missing' })
+  })
+
   it('accepts a publishable key and normalizes the URL to its origin', () => {
     expect(
       readSupabaseConfig({ VITE_SUPABASE_URL: 'https://abc.supabase.co/', VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_123' }),
