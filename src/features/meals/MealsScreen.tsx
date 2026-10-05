@@ -17,6 +17,7 @@ import { MealsContent } from './components/MealsContent'
 import { SaveMealSheet } from './components/SaveMealSheet'
 import { useMealsDay } from './hooks/useMealsDay'
 import { useMealsSheets } from './hooks/useMealsSheets'
+import { RecommendationsSection } from './recommendations/RecommendationsSection'
 import { removeEntry } from './services/mealActions'
 
 /** Meals tab: the selected day's nutrition, its four meals, and logging food. */
@@ -56,8 +57,12 @@ export function MealsScreen() {
             onRetry={day.retry}
           />
         ) : day.status === 'ready' ? (
-          // `recommendations` is the mount point for "Smart options for the rest of today" (./recommendations).
-          <MealsContent day={day} today={today} sheets={sheets} />
+          <MealsContent
+            day={day}
+            today={today}
+            sheets={sheets}
+            recommendations={<RecommendationsSection date={date} entries={day.entries} targets={day.targets} />}
+          />
         ) : (
           <div aria-busy="true" className="space-y-4">
             <LoadingState label="Loading your meals…" className="py-6" />
