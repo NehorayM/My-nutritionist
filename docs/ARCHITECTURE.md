@@ -102,10 +102,22 @@ retry on `online` event / reconnect. 4xx (validation/RLS) → mark `failed`, sur
 Read: fetch from Supabase when reachable, refresh cache, overlay pending local mutations; when unreachable serve cache.
 Conflicts: last writer by `updated_at` wins per record (enforced server-side by the stale-write trigger); deletes win.
 
-## Guest → account migration
+## Session & auth (`services/session`)
+`SessionGate` calls `startSession()` once. Without Supabase config → guest mode immediately. With config, the
+controller creates the Supabase client and subscribes to auth events in the same tick (so `PASSWORD_RECOVERY` is
+never missed), processes email links (`completeRedirect`), verifies connectivity with a real request, then restores
+the stored session (cloud mode), honors a remembered guest choice, or shows the welcome screen. All transitions are
+serialized. Signing out removes the user's cached records from the device unless changes are still waiting to sync;
+an unexpected sign-out (expired session) keeps them and shows a notice. Sync status, connectivity and the guest-import
+offer live in `stores/syncStore`; successful syncs are only announced after an offline/error period.
+
+## Guest → account migration (`services/migration`)
 After sign-in, if the device holds guest records, Profile offers "Import N local items". Records are re-keyed to the
-user id (saved provider foods re-derive their ids and references are remapped), pushed via the outbox, and guest data is
-cleared only after every mutation is acknowledged. Nothing is discarded silently.
+user id (saved provider foods re-derive their ids and references are remapped), saved through the synced repositories
+(local cache + outbox), and guest data is cleared once every record is stored for the account — rejected server writes
+stay visible with Retry/Discard, so nothing is discarded silently. The account's existing profile is never
+overwritten (checked against the server). If an import stops part-way, records that kept their ids already belong to
+the account and the rest stay with the guest; running the import again completes it.
 
 ## Food data
 See docs/FOOD_DATA_SOURCES.md. Providers: local catalog (bundled USDA-sourced seed + user foods; instant,
