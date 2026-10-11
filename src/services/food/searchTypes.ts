@@ -1,3 +1,4 @@
+import type { QueryTranslation, QueryTranslator } from '@/services/translation'
 import type { FoodItem } from '@/types'
 import type { LruCache } from './cache'
 import type { LocalCatalogProvider } from './providers/localCatalogProvider'
@@ -43,6 +44,8 @@ export interface FoodSearchResult {
   providerStatus: ProviderStatusMap
   /** Failed providers' errors (e.g. `retryAfterMs` for 'rate_limited'). */
   errors: Partial<Record<FoodProviderId, FoodProviderError>>
+  /** How a Hebrew query was put into English for the databases; null for other languages. */
+  translation: QueryTranslation | null
 }
 
 export type BarcodeLookupResult =
@@ -95,4 +98,6 @@ export interface FoodSearchServiceOptions {
    * from), so the same USDA record is not listed twice under two names.
    */
   linkedRecordKey?: (food: FoodItem) => string | null
+  /** Hebrew → English for queries (remote providers only get English); null = queries are sent as typed. */
+  translator?: QueryTranslator | null
 }

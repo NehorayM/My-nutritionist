@@ -15,6 +15,7 @@ import {
   ownMutation,
   readQueue,
   runSyncTransaction,
+  type SyncRecord,
   type SyncTransaction,
 } from './outboxStore'
 import type { EnqueueOptions, Outbox, OutboxOptions } from './outboxTypes'
@@ -130,6 +131,27 @@ export function createOutbox(userId: string, options: OutboxOptions = {}): Outbo
     return removed
   }
 
+  /** Acknowledges `mutation` and caches the server's state of its record, unless a newer change is queued. */
+  const reconcile = async (
+    mutation: Pick<OutboxMutation, 'id' | 'entity' | 'recordId'>,
+    key: string,
+    record: SyncRecord | null,
+  ): Promise<boolean> => {
+    const store = STORE_FOR_ENTITY[mutation.entity]
+    const outcome = await transaction('ack', ['outbox', store], async (tx) => {
+      const current = ownMutation(await tx.objectStore('outbox').get(mutation.id), userId)
+      if (current) await tx.objectStore('outbox').delete(mutation.id)
+      const newer = (await readQueue(tx, userId)).some((m) => m.id !== mutation.id && recordKey(m.entity, m.recordId) === key)
+      if (!newer) await mirrorToCache(tx, userId, mutation.entity, mutation.recordId, record)
+      return { removed: current !== null, cached: !newer }
+    })
+    if (outcome.removed) {
+      index.delete(mutation.id)
+      notify()
+    }
+    return outcome.cached
+  }
+
   /** Applies `change` to every failed mutation (optionally only `ids`); null deletes it. */
   const updateFailed = async (
     operation: string,
@@ -166,10 +188,12 @@ export function createOutbox(userId: string, options: OutboxOptions = {}): Outbo
       ),
     markFailed: (id, error) =>
       update('markFailed', id, (m) => ({ ...m, status: 'failed', attempts: m.attempts + 1, lastError: error, nextAttemptAt: null })),
-    ack: (mutation) => {
+    ack: (mutation, server) => {
       // Logged before removal so a concurrent read never sees "neither queued nor acknowledged".
-      acks.record(recordKey(mutation.entity, mutation.recordId))
-      return removeOne('ack', mutation.id)
+      const key = recordKey(mutation.entity, mutation.recordId)
+      acks.record(key)
+      if (!server) return removeOne('ack', mutation.id)
+      return reconcile(mutation, key, server.record)
     },
     remove: (id) => removeOne('remove', id),
     retryFailed: (ids) =>

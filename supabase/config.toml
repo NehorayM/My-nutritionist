@@ -86,7 +86,7 @@ allowed_cidrs_v6 = ["::/0"]
 # enabled = true
 
 [realtime]
-enabled = false
+enabled = true
 # Bind realtime via either IPv4 or IPv6. (default: IPv4)
 # ip_version = "IPv6"
 # The maximum length in bytes of HTTP request headers. (default: 4096)
@@ -395,6 +395,13 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/food-search/deno.json"
 entrypoint = "./functions/food-search/index.ts"
+
+# Routes authenticate themselves (cron secret, user JWT or signed unsubscribe token): see reminders/handler.ts.
+[functions.reminders]
+enabled = true
+verify_jwt = false
+import_map = "./functions/reminders/deno.json"
+entrypoint = "./functions/reminders/index.ts"
 
 [analytics]
 enabled = false

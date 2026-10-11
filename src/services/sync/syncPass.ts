@@ -1,4 +1,5 @@
 import { backoffDelayMs, type BackoffPolicy } from './backoff'
+import type { SyncEntity } from '@/types'
 import type { Outbox } from './outbox'
 import { sendMutation, type RemoteWriters, type RetryKind } from './syncSend'
 import type { Clock } from './timers'
@@ -23,6 +24,8 @@ export interface PassResult {
   retryAt: number | null
   /** Why the pass stopped early, when it did. */
   retryKind: RetryKind | null
+  /** Entities whose local cache now holds the server's version instead of this device's (conflicts resolved). */
+  reconciled: SyncEntity[]
 }
 
 /**
@@ -33,7 +36,8 @@ export interface PassResult {
  */
 export async function runSendPass(input: PassInput): Promise<PassResult> {
   const { outbox, remote, clock, policy, force } = input
-  const result: PassResult = { sent: 0, rejected: 0, retryAt: null, retryKind: null }
+  const result: PassResult = { sent: 0, rejected: 0, retryAt: null, retryKind: null, reconciled: [] }
+  const reconciled = new Set<SyncEntity>()
   const queue = await outbox.list()
   const listedAt = clock().getTime()
   for (const listed of queue) {
@@ -48,7 +52,9 @@ export async function runSendPass(input: PassInput): Promise<PassResult> {
     if (mutation === null || mutation.status !== 'pending') continue
     const outcome = await sendMutation(remote, mutation)
     if (outcome.outcome === 'sent') {
-      await outbox.ack(mutation)
+      // A server version that differs from ours (conflict) replaces the cached copy in the same transaction.
+      const applied = await outbox.ack(mutation, outcome.server ?? undefined)
+      if (applied && outcome.server) reconciled.add(mutation.entity)
       result.sent += 1
     } else if (outcome.outcome === 'reject') {
       await outbox.markFailed(mutation.id, outcome.error)
@@ -60,5 +66,6 @@ export async function runSendPass(input: PassInput): Promise<PassResult> {
       break
     }
   }
+  result.reconciled = [...reconciled]
   return result
 }

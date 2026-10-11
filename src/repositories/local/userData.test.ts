@@ -5,7 +5,10 @@ import {
   makeFood,
   makeMeal,
   makeOutbox,
+  makePantryItem,
+  makePlannerSettings,
   makeProfile,
+  makeReminder,
   makeSavedMeal,
   makeScheduled,
   makeWeight,
@@ -29,6 +32,9 @@ async function seedUser(userId: string, offset: number): Promise<void> {
   await repos.scheduledWorkouts.save(makeScheduled({ id: id(6), userId }))
   await repos.favorites.save(makeFavorite({ id: id(7), userId, foodId: id(1) }))
   await repos.savedMeals.save(makeSavedMeal({ id: id(8), userId }))
+  await repos.pantry.save(makePantryItem({ id: id(11), userId }))
+  await repos.plannerSettings.save(makePlannerSettings({ userId }))
+  await repos.reminders.save(makeReminder({ id: id(12), userId }))
   const db = await openDatabase()
   await db.put('outbox', makeOutbox({ id: id(9), userId, createdAt: '2026-10-03T09:00:00.000Z' }))
   await db.put('outbox', makeOutbox({ id: id(10), userId, createdAt: '2026-10-03T08:00:00.000Z' }))
@@ -44,6 +50,9 @@ const ONE_OF_EACH = {
   scheduledWorkouts: 1,
   favorites: 1,
   savedMeals: 1,
+  pantry: 1,
+  plannerSettings: 1,
+  reminders: 1,
   outbox: 2,
 }
 

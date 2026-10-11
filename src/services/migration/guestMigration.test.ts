@@ -8,6 +8,8 @@ import {
   makeFavorite,
   makeFood,
   makeMeal,
+  makePantryItem,
+  makePlannerSettings,
   makePortion,
   makeProfile,
   makeSavedMeal,
@@ -44,6 +46,8 @@ async function seedGuest(): Promise<void> {
   await guest.weights.save(makeWeight({ id: testId(40), userId: GUEST }))
   await guest.workouts.save(makeWorkout({ id: testId(50), userId: GUEST, scheduledWorkoutId: testId(60) }))
   await guest.scheduledWorkouts.save(makeScheduled({ id: testId(60), userId: GUEST, completedWorkoutId: testId(50) }))
+  await guest.pantry.save(makePantryItem({ id: testId(70), userId: GUEST }))
+  await guest.plannerSettings.save(makePlannerSettings({ userId: GUEST }))
 }
 
 beforeEach(async () => {
@@ -59,8 +63,8 @@ describe('countGuestData', () => {
     expect(await countGuestData(GUEST)).toMatchObject({ total: 0 })
     await seedGuest()
     expect(await countGuestData(GUEST)).toEqual({
-      counts: { profile: 1, foods: 2, meals: 4, favorites: 2, savedMeals: 1, weights: 1, workouts: 1, scheduledWorkouts: 1 },
-      total: 13,
+      counts: { profile: 1, foods: 2, meals: 4, favorites: 2, savedMeals: 1, weights: 1, workouts: 1, scheduledWorkouts: 1, pantry: 1, plannerSettings: 1 },
+      total: 15,
     })
   })
 })
@@ -72,8 +76,8 @@ describe('migrateGuestData', () => {
     const result = await migrateGuestData({ guestId: GUEST, userId: USER_A, target: account, nowIso: NOW, isSystemFood })
     expect(result).toEqual({
       ok: true,
-      migrated: { profile: 1, foods: 2, meals: 4, favorites: 1, savedMeals: 1, weights: 1, workouts: 1, scheduledWorkouts: 1 },
-      skipped: { profile: 0, foods: 0, meals: 0, favorites: 1, savedMeals: 0, weights: 0, workouts: 0, scheduledWorkouts: 0 },
+      migrated: { profile: 1, foods: 2, meals: 4, favorites: 1, savedMeals: 1, weights: 1, workouts: 1, scheduledWorkouts: 1, pantry: 1, plannerSettings: 1 },
+      skipped: { profile: 0, foods: 0, meals: 0, favorites: 1, savedMeals: 0, weights: 0, workouts: 0, scheduledWorkouts: 0, pantry: 0, plannerSettings: 0 },
     })
 
     const usdaId = await userFoodId(USER_A, 'usda', '171477')
@@ -96,7 +100,18 @@ describe('migrateGuestData', () => {
     const [workout] = await account.workouts.listRange({ from: '2026-10-01', to: '2026-10-07' })
     expect(workout).toMatchObject({ userId: USER_A, scheduledWorkoutId: testId(60) })
     expect(await account.profile.get()).toMatchObject({ userId: USER_A, displayName: 'Guest', updatedAt: NOW })
+    expect(await account.pantry.list()).toEqual([expect.objectContaining({ id: testId(70), userId: USER_A, updatedAt: NOW })])
+    expect(await account.plannerSettings.get()).toMatchObject({ userId: USER_A, dailyKcalMin: 1600, updatedAt: NOW })
     expect(await countGuestData(GUEST)).toMatchObject({ total: 0 })
+  })
+
+  it('keeps planner settings the account already has', async () => {
+    await seedGuest()
+    const account = createLocalRepositories(USER_A)
+    await account.plannerSettings.save(makePlannerSettings({ dailyKcalMin: 1200, dailyKcalMax: 1500 }))
+    const result = await migrateGuestData({ guestId: GUEST, userId: USER_A, target: account, nowIso: NOW, isSystemFood })
+    expect(result).toMatchObject({ ok: true, migrated: { plannerSettings: 0 }, skipped: { plannerSettings: 1 } })
+    expect(await account.plannerSettings.get()).toMatchObject({ dailyKcalMin: 1200 })
   })
 
   it('keeps the account profile and reports the guest profile as skipped', async () => {
@@ -123,7 +138,7 @@ describe('migrateGuestData', () => {
     expect(result.ok ? '' : result.error.message).toMatch(/Nothing was deleted/)
     // The custom food keeps its id, so it moved to the account; every other guest record is untouched.
     expect((await countGuestData(GUEST)).counts).toEqual({
-      profile: 1, foods: 1, meals: 4, favorites: 2, savedMeals: 1, weights: 1, workouts: 1, scheduledWorkouts: 1,
+      profile: 1, foods: 1, meals: 4, favorites: 2, savedMeals: 1, weights: 1, workouts: 1, scheduledWorkouts: 1, pantry: 1, plannerSettings: 1,
     })
     expect((await account.foods.list()).map((food) => food.id)).toContain(CUSTOM)
 
@@ -143,7 +158,7 @@ describe('migrateGuestData', () => {
       guestId: GUEST, userId: USER_A, target: account, nowIso: NOW, isSystemFood, accountHasProfile: unreachable,
     })
     expect(result).toMatchObject({ ok: false, error: { retryable: true }, migrated: { profile: 0, foods: 0 } })
-    expect(await countGuestData(GUEST)).toMatchObject({ total: 13 })
+    expect(await countGuestData(GUEST)).toMatchObject({ total: 15 })
     expect(await account.foods.list()).toEqual([])
   })
 
@@ -160,7 +175,7 @@ describe('migrateGuestData', () => {
     await seedGuest()
     const result = await migrateGuestData({ guestId: GUEST, userId: USER_A, target: createLocalRepositories(GUEST), nowIso: NOW })
     expect(result).toMatchObject({ ok: false, error: { retryable: false } })
-    expect(await countGuestData(GUEST)).toMatchObject({ total: 13 })
+    expect(await countGuestData(GUEST)).toMatchObject({ total: 15 })
   })
 
   it('queues the import for sync with foods ahead of the records that reference them', async () => {
@@ -182,6 +197,8 @@ describe('migrateGuestData', () => {
       'weight_logs',
       'workout_logs',
       'scheduled_workouts',
+      'pantry_items',
+      'planner_settings',
     ])
     cloud.connectivity.set('connected')
     await cloud.engine.flushNow()

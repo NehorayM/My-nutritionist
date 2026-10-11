@@ -3,7 +3,10 @@ import type {
   Favorite,
   FoodItem,
   MealEntry,
+  PantryItem,
+  PlannerSettings,
   Profile,
+  ReminderSchedule,
   SavedMeal,
   ScheduledWorkout,
   SyncEntity,
@@ -12,8 +15,10 @@ import type {
 } from '@/types'
 import { scheduledWorkoutSchema, weightEntrySchema, workoutEntrySchema } from './activity'
 import { foodItemSchema } from './food'
+import { pantryItemSchema, plannerSettingsSchema } from './kitchen'
 import { favoriteSchema, mealEntrySchema, savedMealSchema } from './meal'
 import { profileSchema } from './profile'
+import { reminderScheduleSchema } from './reminders'
 
 /** Domain record type stored for each synchronizable entity (table name → record). */
 export interface EntityRecordMap {
@@ -25,6 +30,9 @@ export interface EntityRecordMap {
   scheduled_workouts: ScheduledWorkout
   favorites: Favorite
   saved_meals: SavedMeal
+  pantry_items: PantryItem
+  planner_settings: PlannerSettings
+  reminder_schedules: ReminderSchedule
 }
 
 export type EntityRecord<E extends SyncEntity> = EntityRecordMap[E]
@@ -43,12 +51,15 @@ export const ENTITY_SCHEMAS: { [E in SyncEntity]: z.ZodType<EntityRecordMap[E], 
   scheduled_workouts: scheduledWorkoutSchema,
   favorites: favoriteSchema,
   saved_meals: savedMealSchema,
+  pantry_items: pantryItemSchema,
+  planner_settings: plannerSettingsSchema,
+  reminder_schedules: reminderScheduleSchema,
 }
 
-/** Primary key of a record: profiles are keyed by their owner, everything else by `id`. */
+/** Primary key of a record: profiles and planner settings are keyed by their owner, everything else by `id`. */
 export function recordIdOf<E extends SyncEntity>(entity: E, record: EntityRecordMap[E]): string {
   if ('id' in record) return record.id
-  if (entity === 'profiles' && 'userId' in record) return record.userId
+  if ((entity === 'profiles' || entity === 'planner_settings') && 'userId' in record) return record.userId
   throw new TypeError(`Record of ${entity} has no id`)
 }
 

@@ -1,7 +1,8 @@
 # My-nutritionist — engineering guide
 
-Mobile-first nutrition & wellness web app: log real meals, see today's nutrition, get adaptive
-suggestions for the rest of the day, track weight and weekly activity. Wellness assistant —
+Mobile-first, responsive nutrition & wellness web app: log real meals (search in English or Hebrew), see today's
+nutrition, get adaptive suggestions, plan meals from what's in the kitchen, track weight and weekly activity, and
+get email reminders. Wellness assistant —
 **not** a medical tool. Works fully offline (guest/local mode) and syncs to Supabase when configured.
 
 ## Stack
@@ -27,8 +28,22 @@ Node 24 LTS lives in `~/.local/bin` (no system Node).
 - Imports use the `@/` alias for `src/`.
 - supabase-js and cloud-only code (`services/session/cloudDeps.ts` → auth, sync, migration) load lazily, only when
   Supabase is configured. Don't import them statically from guest-mode code (check with `npm run build` chunk sizes).
-- Recommendations never suggest "occasional" foods (fast food, sweets, sugary drinks, chips) unless favorited;
-  logging is unaffected (`domain/adaptive/candidates.ts`).
+- Recommendations and meal plans never suggest "occasional" foods (fast food, sweets, sugary drinks, chips) unless
+  favorited; logging is unaffected (`domain/adaptive/candidates.ts`, `domain/planner/feasibility.ts`).
+- Stores: every optimistic change goes through the store's `ChangeJournal` (loads overlay it) and every async
+  continuation checks `sessionGuard()` (stores/registry.ts); roll back one record, never a whole list snapshot.
+  A store that shows synced data gets a `refresh()` and an entry in `stores/refresh.ts`.
+- New synced table checklist: type + Zod schema (`schemas/`), `SYNC_ENTITIES`, `RECORD_SPECS`, IndexedDB store via a new
+  `DB_VERSION` step (never edit old steps), local/supabase/synced repositories, row mapper + `schemaAssertions.ts`,
+  `ENTITY_OF_REPOSITORY`, guest migration (if guests can have it), export, migration with RLS + grants + the 004
+  triggers (guard, tombstone, notify), pgTAP + `tests/db/support/rows.ts`, then `npm run db:types`.
+- Hebrew search: queries go through `services/translation` (dictionary first, MyMemory for unknown words); remote
+  providers only ever get English. Add missing food words to `services/translation/dictionary/*`.
+- The planner (`domain/planner`) must stay strict: options use only pantry items within stock, equipment, cooking,
+  time and kcal limits. Keep the property test in `engine.test.ts` passing.
+- Layout: screens use `ScreenHeader` + `ScreenBody` + `ScreenColumns` (lead/main/aside); one primary navigation at a
+  time (bottom bar < 48 rem, side nav from md). Colors only via tokens; `tests/design/contrast.test.ts` must pass.
+  Absolutely positioned content inside horizontal scrollers needs a `relative` scroller (else the page overflows).
 
 ## Commands
 ```bash
@@ -38,13 +53,16 @@ npm run lint           # oxlint
 npm test               # vitest run (unit + integration, jsdom)
 npm run test:coverage  # with v8 coverage
 npm run test:db        # RLS/DB tests against local Supabase (needs `npm run db:start`)
-npm run test:e2e       # Playwright (system Chrome) against dev server
+npm run test:e2e       # Playwright (system Chrome): guest, responsive, kitchen, Hebrew; cloud + reminders when the stack runs
 npm run build          # typecheck + production build
 npm run db:start       # supabase start (Docker)   · npm run db:reset — reapply migrations + seed
 npm run seed:sql       # regenerate supabase/migrations/003_seed_foods.sql from src/data/system-foods.json
 ```
 Local cloud mode: `.env.local` (gitignored; Vitest ignores it via `test.env`) with the local stack's `API_URL` + `PUBLISHABLE_KEY` from
-`npx supabase status -o env`. Delete it to run in guest mode.
+`npx supabase status -o env`. Delete it to run in guest mode. Realtime is enabled in `supabase/config.toml`.
+`supabase/functions/.env` (gitignored) holds local function secrets: `FDC_API_KEY`, `REMINDERS_CRON_SECRET`,
+`REMINDERS_SIGNING_KEY`, `MAILPIT_URL`, `APP_URL` (test:db and the reminders E2E read the cron secret from it; restart the
+stack after editing). Local reminder emails land in Mailpit: http://127.0.0.1:54324.
 
 ## Deployment (GitHub Pages)
 - Repo: https://github.com/NehorayM/My-nutritionist · site: https://nehoraym.github.io/My-nutritionist/
@@ -60,8 +78,12 @@ Local cloud mode: `.env.local` (gitignored; Vitest ignores it via `test.env`) wi
 - Schema changes: add a new migration in `supabase/migrations/` (never edit applied ones), test locally
   (`npm run db:reset && npm run test:db`), then `npx supabase db push --dry-run` and `npx supabase db push`.
   Check `npx supabase db advisors --linked --type all` afterwards.
-- Edge Function: `npx supabase functions deploy food-search --project-ref ucboymoqcfllaoobdcgd --use-api`.
+- Edge Functions: `npx supabase functions deploy food-search --project-ref ucboymoqcfllaoobdcgd --use-api` and
+  `npx supabase functions deploy reminders --project-ref ucboymoqcfllaoobdcgd --no-verify-jwt --use-api`.
   Secret `FDC_API_KEY` is currently USDA's rate-limited `DEMO_KEY` (replace with a real api.data.gov key).
+- Reminders (hosted): secrets `REMINDERS_CRON_SECRET`, `REMINDERS_SIGNING_KEY`, `APP_URL` are set; Vault holds
+  `reminders_dispatch_url` + `reminders_cron_secret` for pg_cron. Emails need `RESEND_API_KEY` (the user's Resend
+  account) — without it deliveries are recorded as skipped. See docs/SUPABASE_SETUP.md §8.
 - Auth: Site URL / redirect URLs point to the Pages URL (+ `http://localhost:5173/**`); email confirmation is set in
   the dashboard (built-in email only reaches org members — use custom SMTP before inviting others).
 

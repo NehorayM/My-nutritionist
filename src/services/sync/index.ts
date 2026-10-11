@@ -21,3 +21,5 @@ export type { FlushOptions, SyncEngine, SyncEngineOptions, SyncEvent, SyncState,
 export type { RemoteWriter, RemoteWriters } from './syncSend'
 export { backoffDelayMs, DEFAULT_BACKOFF, type BackoffPolicy } from './backoff'
 export { browserTimers, systemClock, type Clock, type Timers } from './timers'
+export { browserLock, createMemoryLock, syncLockName, type LockRunner } from './locks'
+export type { ServerState } from './syncSend'

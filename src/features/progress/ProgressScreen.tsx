@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { ScreenHeader } from '@/app/ScreenHeader'
+import { ScreenBody } from '@/app/ScreenLayout'
 import { ErrorState, LoadingState, Skeleton } from '@/components/ui'
 import { useProfileStore } from '@/stores/profileStore'
 import { useWeightStore } from '@/stores/weightStore'
@@ -32,19 +33,23 @@ export function ProgressScreen() {
     <>
       <ScreenHeader title="Progress" subtitle="Weigh-ins and your weight trend" />
       {failed ? (
-        <ErrorState
-          title="Couldn't load your progress"
-          description={`${weightError ?? profileError ?? ''} Your data is safe.`.trim()}
-          onRetry={retry}
-        />
+        <ScreenBody>
+          <ErrorState
+            title="Couldn't load your progress"
+            description={`${weightError ?? profileError ?? ''} Your data is safe.`.trim()}
+            onRetry={retry}
+          />
+        </ScreenBody>
       ) : ready ? (
         <ProgressContent model={model} />
       ) : (
-        <div className="space-y-4 px-5 pt-1" aria-busy="true">
-          <LoadingState label="Loading your progress…" className="py-6" />
-          <Skeleton className="h-56 rounded-card" />
-          <Skeleton className="h-40 rounded-card" />
-        </div>
+        <ScreenBody className="space-y-4">
+          <div className="space-y-4" aria-busy="true">
+            <LoadingState label="Loading your progress…" className="py-6" />
+            <Skeleton className="h-56 rounded-card" />
+            <Skeleton className="h-40 rounded-card" />
+          </div>
+        </ScreenBody>
       )}
     </>
   )

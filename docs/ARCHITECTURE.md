@@ -100,7 +100,30 @@ a delete replaces a pending upsert) → flush. Flush: FIFO per user (keeps FK or
 id (idempotent → no duplicates on retry), delete by id. Network/5xx errors → keep, exponential backoff (2 s → 5 min),
 retry on `online` event / reconnect. 4xx (validation/RLS) → mark `failed`, surface in Profile with Retry/Discard.
 Read: fetch from Supabase when reachable, refresh cache, overlay pending local mutations; when unreachable serve cache.
-Conflicts: last writer by `updated_at` wins per record (enforced server-side by the stale-write trigger); deletes win.
+Conflicts: last writer by `updated_at` wins per record (enforced server-side by the stale-write trigger). A deleted
+record comes back only with a newer version (Undo); an older queued edit can't resurrect it (tombstones, migration 004).
+
+### Sync integrity (audit, 2026-10)
+- **Server outcome reconciliation** — `RemoteTable.write` reports `applied | superseded | deleted`. When the server kept
+  another version (newer write elsewhere, clamped clock, tombstone) the sync pass copies it into the cache in the
+  same IndexedDB transaction as the acknowledgement (unless a newer local change is queued) and emits `reconciled`.
+- **One sender per user across tabs** — each pass runs under a Web Lock (`my-nutritionist:sync:<user>`), so two tabs
+  never send versions of one record concurrently (`services/sync/locks.ts`).
+- **Stores never lose local changes to slow loads** — every store records its optimistic changes in a
+  `ChangeJournal` and overlays them on load results that started earlier; rollbacks are per record.
+- **No data across sessions** — `resetUserStores()` starts a new session epoch; async results of an older epoch
+  are dropped (`sessionGuard()` in `stores/registry.ts`).
+- **Live refresh** (`services/session/liveRefresh.ts`): this tab's writes are announced to other tabs (BroadcastChannel,
+  `services/dataEvents.ts`); the server announces changes of the signed-in user over a private Realtime topic
+  (`user:<id>`, broadcast by a database trigger — table names only, never row data); a tab that was hidden ≥ 30 s,
+  a reconnect or a Realtime re-subscribe reloads everything. Bursts are coalesced (250 ms) into one reload per store.
+
+## Hebrew search translation (`services/translation`)
+Hebrew queries are put into English before any provider is asked: a built-in food dictionary (≈ 530 phrases, prefix
+and plural/construct-form variants, describing words moved in front: "חזה עוף צלוי" → "roasted chicken breast")
+answers instantly and offline; words it doesn't know are machine-translated (MyMemory, only when online, cached per
+session). Local search runs on both texts (the user's own foods may have Hebrew names); USDA and Open Food Facts only
+ever receive English. `FoodSearchResult.translation` drives the "Searching in English for …" note.
 
 ## Session & auth (`services/session`)
 `SessionGate` calls `startSession()` once. Without Supabase config → guest mode immediately. With config, the
@@ -119,6 +142,29 @@ stay visible with Retry/Discard, so nothing is discarded silently. The account's
 overwritten (checked against the server). If an import stops part-way, records that kept their ids already belong to
 the account and the rest stay with the guest; running the import again completes it.
 
+## Kitchen & meal planner (`domain/planner`, `features/kitchen`)
+Pantry items (`pantry_items`) snapshot the food and say how it is eaten: `ready`, `reheat` (needs one of its
+`methods`) or `cook` (needs cooking allowed, a method and `cookMinutes`). Planner settings (`planner_settings`, one per
+user) hold equipment for the whole day or per meal, and per meal: enabled, can cook, minutes, kcal range; plus a
+daily kcal range (empty → the nutrition targets ±10 %). `planMeals()` is pure and deterministic:
+1. items that can never be planned are set aside with a reason (unknown kcal, expired, used up, occasional food that is
+   not a favorite, allergens incl. unknown allergen data, diet);
+2. per enabled meal: items its equipment/cooking/time allow → combinations of 1–4 items (1–2 for snacks, best 4 per
+   plate role) → realistic portions sized into the meal's kcal range (never more than is at home) → scored (fit,
+   protein, plate balance, fiber, prep time, meal-time fit, use-soon);
+3. one option per meal is combined (exhaustive search over the top 8) so the day never uses more of an item than is at
+   home and lands in the daily range when possible (`fits`). Meals without an option report why (`gap`).
+A seeded property test checks every option and day plan against all rules on 150 random kitchens.
+
+## Email reminders (`reminder_schedules`, `supabase/functions/reminders`)
+Schedules are synced records (kind, meal, local time, weekdays, IANA time zone, skip-if-logged). Every 5 minutes
+pg_cron → `private.invoke_reminders()` (pg_net) → Edge Function `/reminders/dispatch` (shared secret) →
+`claim_due_reminders()` inserts one `reminder_dispatches` row per (schedule, local day) and claims due rows with
+`for update skip locked` → emails via Resend (production) or Mailpit (local) with one-click unsubscribe headers and a
+signed unsubscribe link (`#/unsubscribe?token=…`, HMAC) → outcome recorded (`sent`, `skipped` with a reason, or
+`failed` → retried up to 3 attempts while timely). Delivery rows are read-only for their owner and announced over
+Realtime, so Profile shows "sent" live. `/reminders/test` sends a test email to the signed-in user (JWT, 1/min).
+
 ## Food data
 See docs/FOOD_DATA_SOURCES.md. Providers: local catalog (bundled USDA-sourced seed + user foods; instant,
 search-as-you-type with a 350 ms UI debounce), USDA FoodData Central via the `food-search` Edge Function (API key stays
@@ -131,7 +177,7 @@ paginates, rate-limits OFF client-side, and returns partial results with per-pro
 | Decision | Reason |
 |---|---|
 | Lazy loading: Progress/Activity/Profile routes, supabase-js + cloud services only when configured; no manual chunking | Vite 8 (Rolldown) manual groups pulled React into the charts chunk and loaded it eagerly |
-| Hash-based tab navigation, no router library | 4 tabs + auth callback; keeps bundle small; deep links & refresh work |
+| Hash-based tab navigation, no router library | 5 tabs + auth callback + unsubscribe links; keeps bundle small; deep links & refresh work |
 | IndexedDB (idb) over localStorage | multi-year logs exceed localStorage quotas; async, indexed queries |
 | Client-generated UUIDs | idempotent retries, offline creation, no temp-id remapping |
 | Snapshot nutrients in meal logs | history stays correct when provider data changes |

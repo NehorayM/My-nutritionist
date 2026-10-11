@@ -10,6 +10,8 @@
 | Database security & constraints | `tests/db/*.test.ts` | Vitest (node) against the **local Supabase stack**, two real users | `npm run test:db` |
 | Edge Function (`food-search`) | `tests/db/functions/*.test.ts` | Vitest (node), fake upstream | `npm run test:db` |
 | Database policies (pgTAP) | `supabase/tests/database/*.test.sql` | Postgres in the local stack | `npx supabase test db` |
+| Reminder delivery (local Edge Function + Mailpit) | `tests/db/remindersDelivery.test.ts` | Vitest (node) against the local stack | `npm run test:db` |
+| Design tokens | `tests/design/*.test.ts` | Vitest (WCAG contrast from tokens.css) | `npm test` |
 | End-to-end | `tests/e2e/*.spec.ts` | Playwright in the system Google Chrome | `npm run test:e2e` |
 
 Prerequisites: Node 24 (`~/.local/bin`), Docker for the local Supabase stack (`npm run db:start`), Google Chrome at
@@ -50,6 +52,21 @@ stack running; without it Playwright runs only the `guest` project.
   workout → refresh → everything persists, no console errors. Signed in (local Supabase): sign up → profile → add,
   edit, delete foods → weigh-in → weekly target → workout → Smart Catch-Up → refresh → sign out (cache removed) →
   sign in → data restored from Supabase, no console errors.
+
+- **Sync integrity** — races between slow loads and local edits (every store), results of a previous session dropped,
+  per-record rollback, server conflict outcomes copied into the cache (superseded / deleted elsewhere), two tabs with
+  one sender (Web Lock), cross-tab and Realtime live refresh, tombstones and private Realtime topics (`test:db`).
+- **Meal planner** — ranges, feasibility (equipment, cooking, time, allergens, diet, occasional, expiry), scenarios
+  (microwave-only lunch, no-cook breakfast, scarce stock, impossible meals) and a property test over 150 seeded random
+  kitchens that checks every option and day plan against every rule.
+- **Hebrew translation** — morphology, dictionary phrases, machine-translation fallback (errors, quota, offline,
+  cache), search service (only English reaches USDA/OFF), Add Food and kitchen pickers.
+- **Email reminders** — schedule validation, claiming in time zones/weekdays/after midnight, idempotency, retries,
+  stale claims, skip-if-logged, delivery-log access (`test:db`); Edge Function routes, tokens, templates and providers
+  (`edge-functions`); full delivery through the local function into Mailpit; UI cards and unsubscribe page.
+- **End-to-end (new)** — Hebrew query → English search → log; kitchen inventory + constraints → plan → log; every tab
+  at phone/tablet/desktop width without horizontal overflow; reminder scheduled in the app → dispatch → email →
+  "sent" shown live → unsubscribe link.
 
 ## Coverage
 

@@ -6,7 +6,7 @@
  *
  * This file only wires Deno globals into the runtime-agnostic handler (handler.ts).
  */
-import { createSupabaseClaimsVerifier, createUserVerifier } from './auth.ts'
+import { createSupabaseClaimsVerifier, createUserVerifier } from '../_shared/auth.ts'
 import { readFdcApiKey, readFunctionEnv, type EnvGetter } from './config.ts'
 import { createFoodSearchHandler, type LogFn } from './handler.ts'
 

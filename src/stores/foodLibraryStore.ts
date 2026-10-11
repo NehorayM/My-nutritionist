@@ -8,8 +8,9 @@ import type { Favorite, FoodItem, FoodPortion, MealType, SavedMeal } from '@/typ
 import { userMessageFor } from './errors'
 import type { LoadStatus, SaveResult } from './profileStore'
 import { toPortion } from '@/domain/foodLog'
+import { createChangeJournal, type ChangeJournal } from './changeJournal'
 import { favoriteFor, newestFirst, resolveFavoriteFoods, savedCopyOf } from './foodLibraryHelpers'
-import { registerUserStoreReset } from './registry'
+import { registerUserStoreReset, sessionGuard } from './registry'
 
 /** What the user enters for a custom food (everything else is filled in by the store). */
 export type CustomFoodInput = Pick<FoodItem, 'name' | 'brand' | 'servings' | 'per100g' | 'allergens' | 'dietFlags'>
@@ -38,18 +39,28 @@ interface FoodLibraryState {
   saveMeal: (name: string, items: readonly FoodPortion[], mealType: MealType | null) => Promise<LibraryResult<SavedMeal>>
   deleteSavedMeal: (id: string) => Promise<LibraryResult<SavedMeal>>
   restoreSavedMeal: (meal: SavedMeal) => Promise<SaveResult>
+  /** Reloads when already loaded (data changed elsewhere). */
+  refresh: () => Promise<void>
   reset: () => void
 }
 
 const initial = { userFoods: [], favorites: [], savedMeals: [], status: 'idle' as LoadStatus, error: null }
-let generation = 0
 
 type ListKey = 'userFoods' | 'favorites' | 'savedMeals'
 type Item = FoodItem | Favorite | SavedMeal
 
+/** Local changes per list, re-applied to loads that started before them (see `ChangeJournal`). */
+const journals = {
+  userFoods: createChangeJournal<FoodItem>(),
+  favorites: createChangeJournal<Favorite>(),
+  savedMeals: createChangeJournal<SavedMeal>(),
+}
+
 export const useFoodLibraryStore = create<FoodLibraryState>()((set, get) => {
   /** Replaces the record with `id` in a list (removing it when `item` is null). */
   function put<K extends ListKey>(key: K, id: string, item: FoodLibraryState[K][number] | null): void {
+    const journal: ChangeJournal<Item> = journals[key]
+    journal.record(id, item)
     set((state) => {
       const rest = (state[key] as Item[]).filter((existing) => existing.id !== id)
       return { [key]: (item ? [...rest, item] : rest).sort(newestFirst) } as Pick<FoodLibraryState, K>
@@ -57,6 +68,7 @@ export const useFoodLibraryStore = create<FoodLibraryState>()((set, get) => {
   }
 
   async function save<K extends ListKey>(key: K, item: FoodLibraryState[K][number], action: string): Promise<LibraryResult<typeof item>> {
+    const current = sessionGuard()
     const before = (get()[key] as Item[]).find((existing) => existing.id === item.id) ?? null
     put(key, item.id, item)
     try {
@@ -65,10 +77,10 @@ export const useFoodLibraryStore = create<FoodLibraryState>()((set, get) => {
         key === 'userFoods' ? await repos.foods.save(item as FoodItem)
         : key === 'favorites' ? await repos.favorites.save(item as Favorite)
         : await repos.savedMeals.save(item as SavedMeal)
-      put(key, saved.id, saved as typeof item)
+      if (current()) put(key, saved.id, saved as typeof item)
       return { ok: true, value: saved as typeof item }
     } catch (error) {
-      put(key, item.id, before as typeof item | null)
+      if (current()) put(key, item.id, before as typeof item | null)
       return fail(userMessageFor(error, action))
     }
   }
@@ -76,13 +88,14 @@ export const useFoodLibraryStore = create<FoodLibraryState>()((set, get) => {
   async function remove<K extends ListKey>(key: K, id: string, action: string): Promise<SaveResult> {
     const before = (get()[key] as Item[]).find((existing) => existing.id === id)
     if (!before) return { ok: true }
+    const current = sessionGuard()
     put(key, id, null)
     try {
       const repos = getRepositories()
       await (key === 'userFoods' ? repos.foods : key === 'favorites' ? repos.favorites : repos.savedMeals).remove(id)
       return { ok: true }
     } catch (error) {
-      put(key, id, before as FoodLibraryState[K][number])
+      if (current()) put(key, id, before as FoodLibraryState[K][number])
       return fail(userMessageFor(error, action))
     }
   }
@@ -121,15 +134,22 @@ export const useFoodLibraryStore = create<FoodLibraryState>()((set, get) => {
     async load(options = {}) {
       const { status } = get()
       if (!options.force && (status === 'ready' || status === 'loading')) return
-      const run = generation
+      const current = sessionGuard()
       set({ status: 'loading', error: null })
+      const marks = { userFoods: journals.userFoods.mark(), favorites: journals.favorites.mark(), savedMeals: journals.savedMeals.mark() }
       try {
         const repos = getRepositories()
         const [userFoods, favorites, savedMeals] = await Promise.all([repos.foods.list(), repos.favorites.list(), repos.savedMeals.list()])
-        if (run !== generation) return
-        set({ userFoods: userFoods.sort(newestFirst), favorites: favorites.sort(newestFirst), savedMeals: savedMeals.sort(newestFirst), status: 'ready' })
+        if (!current()) return
+        set({
+          userFoods: journals.userFoods.overlay(userFoods, marks.userFoods).sort(newestFirst),
+          favorites: journals.favorites.overlay(favorites, marks.favorites).sort(newestFirst),
+          savedMeals: journals.savedMeals.overlay(savedMeals, marks.savedMeals).sort(newestFirst),
+          status: 'ready',
+        })
       } catch (error) {
-        if (run === generation) set({ status: 'error', error: userMessageFor(error, 'load your foods') })
+        const message = userMessageFor(error, 'load your foods')
+        if (current()) set({ status: 'error', error: message })
       }
     },
 
@@ -212,8 +232,12 @@ export const useFoodLibraryStore = create<FoodLibraryState>()((set, get) => {
       return restored.ok ? { ok: true } : restored
     },
 
+    async refresh() {
+      if (get().status !== 'idle') await get().load({ force: true })
+    },
+
     reset() {
-      generation += 1
+      for (const journal of Object.values(journals)) journal.clear()
       set(initial)
     },
   }

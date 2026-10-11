@@ -8,6 +8,9 @@ export const SYNC_ENTITIES = [
   'scheduled_workouts',
   'favorites',
   'saved_meals',
+  'pantry_items',
+  'planner_settings',
+  'reminder_schedules',
 ] as const
 export type SyncEntity = (typeof SYNC_ENTITIES)[number]
 

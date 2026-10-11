@@ -4,6 +4,7 @@ import { lookupBarcodeAcrossProviders } from './barcodeLookup'
 import { throwIfAborted } from './providerErrors'
 import type { FoodProviderError, FoodProviderId, FoodSearchPage } from './providers/types'
 import { uniqueAgainst } from './search/merge'
+import { remoteQuery, searchLocal, type RemoteQuery } from './searchTranslation'
 import { cacheKey, clampPage, readThrough, settle, statusOf, type Outcome } from './serviceSupport'
 import type {
   CachedValue,
@@ -48,6 +49,7 @@ export function createFoodSearchService(options: FoodSearchServiceOptions): Food
   const { local } = options
   const usda = options.usda ?? null
   const off = options.off ?? null
+  const translator = options.translator ?? null
 
   async function search(text: string, searchOptions: FoodSearchOptions = {}): Promise<FoodSearchResult> {
     const { signal } = searchOptions
@@ -55,30 +57,37 @@ export function createFoodSearchService(options: FoodSearchServiceOptions): Food
     const query = text.trim()
     const page = clampPage(searchOptions.page)
     const scope = searchOptions.usdaScope ?? 'generic'
+    // Hebrew is translated before anything is sent: the dictionary at once, machine translation when needed.
+    const instant = translator?.translateNow(query) ?? null
     // Local results of pages 1…page in one cheap in-memory call: the current page is displayed and the
     // earlier ones are used to drop remote duplicates of foods the user has already seen.
     const localTask = settle(
       'local',
-      (s) => local.search({ text: query, page: 1, pageSize: page * LOCAL_PAGE_SIZE, signal: s }),
+      (s) => searchLocal(local, query, instant?.query || null, page * LOCAL_PAGE_SIZE, s),
       signal,
       timeoutMs,
     )
-    const usdaTask =
-      usda !== null && usda.isAvailable() && query.length >= MIN_REMOTE_QUERY_LENGTH
-        ? settle(
+    const usdaProvider = usda !== null && usda.isAvailable() && query.length >= MIN_REMOTE_QUERY_LENGTH ? usda : null
+    const remote = usdaProvider === null ? null : remoteQuery(translator, query, signal)
+    const askUsda = ({ text: english }: RemoteQuery): Promise<Outcome<FoodSearchPage>> | null =>
+      usdaProvider === null || english.length < MIN_REMOTE_QUERY_LENGTH
+        ? null
+        : settle(
             'usda',
             (s) =>
-              readThrough(cache, cacheKey('usda', 'search', scope, query, page, REMOTE_PAGE_SIZE), readPage, wrapPage, () =>
-                usda.search({ text: query, page, pageSize: REMOTE_PAGE_SIZE, signal: s, scope }),
+              readThrough(cache, cacheKey('usda', 'search', scope, english, page, REMOTE_PAGE_SIZE), readPage, wrapPage, () =>
+                usdaProvider.search({ text: english, page, pageSize: REMOTE_PAGE_SIZE, signal: s, scope }),
               ),
             signal,
             timeoutMs,
           )
-        : null
+    // Known English text → the request starts now; a pending machine translation → right after it.
+    const usdaTask = remote === null ? null : remote instanceof Promise ? remote.then(askUsda) : askUsda(remote)
     const build = (
       localOutcome: Outcome<FoodSearchPage>,
       usdaOutcome: Outcome<FoodSearchPage> | null,
       usdaPending: boolean,
+      translation: FoodSearchResult['translation'],
     ): FoodSearchResult => {
       const seenLocal = localOutcome.ok ? localOutcome.value.items : []
       const localItems = seenLocal.slice((page - 1) * LOCAL_PAGE_SIZE)
@@ -90,19 +99,20 @@ export function createFoodSearchService(options: FoodSearchServiceOptions): Food
         hasMore: (localOutcome.ok && localOutcome.value.hasMore) || (usdaOutcome?.ok === true && usdaOutcome.value.hasMore),
         providerStatus: { local: statusOf(localOutcome), usda: usdaPending ? 'pending' : statusOf(usdaOutcome), off: 'skipped' },
         errors: errorsOf({ local: localOutcome, usda: usdaOutcome }),
+        translation,
       }
     }
     let complete = false
     const { onPartial } = searchOptions
     if (usdaTask !== null && onPartial) {
       void localTask.then((localOutcome) => {
-        if (!complete && !signal?.aborted) onPartial(build(localOutcome, null, true))
+        if (!complete && !signal?.aborted) onPartial(build(localOutcome, null, true, instant))
       })
     }
-    const [localOutcome, usdaOutcome] = await Promise.all([localTask, usdaTask])
+    const [localOutcome, usdaOutcome, resolved] = await Promise.all([localTask, usdaTask, remote])
     complete = true
     throwIfAborted(signal)
-    return build(localOutcome, usdaOutcome, false)
+    return build(localOutcome, usdaOutcome, false, resolved?.translation ?? instant)
   }
 
   async function searchPackaged(
@@ -113,13 +123,16 @@ export function createFoodSearchService(options: FoodSearchServiceOptions): Food
     throwIfAborted(signal)
     const query = text.trim()
     const page = clampPage(searchOptions.page)
+    const available = off !== null && off.isAvailable() && query.length >= MIN_REMOTE_QUERY_LENGTH
+    const { text: english, translation } = available ? await remoteQuery(translator, query, signal) : { text: query, translation: null }
+    throwIfAborted(signal)
     const offTask =
-      off !== null && off.isAvailable() && query.length >= MIN_REMOTE_QUERY_LENGTH
+      off !== null && available && english.length >= MIN_REMOTE_QUERY_LENGTH
         ? settle(
             'off',
             (s) =>
-              readThrough(cache, cacheKey('off', 'search', query, page, REMOTE_PAGE_SIZE), readPage, wrapPage, () =>
-                off.searchPackaged({ text: query, page, pageSize: REMOTE_PAGE_SIZE, signal: s }),
+              readThrough(cache, cacheKey('off', 'search', english, page, REMOTE_PAGE_SIZE), readPage, wrapPage, () =>
+                off.searchPackaged({ text: english, page, pageSize: REMOTE_PAGE_SIZE, signal: s }),
               ),
             signal,
             timeoutMs,
@@ -134,6 +147,7 @@ export function createFoodSearchService(options: FoodSearchServiceOptions): Food
       hasMore: outcome?.ok === true && outcome.value.hasMore,
       providerStatus: { local: 'skipped', usda: 'skipped', off: statusOf(outcome) },
       errors: errorsOf({ off: outcome }),
+      translation: translation ?? translator?.translateNow(query) ?? null,
     }
   }
 

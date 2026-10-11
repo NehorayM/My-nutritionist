@@ -1,7 +1,9 @@
 import { notify } from '@/lib/notify'
+import { observeWrites } from '@/repositories/observed'
 import type { AuthSession } from '@/services/auth'
 import { setRepositories } from '@/services/runtime'
 import type { CloudSync, SyncEvent, SyncStatus } from '@/services/sync'
+import { SYNC_ENTITIES } from '@/types'
 import { resetUserStores } from '@/stores/registry'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useSyncStore } from '@/stores/syncStore'
@@ -24,8 +26,12 @@ export function createCloudSession(deps: SessionDeps) {
     useSyncStore.setState({ sync: status })
   }
 
-  function onEvent(event: SyncEvent): void {
-    if (event.type === 'failed' && event.count > 0) {
+  function onEvent(userId: string, event: SyncEvent): void {
+    if (event.type === 'reconciled') {
+      // The server kept other versions than ours: every tab of this user reloads them from the cache.
+      deps.events.notifyThisTab({ userId, entities: event.entities })
+      deps.events.notifyOtherTabs({ userId, entities: event.entities })
+    } else if (event.type === 'failed' && event.count > 0) {
       notify.error(`${plural(event.count, 'change')} couldn't sync`, { description: 'Review them in Profile → Sync.' })
     } else if (event.type === 'synced' && event.count > 0 && recovering) {
       recovering = false
@@ -63,8 +69,17 @@ export function createCloudSession(deps: SessionDeps) {
     cloud = next
     recovering = false
     resetUserStores()
-    setRepositories(next.repositories)
-    cleanups = [next.engine.subscribe(onStatus), next.engine.onEvent(onEvent)]
+    const { userId } = session
+    setRepositories(observeWrites(next.repositories, (entity) => deps.events.notifyOtherTabs({ userId, entities: [entity] })))
+    cleanups = [next.engine.subscribe(onStatus), next.engine.onEvent((event) => onEvent(userId, event))]
+    if (deps.remoteChanges) {
+      cleanups.push(
+        deps.remoteChanges(userId, {
+          changed: (entities) => deps.events.notifyThisTab({ userId, entities }),
+          resynced: () => deps.events.notifyThisTab({ userId, entities: [...SYNC_ENTITIES] }),
+        }),
+      )
+    }
     useSyncStore.setState({ sync: next.engine.getStatus(), authNotice: null })
     useSessionStore.setState({ phase: 'ready', mode: 'cloud', userId: session.userId, email: session.email })
     loadSharedData()

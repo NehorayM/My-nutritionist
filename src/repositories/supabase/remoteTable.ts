@@ -38,6 +38,14 @@ export interface SelectOptions {
 }
 
 /**
+ * What the server did with a write:
+ * - `applied`: stored; `record` is the server's copy (its timestamps may differ, e.g. a future clock clamped);
+ * - `superseded`: the stale-write guard kept a NEWER server version, which is `record`;
+ * - `deleted`: the record was deleted with a version at least as new as this one (tombstone), so it stays deleted.
+ */
+export type WriteOutcome<T> = { status: 'applied' | 'superseded'; record: T } | { status: 'deleted' }
+
+/**
  * Generic access to one Supabase table for ONE user. Every query also filters by the owner column
  * (defense in depth on top of RLS); rows are validated with the entity schema and invalid ones are
  * skipped with a warning. Reused by the Supabase repositories and by the sync layer (outbox flush).
@@ -52,6 +60,8 @@ export interface RemoteTable<T> {
    * guard skipped the write (the stored row is newer), returns the CURRENT server record instead.
    */
   upsert(record: T): Promise<T>
+  /** Like `upsert`, but reports conflicts as outcomes instead of errors (used by the sync engine). */
+  write(record: T): Promise<WriteOutcome<T>>
   /** Deletes the user's record with this id; missing records are not an error (idempotent). */
   remove(id: string): Promise<void>
 }
@@ -132,11 +142,10 @@ export function createRemoteTable<E extends SyncEntity>(
     return records.slice(0, max)
   }
 
-  const upsert = async (record: Item): Promise<Item> => {
+  const write = async (record: Item): Promise<WriteOutcome<Item>> => {
     const valid = validateForWrite(spec, record, userId)
-    const operation = `${entity}.save`
     const data = await execute(
-      operation,
+      `${entity}.save`,
       client
         .from(entity)
         .upsert(mapper.toRow(valid), { onConflict: 'id' })
@@ -145,17 +154,22 @@ export function createRemoteTable<E extends SyncEntity>(
     )
     const rows = rowsOf(data)
     if (rows.length === 0) {
-      // guard_stale_write() skipped the update: the server already holds a newer version.
+      // guard_stale_write() skipped the write: a newer version exists, or a newer version was deleted.
       const current = await getById(recordIdOf(entity, valid))
-      if (current) return current
-      throw new SupabaseRepositoryError(
-        `Supabase ${operation} failed: the record conflicts with existing data`,
-        { kind: 'conflict', retryable: false, code: null, status: null },
-        null,
-      )
+      return current ? { status: 'superseded', record: current } : { status: 'deleted' }
     }
     // The write succeeded; if the echoed row is unreadable, the validated input is the best answer.
-    return parseRows(rows)[0] ?? valid
+    return { status: 'applied', record: parseRows(rows)[0] ?? valid }
+  }
+
+  const upsert = async (record: Item): Promise<Item> => {
+    const outcome = await write(record)
+    if (outcome.status !== 'deleted') return outcome.record
+    throw new SupabaseRepositoryError(
+      `Supabase ${entity}.save failed: the record was deleted on another device`,
+      { kind: 'conflict', retryable: false, code: null, status: null },
+      null,
+    )
   }
 
   const remove = async (id: string): Promise<void> => {
@@ -165,7 +179,7 @@ export function createRemoteTable<E extends SyncEntity>(
     await execute(`${entity}.remove`, builder.abortSignal(AbortSignal.timeout(timeoutMs)))
   }
 
-  return { entity, getById, select, upsert, remove }
+  return { entity, getById, select, upsert, write, remove }
 }
 
 export type RemoteTables = { [E in SyncEntity]: RemoteTable<EntityRecordMap[E]> }
@@ -181,5 +195,8 @@ export function createRemoteTables(client: SupabaseDataClient, userId: string, o
     scheduled_workouts: createRemoteTable(client, userId, 'scheduled_workouts', options),
     favorites: createRemoteTable(client, userId, 'favorites', options),
     saved_meals: createRemoteTable(client, userId, 'saved_meals', options),
+    pantry_items: createRemoteTable(client, userId, 'pantry_items', options),
+    planner_settings: createRemoteTable(client, userId, 'planner_settings', options),
+    reminder_schedules: createRemoteTable(client, userId, 'reminder_schedules', options),
   }
 }

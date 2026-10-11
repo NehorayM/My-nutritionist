@@ -1,6 +1,7 @@
 import { Plus } from 'lucide-react'
 import { useEffect } from 'react'
 import { ScreenHeader } from '@/app/ScreenHeader'
+import { ScreenBody, ScreenColumns } from '@/app/ScreenLayout'
 import { Button, ErrorState, LoadingState } from '@/components/ui'
 import { useToday } from '@/hooks/useToday'
 import { useActivityStore } from '@/stores/activityStore'
@@ -29,12 +30,22 @@ function ActivityContent({ profile, today, sheets }: ContentProps) {
   const showNudge = profile.reminders.activity && progress.totalRemaining > 0
 
   return (
-    <div className="space-y-6 px-5 pb-6 pt-1">
-      {showNudge ? <ActivityNudge progress={progress} onLog={sheets.openLog} /> : null}
-      <WeeklyProgressCard progress={progress} profile={profile} onEditPlan={sheets.openPlan} />
-      <CatchUpCard key={progress.week.start} profile={profile} progress={progress} today={today} onEditPlan={sheets.openPlan} />
-      <ScheduledSection today={today} onComplete={sheets.openComplete} />
-      <WorkoutsSection workouts={progress.workouts} today={today} onLog={sheets.openLog} onEdit={sheets.openEdit} />
+    <ScreenBody>
+      <ScreenColumns
+        lead={
+          <>
+            {showNudge ? <ActivityNudge progress={progress} onLog={sheets.openLog} /> : null}
+            <WeeklyProgressCard progress={progress} profile={profile} onEditPlan={sheets.openPlan} />
+          </>
+        }
+        main={
+          <>
+            <CatchUpCard key={progress.week.start} profile={profile} progress={progress} today={today} onEditPlan={sheets.openPlan} />
+            <ScheduledSection today={today} onComplete={sheets.openComplete} />
+          </>
+        }
+        aside={<WorkoutsSection workouts={progress.workouts} today={today} onLog={sheets.openLog} onEdit={sheets.openEdit} />}
+      />
       <WorkoutSheet
         key={`workout-${sheets.workout.key}`}
         open={sheets.workout.open}
@@ -45,7 +56,7 @@ function ActivityContent({ profile, today, sheets }: ContentProps) {
         weightKg={weightKg}
       />
       <WeeklyPlanSheet key={`plan-${sheets.plan.key}`} open={sheets.plan.open} onOpenChange={sheets.setPlanOpen} profile={profile} />
-    </div>
+    </ScreenBody>
   )
 }
 
@@ -78,9 +89,17 @@ export function ActivityScreen() {
 
   let body
   if (profile === null && profileStatus === 'error') {
-    body = <ErrorState title="Your weekly plan didn't load" onRetry={retry} />
+    body = (
+      <ScreenBody>
+        <ErrorState title="Your weekly plan didn't load" onRetry={retry} />
+      </ScreenBody>
+    )
   } else if (profile !== null && status === 'error') {
-    body = <ErrorState title="Your activity didn't load" description={`${error ?? ''} Your data is safe.`.trim()} onRetry={retry} />
+    body = (
+      <ScreenBody>
+        <ErrorState title="Your activity didn't load" description={`${error ?? ''} Your data is safe.`.trim()} onRetry={retry} />
+      </ScreenBody>
+    )
   } else if (!ready) {
     body = <LoadingState label="Loading your week…" />
   } else {

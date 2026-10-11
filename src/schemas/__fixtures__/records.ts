@@ -5,7 +5,10 @@ import type {
   MealEntry,
   NutrientProfile,
   OutboxMutation,
+  PantryItem,
+  PlannerSettings,
   Profile,
+  ReminderSchedule,
   SavedMeal,
   ScheduledWorkout,
   WeightEntry,
@@ -198,6 +201,56 @@ export function makeOutbox(overrides: Partial<OutboxMutation> = {}): OutboxMutat
     status: 'pending',
     lastError: null,
     nextAttemptAt: null,
+    ...overrides,
+  }
+}
+
+export function makePantryItem(overrides: Partial<PantryItem> = {}): PantryItem {
+  return {
+    id: testId(900),
+    userId: USER_A,
+    food: makeFood(),
+    grams: 400,
+    servingLabel: null,
+    servingGrams: null,
+    prep: 'reheat',
+    cookMinutes: null,
+    methods: ['microwave', 'stove'],
+    useBy: '2026-10-05',
+    createdAt: TS,
+    updatedAt: TS,
+    ...overrides,
+  }
+}
+
+export function makePlannerSettings(overrides: Partial<PlannerSettings> = {}): PlannerSettings {
+  const meal = { enabled: true, equipment: ['microwave' as const], canCook: false, maxMinutes: 10, kcalMin: null, kcalMax: null }
+  return {
+    userId: USER_A,
+    equipmentScope: 'day',
+    dayEquipment: ['microwave', 'stove'],
+    dailyKcalMin: 1600,
+    dailyKcalMax: 2000,
+    meals: { breakfast: { ...meal }, lunch: { ...meal, kcalMin: 400, kcalMax: 600 }, dinner: { ...meal, canCook: true, maxMinutes: 40 }, snack: { ...meal, enabled: false } },
+    createdAt: TS,
+    updatedAt: TS,
+    ...overrides,
+  }
+}
+
+export function makeReminder(overrides: Partial<ReminderSchedule> = {}): ReminderSchedule {
+  return {
+    id: testId(1000),
+    userId: USER_A,
+    kind: 'meal_log',
+    mealType: 'lunch',
+    localTime: '12:30',
+    days: [0, 1, 2, 3, 4],
+    timezone: 'Asia/Jerusalem',
+    enabled: true,
+    skipIfLogged: true,
+    createdAt: TS,
+    updatedAt: TS,
     ...overrides,
   }
 }

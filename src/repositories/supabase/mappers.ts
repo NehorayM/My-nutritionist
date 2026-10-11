@@ -9,8 +9,10 @@ import {
   workoutEntryToRow,
 } from './rows/activity'
 import { foodItemFromRow, foodItemToRow } from './rows/food'
+import { pantryItemFromRow, pantryItemToRow, plannerSettingsFromRow, plannerSettingsToRow } from './rows/kitchen'
 import { favoriteFromRow, favoriteToRow, mealEntryFromRow, mealEntryToRow, savedMealFromRow, savedMealToRow } from './rows/meal'
 import { profileFromRow, profileToRow } from './rows/profile'
+import { reminderScheduleFromRow, reminderScheduleToRow } from './rows/reminders'
 
 /**
  * Domain ↔ database row mapping for every synchronizable table (exactly per
@@ -76,10 +78,33 @@ export const TABLE_MAPPERS: TableMappers = {
     toRow: savedMealToRow,
     fromRow: savedMealFromRow,
   },
+  pantry_items: {
+    table: 'pantry_items',
+    ownerColumn: 'user_id',
+    dateColumn: null,
+    toRow: pantryItemToRow,
+    fromRow: pantryItemFromRow,
+  },
+  planner_settings: {
+    table: 'planner_settings',
+    ownerColumn: 'id',
+    dateColumn: null,
+    toRow: plannerSettingsToRow,
+    fromRow: plannerSettingsFromRow,
+  },
+  reminder_schedules: {
+    table: 'reminder_schedules',
+    ownerColumn: 'user_id',
+    dateColumn: null,
+    toRow: reminderScheduleToRow,
+    fromRow: reminderScheduleFromRow,
+  },
 }
 
 export { asRow, numeric } from './rows/shared'
 export * from './rows/activity'
 export * from './rows/food'
+export * from './rows/kitchen'
 export * from './rows/meal'
 export * from './rows/profile'
+export * from './rows/reminders'

@@ -4,7 +4,8 @@ import type { FilterQuery, QueryResult, ReturningQuery, SupabaseDataClient, Tabl
  * Small in-memory stand-in for the supabase-js query builder (tests only).
  * Supports exactly what the repositories use: select / upsert(onConflict) + select / delete, eq / gte / lte
  * filters, order, range, limit, abortSignal. Upserts apply the same stale-write rule as the database
- * trigger (an update older than the stored row is skipped and returns no row) and keep `created_at`.
+ * trigger (an update older than the stored row is skipped and returns no row) and keep `created_at`, and deletes
+ * leave tombstones like migration 004 (re-inserting a deleted id needs a newer `updated_at`).
  * Every executed request is recorded in `calls`.
  */
 export type Row = Record<string, unknown>
@@ -99,6 +100,8 @@ export class FakeSupabase implements SupabaseDataClient {
   /** When true, filters are ignored (simulates a server that returns too much) — tests defense in depth. */
   ignoreFilters = false
   #failures: Failure[] = []
+  /** `${table}:${id}` → `updated_at` of the deleted version. */
+  readonly tombstones = new Map<string, unknown>()
 
   rows(table: string): Row[] {
     let rows = this.tables.get(table)
@@ -154,10 +157,15 @@ export class FakeSupabase implements SupabaseDataClient {
     const rows = this.rows(call.table)
     const filters = this.ignoreFilters ? [] : call.filters
     if (call.method === 'delete') {
+      for (const row of rows.filter((candidate) => matches(candidate, filters))) {
+        const key = `${call.table}:${String(row.id)}`
+        const previous = this.tombstones.get(key)
+        if (previous === undefined || compare(row.updated_at, previous) > 0) this.tombstones.set(key, row.updated_at)
+      }
       this.tables.set(call.table, rows.filter((row) => !matches(row, filters)))
       return { data: null, error: null, status: 204 }
     }
-    if (call.method === 'upsert') return this.#upsert(rows, call.values ?? {})
+    if (call.method === 'upsert') return this.#upsert(call.table, rows, call.values ?? {})
     let result = rows.filter((row) => matches(row, filters))
     result.sort((a, b) => {
       for (const { column, ascending } of call.order) {
@@ -171,13 +179,15 @@ export class FakeSupabase implements SupabaseDataClient {
     return { data: structuredClone(result), error: null, status: 200 }
   }
 
-  #upsert(rows: Row[], values: Row): QueryResult {
+  #upsert(table: string, rows: Row[], values: Row): QueryResult {
     const index = rows.findIndex((row) => row.id === values.id)
     const existing = rows[index]
     if (existing) {
       if (compare(values.updated_at, existing.updated_at) < 0) return { data: [], error: null, status: 201 }
       rows[index] = { ...values, created_at: existing.created_at }
     } else {
+      const deleted = this.tombstones.get(`${table}:${String(values.id)}`)
+      if (deleted !== undefined && compare(values.updated_at, deleted) <= 0) return { data: [], error: null, status: 201 }
       rows.push(values)
     }
     return { data: [structuredClone(rows[index] ?? values)], error: null, status: 201 }

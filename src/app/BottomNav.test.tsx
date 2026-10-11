@@ -20,18 +20,18 @@ beforeEach(() => {
 })
 
 describe('BottomNav', () => {
-  it('is the primary navigation with exactly four tabs in order', () => {
+  it('is the primary navigation with exactly five tabs in order', () => {
     render(<BottomNav current="meals" />)
     const nav = screen.getByRole('navigation', { name: 'Primary' })
     const links = within(nav).getAllByRole('link')
-    expect(links.map((link) => link.textContent)).toEqual(['Meals', 'Progress', 'Activity', 'Profile'])
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(['#/meals', '#/progress', '#/activity', '#/profile'])
+    expect(links.map((link) => link.textContent)).toEqual(['Meals', 'Kitchen', 'Progress', 'Activity', 'Profile'])
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['#/meals', '#/kitchen', '#/progress', '#/activity', '#/profile'])
   })
 
   it('marks only the current tab with aria-current="page"', () => {
     render(<BottomNav current="activity" />)
     expect(screen.getByRole('link', { name: 'Activity' })).toHaveAttribute('aria-current', 'page')
-    for (const name of ['Meals', 'Progress', 'Profile']) {
+    for (const name of ['Meals', 'Kitchen', 'Progress', 'Profile']) {
       expect(screen.getByRole('link', { name })).not.toHaveAttribute('aria-current')
     }
   })

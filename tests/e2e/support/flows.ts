@@ -10,7 +10,7 @@ export function trackErrors(page: Page): string[] {
   return errors
 }
 
-export async function goToTab(page: Page, tab: 'Meals' | 'Progress' | 'Activity' | 'Profile'): Promise<void> {
+export async function goToTab(page: Page, tab: 'Meals' | 'Kitchen' | 'Progress' | 'Activity' | 'Profile'): Promise<void> {
   await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: tab }).click()
   await expect(page.getByRole('heading', { level: 1, name: tab })).toBeVisible()
 }

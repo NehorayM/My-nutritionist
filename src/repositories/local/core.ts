@@ -27,6 +27,9 @@ export const STORE_SPECS: { [S in UserStoreName]: RecordSpec<UserStoreRecord<S>>
   scheduledWorkouts: RECORD_SPECS.scheduled_workouts,
   favorites: RECORD_SPECS.favorites,
   savedMeals: RECORD_SPECS.saved_meals,
+  pantry: RECORD_SPECS.pantry_items,
+  plannerSettings: RECORD_SPECS.planner_settings,
+  reminders: RECORD_SPECS.reminder_schedules,
   outbox: { label: 'outbox mutation', schema: outboxMutationSchema, ownerField: 'userId' },
 }
 
@@ -60,7 +63,7 @@ export async function runLocal<T>(operation: string, task: () => Promise<T>): Pr
  * Deletes a record by id when it belongs to `userId`. Missing records and records of another user
  * are left untouched (idempotent, never reveals other users' data). Invalid records can be removed.
  */
-export async function removeOwned(store: Exclude<EntityStoreName, 'profiles'>, id: string, userId: string): Promise<void> {
+export async function removeOwned(store: Exclude<EntityStoreName, 'profiles' | 'plannerSettings'>, id: string, userId: string): Promise<void> {
   const db = await openDatabase()
   const tx = db.transaction(store, 'readwrite')
   const existing: unknown = await tx.store.get(id)

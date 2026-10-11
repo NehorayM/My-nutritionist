@@ -10,7 +10,8 @@ export default mergeConfig(
       // Tests never pick up a developer's .env.local: the app under test runs unconfigured (guest mode)
       // unless a test injects its own dependencies.
       env: { VITE_SUPABASE_URL: '', VITE_SUPABASE_PUBLISHABLE_KEY: '', VITE_SUPABASE_ANON_KEY: '' },
-      include: ['src/**/*.test.{ts,tsx}'],
+      // tests/design: checks of the design tokens (contrast) that read source files from disk.
+      include: ['src/**/*.test.{ts,tsx}', 'tests/design/**/*.test.ts'],
       restoreMocks: true,
       // UI integration tests drive multi-step flows with user-event; under full parallel load they need more than the 5 s default.
       testTimeout: 20_000,

@@ -2,6 +2,7 @@ import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { Toaster as SonnerToaster } from 'sonner'
 import { useResolvedTheme } from '@/hooks/useApplyTheme'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Spinner } from './Spinner'
 
 /** Sonner reads these variables for its default toast styling; map them to our tokens. */
@@ -13,13 +14,17 @@ const TOKEN_STYLE = {
   '--width': 'min(356px, calc(100vw - 2rem))',
 } as CSSProperties
 
-/** Positioned above the bottom navigation (see --toast-offset in index.css). Mount once in App. */
+/**
+ * Phones: centered above the bottom navigation. From md (side navigation): bottom-right corner.
+ * Offsets come from --toast-offset (tokens.css). Mount once in App.
+ */
 export function Toaster() {
   const theme = useResolvedTheme()
+  const wide = useMediaQuery('(min-width: 48rem)')
   return (
     <SonnerToaster
       theme={theme}
-      position="bottom-center"
+      position={wide ? 'bottom-right' : 'bottom-center'}
       offset={{ bottom: 'var(--toast-offset)' }}
       mobileOffset={{ bottom: 'var(--toast-offset)', left: '1rem', right: '1rem' }}
       gap={10}

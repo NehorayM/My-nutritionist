@@ -1,6 +1,6 @@
 import { describe, expect, inject, it } from 'vitest'
 import './support/context.ts'
-import { createSupabaseClaimsVerifier, createUserVerifier } from '../../supabase/functions/food-search/auth.ts'
+import { createSupabaseClaimsVerifier, createUserVerifier } from '../../supabase/functions/_shared/auth.ts'
 
 /**
  * The food-search function's caller check (supabase-js auth.getClaims) against the real local Auth server:

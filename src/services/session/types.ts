@@ -1,7 +1,9 @@
 import type { Repositories } from '@/repositories/types'
 import type { AuthService } from '@/services/auth'
 import type { GuestDataSummary, MigrateGuestDataInput, MigrationResult } from '@/services/migration'
+import type { DataEvents } from '@/services/dataEvents'
 import type { CloudSync, ConnectivityMonitor } from '@/services/sync'
+import type { RemoteChangeSubscriber } from '@/services/sync/realtimeChanges'
 
 /** Everything the session controller touches outside the stores — injectable for tests. */
 export interface SessionDeps {
@@ -21,6 +23,10 @@ export interface SessionDeps {
   redirectUrl(): string
   currentUrl(): string
   now(): Date
+  /** "Data changed" signals between tabs and from the server (see services/dataEvents). */
+  events: DataEvents
+  /** Realtime change notifications for the signed-in user; null without Supabase. */
+  remoteChanges: RemoteChangeSubscriber | null
 }
 
 export type ActionResult = { ok: true } | { ok: false; message: string }

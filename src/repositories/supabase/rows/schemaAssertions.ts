@@ -3,6 +3,8 @@ import type { FoodItemRow } from './food'
 import type { FavoriteRow, MealLogRow, SavedMealRow } from './meal'
 import type { ProfileRow } from './profile'
 import type { ScheduledWorkoutRow, WeightLogRow, WorkoutLogRow } from './activity'
+import type { PantryItemRow, PlannerSettingsRow } from './kitchen'
+import type { ReminderScheduleRow } from './reminders'
 
 /**
  * Compile-time guard (checked by `tsc`, no runtime code): every hand-written row type has exactly the columns of
@@ -23,4 +25,7 @@ export type RowColumnsMatchSchema = [
   Assert<SameKeys<keyof WeightLogRow, Columns<'weight_logs'>>>,
   Assert<SameKeys<keyof WorkoutLogRow, Columns<'workout_logs'>>>,
   Assert<SameKeys<keyof ScheduledWorkoutRow, Columns<'scheduled_workouts'>>>,
+  Assert<SameKeys<keyof PantryItemRow, Columns<'pantry_items'>>>,
+  Assert<SameKeys<keyof PlannerSettingsRow, Columns<'planner_settings'>>>,
+  Assert<SameKeys<keyof ReminderScheduleRow, Columns<'reminder_schedules'>>>,
 ]

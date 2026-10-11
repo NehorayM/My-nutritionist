@@ -8,6 +8,10 @@ overrides, shell geometry) and `src/app/styles/utilities.css`; components in `sr
 
 ## Tokens
 
+Palette (2026-10 refresh): cool sage neutrals, deep emerald primary, apricot accent; light and dark values in
+`src/app/styles/tokens.css`. `tests/design/contrast.test.ts` computes WCAG contrast from the OKLCH values and requires
+text ≥ 12:1, muted text ≥ 5.5:1 (≥ 4.5:1 on `surface-2`), button text ≥ 5.5:1 and status colors ≥ 4.5:1 in both themes.
+
 Tailwind CSS 4 `@theme` variables, so every token is also a utility (`bg-surface`, `text-protein-ink`,
 `rounded-card`, `shadow-card`, …). Dark values override the same variables on
 `:root[data-theme="dark"]`; `dark:` variants key on that attribute.
@@ -59,11 +63,14 @@ Weights: 500 for long text, 600 for labels, 700 for headings, 800 for screen tit
 
 ## Spacing & layout
 
-- 4 px grid (Tailwind spacing). Screen gutters `px-5` (20 px); card padding `px-5 py-4`; gaps between
-  cards `space-y-4`–`space-y-6`.
-- **AppShell**: phones get a full-bleed column (`h-dvh`) with the screen scrolling inside `<main>`. From
-  `sm` (40 rem) the app sits in a centered **30 rem** frame (`rounded-frame`, `shadow-frame`) on the soft
-  `app-backdrop`. Bottom padding of `<main>` clears the nav (`--nav-height` + safe area).
+- 4 px grid (Tailwind spacing). Screen gutters `SCREEN_PADDING` (16 → 20 → 32 → 40 px from phone to desktop); card
+  padding `px-5 py-4`; gaps between cards `gap-5`.
+- **AppShell** (responsive, the page scrolls): phones (< 48 rem) — full-width column and the bottom tab bar;
+  tablets (md) — a navigation rail (`--rail-width`); desktop (lg) — a labelled sidebar (`--sidebar-width`) with the sync
+  badge, content up to 82 rem wide. Only one primary navigation is rendered at a time (`useMediaQuery`).
+- **ScreenColumns** (`app/ScreenLayout.tsx`): `lead` → `main` → `aside` in one column on phones; from lg the main task on
+  the left (7/12) and lead + aside on the right (5/12). Column children may shrink (`[&>*]:min-w-0`), so carousels
+  never widen the page (E2E checks every tab at 390, 820 and 1440 px for horizontal overflow).
 - Safe areas: `viewport-fit=cover` in `index.html`; utilities `pt-safe`, `pb-safe`, `px-safe`.
 
 ## Radii & elevation
@@ -108,9 +115,10 @@ supported, nothing otherwise).
 | `Toaster` + `notify` | Mount `Toaster` once (App). Features call `notify.success \| info \| error(message, { description, undo, id, duration })` from `@/lib/notify` and never import sonner. Toasts sit above the bottom bar (`--toast-offset`). |
 
 App shell (`src/app`): `AppShell`, `ScreenHeader` (sticky; the screen's only `<h1>`; `eyebrow`, `subtitle`,
-`actions`, extra sticky `children` such as a date switcher), `BottomNav` (exactly four tabs: Meals,
-Progress, Activity, Profile), `useHashRoute` (`#/meals` default; unknown `#/…` → `#/meals`; non-route
-fragments such as auth callbacks and the query string are left untouched), `ScreenErrorBoundary`,
+`actions`, extra sticky `children` such as a date switcher), `BottomNav` / `SideNav` (five tabs: Meals, Kitchen,
+Progress, Activity, Profile; the sidebar adds the `SyncBadge`), `ScreenBody` / `ScreenColumns`, `useHashRoute`
+(`#/meals` default; unknown `#/…` → `#/meals`; non-route fragments such as auth callbacks, `#/unsubscribe?token=…`
+and the query string are left untouched), `ScreenErrorBoundary`,
 `RoutedApp` (Meals eager; other tabs lazy — Progress carries recharts — with preload on hover/focus).
 
 ## Motion

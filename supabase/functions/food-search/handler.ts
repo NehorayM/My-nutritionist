@@ -4,7 +4,7 @@
  */
 import { normalizeUsdaFoodResponse, normalizeUsdaSearchResponse } from '../_shared/usda/normalize.ts'
 import type { UsdaFoodResponseDto, UsdaSearchResponseDto } from '../_shared/usda/types.ts'
-import type { VerifyUser } from './auth.ts'
+import type { VerifyUser } from '../_shared/auth.ts'
 import { createLruCache } from './cache.ts'
 import { errorResponse, jsonResponse, preflightResponse } from './http.ts'
 import {

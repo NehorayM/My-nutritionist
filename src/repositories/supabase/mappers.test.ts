@@ -7,6 +7,9 @@ import {
   makePortion,
   makeProfile,
   makeSavedMeal,
+  makePantryItem,
+  makePlannerSettings,
+  makeReminder,
   makeScheduled,
   makeWeight,
   makeWorkout,
@@ -14,12 +17,17 @@ import {
   USER_A,
 } from '@/schemas/__fixtures__/records'
 import { NUTRIENT_KEYS, SYNC_ENTITIES } from '@/types'
-import migration from '../../../supabase/migrations/001_initial_schema.sql?raw'
+import initialSchema from '../../../supabase/migrations/001_initial_schema.sql?raw'
+import kitchenSchema from '../../../supabase/migrations/005_kitchen_and_reminders.sql?raw'
 import { profileToRow, savedMealToRow, TABLE_MAPPERS } from './mappers'
 
-/** Column names of one table in the migration, in declaration order. */
+/** Every migration that creates synchronized tables. */
+const migration = `${initialSchema}\n${kitchenSchema}`
+
+/** Column names of one table in the migrations, in declaration order. */
 function columnsOf(table: string): string[] {
   const start = migration.indexOf(`create table public.${table} (`)
+  expect(start, `table ${table} is created by a migration`).toBeGreaterThanOrEqual(0)
   const body = migration.slice(migration.indexOf('\n', start) + 1, migration.indexOf('\n);', start))
   return body
     .split('\n')
@@ -36,6 +44,9 @@ const RECORDS = {
   scheduled_workouts: makeScheduled(),
   favorites: makeFavorite(),
   saved_meals: makeSavedMeal(),
+  pantry_items: makePantryItem(),
+  planner_settings: makePlannerSettings(),
+  reminder_schedules: makeReminder(),
 }
 
 describe('TABLE_MAPPERS', () => {

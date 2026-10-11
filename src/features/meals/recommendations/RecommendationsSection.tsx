@@ -51,7 +51,7 @@ export function RecommendationsSection({ date, entries, targets }: Recommendatio
       {plan.status === 'ok' && plan.recommendations.length > 0 ? (
         <ul
           aria-label="Suggested meals"
-          className="-mx-5 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:thin]"
+          className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:-mx-5 sm:scroll-px-5 sm:px-5 md:mx-0 md:scroll-px-0 md:px-0"
         >
           {plan.recommendations.map((rec) => (
             <li key={rec.id} className="w-[min(18.5rem,82%)] shrink-0 snap-start">

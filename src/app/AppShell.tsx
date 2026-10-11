@@ -1,40 +1,38 @@
 import type { ReactNode, Ref } from 'react'
+import { cn } from '@/components/ui/cn'
 
 interface AppShellProps {
   /** The current screen. */
   children: ReactNode
-  /** Bottom navigation, overlaid on the scroll area so content scrolls under its translucent bar (absent on the welcome screen). */
-  nav?: ReactNode
+  /** Side navigation (rail from md, sidebar from lg); absent on the welcome screen. */
+  sidebar?: ReactNode
+  /** Bottom tab bar for phones (hidden from md). */
+  bottomNav?: ReactNode
   mainRef?: Ref<HTMLElement>
 }
 
 /**
- * Phone: full-bleed column filling the dynamic viewport. From `sm`: a centered ≈30 rem column in a
- * rounded, shadowed frame on a soft backdrop. The screen scrolls inside <main>.
+ * Responsive app frame. Phones: full-width column, the page scrolls, a tab bar sits at the bottom. Tablets: a
+ * navigation rail on the left. Desktop: a labelled sidebar and a wide content area (screens lay out in columns).
  */
-export function AppShell({ children, nav, mainRef }: AppShellProps) {
+export function AppShell({ children, sidebar, bottomNav, mainRef }: AppShellProps) {
   return (
-    <div className="app-backdrop min-h-dvh sm:grid sm:place-items-center sm:p-6">
-      <div
-        className={
-          'relative isolate mx-auto flex h-dvh w-full flex-col overflow-hidden bg-bg ' +
-          'sm:h-[min(var(--frame-max-height),calc(100dvh-3rem))] sm:max-w-[30rem] sm:rounded-frame ' +
-          'sm:shadow-frame sm:ring-1 sm:ring-border/80'
-        }
-      >
+    <div className="min-h-dvh bg-bg">
+      {sidebar}
+      <div className={cn(sidebar && 'md:pl-[var(--rail-width)] lg:pl-[var(--sidebar-width)]')}>
         <main
           ref={mainRef}
           id="main"
           tabIndex={-1}
-          className={
-            'scrollbar-soft min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-safe outline-none ' +
-            (nav ? 'pb-[calc(var(--nav-height)+env(safe-area-inset-bottom,0px)+1.5rem)]' : 'pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)]')
-          }
+          className={cn(
+            'mx-auto w-full max-w-[82rem] px-safe outline-none',
+            bottomNav ? 'pb-[calc(var(--nav-height)+env(safe-area-inset-bottom,0px)+1.5rem)] md:pb-12' : 'pb-12',
+          )}
         >
           {children}
         </main>
-        {nav}
       </div>
+      {bottomNav}
     </div>
   )
 }

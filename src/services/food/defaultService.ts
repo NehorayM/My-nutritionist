@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { SYSTEM_FOODS, systemFoodProvenance } from '@/data/systemFoods'
 import { getSupabase } from '@/lib/supabase'
 import { getRepositories, hasRepositories } from '@/services/runtime'
+import { createMyMemoryTranslator, createQueryTranslator } from '@/services/translation'
 import type { FoodItem } from '@/types'
 import { createFoodSearchService } from './foodSearchService'
 import { createLocalCatalogProvider } from './providers/localCatalogProvider'
@@ -49,7 +50,8 @@ function functionInvoker(client: SupabaseClient | null): InvokeFunction {
 
 /**
  * Production wiring: bundled system catalog + user foods (always), USDA through the Edge Function
- * (cloud mode only), Open Food Facts browser-direct (barcode + explicit packaged search).
+ * (cloud mode only), Open Food Facts browser-direct (barcode + explicit packaged search). Hebrew queries are
+ * translated to English first (built-in dictionary; MyMemory machine translation for unknown words).
  */
 export function createDefaultFoodSearchService(options: DefaultFoodSearchOptions = {}): FoodSearchService {
   const client = options.supabase === undefined ? getSupabase() : options.supabase
@@ -64,6 +66,7 @@ export function createDefaultFoodSearchService(options: DefaultFoodSearchOptions
     }),
     off: createOpenFoodFactsProvider(),
     linkedRecordKey: catalogUsdaRecord,
+    translator: createQueryTranslator({ machine: createMyMemoryTranslator() }),
   })
 }
 

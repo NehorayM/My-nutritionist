@@ -4,7 +4,10 @@ import type {
   FoodItem,
   MealEntry,
   OutboxMutation,
+  PantryItem,
+  PlannerSettings,
   Profile,
+  ReminderSchedule,
   SavedMeal,
   ScheduledWorkout,
   SyncEntity,
@@ -18,7 +21,7 @@ import { logger } from './logger'
  * Records are stored in their domain shape; repositories validate them on read.
  */
 export const DB_NAME = 'my-nutritionist'
-export const DB_VERSION = 1
+export const DB_VERSION = 2
 
 /** Free-form key/value record (sync cursors, migration flags). User-scoped keys: see `userMetaKey`. */
 export interface MetaRecord {
@@ -43,6 +46,10 @@ export interface NutritionistDB extends DBSchema {
   scheduledWorkouts: { key: string; value: ScheduledWorkout; indexes: { byUserDate: UserKey } }
   favorites: { key: string; value: Favorite; indexes: { byUser: string } }
   savedMeals: { key: string; value: SavedMeal; indexes: { byUser: string } }
+  pantry: { key: string; value: PantryItem; indexes: { byUser: string } }
+  /** Keyed by the user (one record each), like profiles. */
+  plannerSettings: { key: string; value: PlannerSettings }
+  reminders: { key: string; value: ReminderSchedule; indexes: { byUser: string } }
   outbox: { key: string; value: OutboxMutation; indexes: { byUserCreated: UserKey } }
   meta: { key: string; value: MetaRecord }
 }
@@ -60,6 +67,9 @@ export const USER_STORES = [
   'scheduledWorkouts',
   'favorites',
   'savedMeals',
+  'pantry',
+  'plannerSettings',
+  'reminders',
   'outbox',
 ] as const satisfies readonly StoreName[]
 export type UserStoreName = (typeof USER_STORES)[number]
@@ -75,6 +85,9 @@ export const STORE_FOR_ENTITY = {
   scheduled_workouts: 'scheduledWorkouts',
   favorites: 'favorites',
   saved_meals: 'savedMeals',
+  pantry_items: 'pantry',
+  planner_settings: 'plannerSettings',
+  reminder_schedules: 'reminders',
 } as const satisfies Record<SyncEntity, EntityStoreName>
 
 /** Meta key owned by one user; `clearUserData(userId)` removes every key built with this helper. */
@@ -108,6 +121,11 @@ function upgradeDatabase(db: NutritionistDatabase, oldVersion: number): void {
     db.createObjectStore('savedMeals', { keyPath: 'id' }).createIndex('byUser', 'userId')
     db.createObjectStore('outbox', { keyPath: 'id' }).createIndex('byUserCreated', ['userId', 'createdAt'])
     db.createObjectStore('meta', { keyPath: 'key' })
+  }
+  if (oldVersion < 2) {
+    db.createObjectStore('pantry', { keyPath: 'id' }).createIndex('byUser', 'userId')
+    db.createObjectStore('plannerSettings', { keyPath: 'userId' })
+    db.createObjectStore('reminders', { keyPath: 'id' }).createIndex('byUser', 'userId')
   }
 }
 

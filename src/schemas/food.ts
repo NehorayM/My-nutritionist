@@ -27,30 +27,31 @@ const foodMealTypesSchema = z
   .max(COUNT_LIMITS.foodMealTypes)
   .transform((values) => values.filter(isMealType))
 
-export const foodItemSchema = z
-  .object({
-    id: uuidSchema,
-    source: z.enum(FOOD_SOURCES),
-    externalId: boundedText(1, TEXT_LIMITS.externalId).nullable(),
-    name: boundedText(1, TEXT_LIMITS.foodName),
-    brand: boundedText(0, TEXT_LIMITS.brand).nullable(),
-    barcode: z.string().regex(BARCODE_PATTERN, { message: 'Barcode must be 6–14 digits' }).nullable(),
-    category: z.enum(FOOD_CATEGORIES).nullable(),
-    per100g: nutrientsPer100gSchema,
-    servings: z.array(servingOptionSchema).max(COUNT_LIMITS.servings),
-    allergens: z.array(z.enum(ALLERGENS)).nullable(),
-    dietFlags: dietFlagsSchema,
-    tags: z.array(boundedText(1, TEXT_LIMITS.foodTag)).max(COUNT_LIMITS.foodTags),
-    mealTypes: foodMealTypesSchema,
-    prepMinutes: intInRange(LIMITS.foodPrepMinutes).nullable(),
-    requiresCooking: z.boolean().nullable(),
-    costTier: z.literal([1, 2, 3]).nullable(),
-    attribution: boundedText(0, TEXT_LIMITS.attribution).nullable(),
-    createdBy: uuidSchema.nullable(),
-    createdAt: isoTimestampSchema,
-    updatedAt: isoTimestampSchema,
-  })
-  .refine((food) => (food.source === 'system') === (food.createdBy === null), {
-    message: 'System foods have no owner and every other food has one',
-    path: ['createdBy'],
-  })
+/** Every field of a food, without the ownership rule (pantry snapshots may hold unsaved provider foods). */
+export const foodSnapshotSchema = z.object({
+  id: uuidSchema,
+  source: z.enum(FOOD_SOURCES),
+  externalId: boundedText(1, TEXT_LIMITS.externalId).nullable(),
+  name: boundedText(1, TEXT_LIMITS.foodName),
+  brand: boundedText(0, TEXT_LIMITS.brand).nullable(),
+  barcode: z.string().regex(BARCODE_PATTERN, { message: 'Barcode must be 6–14 digits' }).nullable(),
+  category: z.enum(FOOD_CATEGORIES).nullable(),
+  per100g: nutrientsPer100gSchema,
+  servings: z.array(servingOptionSchema).max(COUNT_LIMITS.servings),
+  allergens: z.array(z.enum(ALLERGENS)).nullable(),
+  dietFlags: dietFlagsSchema,
+  tags: z.array(boundedText(1, TEXT_LIMITS.foodTag)).max(COUNT_LIMITS.foodTags),
+  mealTypes: foodMealTypesSchema,
+  prepMinutes: intInRange(LIMITS.foodPrepMinutes).nullable(),
+  requiresCooking: z.boolean().nullable(),
+  costTier: z.literal([1, 2, 3]).nullable(),
+  attribution: boundedText(0, TEXT_LIMITS.attribution).nullable(),
+  createdBy: uuidSchema.nullable(),
+  createdAt: isoTimestampSchema,
+  updatedAt: isoTimestampSchema,
+})
+
+export const foodItemSchema = foodSnapshotSchema.refine((food) => (food.source === 'system') === (food.createdBy === null), {
+  message: 'System foods have no owner and every other food has one',
+  path: ['createdBy'],
+})

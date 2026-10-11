@@ -28,6 +28,9 @@ export const RECORD_SPECS: { [E in SyncEntity]: RecordSpec<EntityRecordMap[E]> }
   scheduled_workouts: { label: 'scheduled workout', schema: ENTITY_SCHEMAS.scheduled_workouts, ownerField: 'userId' },
   favorites: { label: 'favorite', schema: ENTITY_SCHEMAS.favorites, ownerField: 'userId' },
   saved_meals: { label: 'saved meal', schema: ENTITY_SCHEMAS.saved_meals, ownerField: 'userId' },
+  pantry_items: { label: 'pantry item', schema: ENTITY_SCHEMAS.pantry_items, ownerField: 'userId' },
+  planner_settings: { label: 'planner settings', schema: ENTITY_SCHEMAS.planner_settings, ownerField: 'userId' },
+  reminder_schedules: { label: 'reminder', schema: ENTITY_SCHEMAS.reminder_schedules, ownerField: 'userId' },
 }
 
 /** Owner id of a value without trusting its shape; null when absent or not a string. */

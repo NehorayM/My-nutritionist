@@ -8,8 +8,9 @@ import { mealEntrySchema } from '@/schemas'
 import { getRepositories } from '@/services/runtime'
 import type { FoodPortion, MealEntry, MealType } from '@/types'
 import { userMessageFor } from './errors'
+import { createChangeJournal } from './changeJournal'
 import type { LoadStatus, SaveResult } from './profileStore'
-import { registerUserStoreReset } from './registry'
+import { registerUserStoreReset, sessionGuard } from './registry'
 
 /** Entries scanned for the Recent list (newest first). */
 export const RECENT_ENTRY_LIMIT = 60
@@ -47,12 +48,15 @@ interface MealsState {
   restoreEntry: (entry: MealEntry) => Promise<SaveResult>
   /** Logs a copy of `mealType` from `fromDate` into the same meal of `toDate` ("repeat yesterday"). */
   copyMeal: (fromDate: DateKey, toDate: DateKey, mealType: MealType) => Promise<MealsResult<MealEntry[]>>
+  /** Reloads every loaded day and the recent list (data changed elsewhere). */
+  refresh: () => Promise<void>
   reset: () => void
 }
 
 const initial = { selectedDate: null, days: {}, recentEntries: [], recentStatus: 'idle' as LoadStatus }
-let generation = 0
 const loadTokens = new Map<DateKey, number>()
+/** Local changes, re-applied to loads that started before them (see `ChangeJournal`). */
+const journal = createChangeJournal<MealEntry>()
 
 export const useMealsStore = create<MealsState>()((set, get) => {
   function setDay(date: DateKey, day: DayLog): void {
@@ -61,6 +65,7 @@ export const useMealsStore = create<MealsState>()((set, get) => {
 
   /** Puts `entry` in its day (when that day is cached) and the recent list; `null` removes `id` everywhere. */
   function place(id: string, entry: MealEntry | null): void {
+    journal.record(id, entry)
     set((state) => {
       const days: Record<DateKey, DayLog> = {}
       for (const [date, day] of Object.entries(state.days)) {
@@ -85,13 +90,14 @@ export const useMealsStore = create<MealsState>()((set, get) => {
   /** Optimistic save of one entry; restores `before` (or removes the entry) when it fails. */
   async function persist(entry: MealEntry, before: MealEntry | null, action: string): Promise<MealsResult<MealEntry>> {
     if (!mealEntrySchema.safeParse(entry).success) return fail('Some details of this entry are invalid. Please check the amount.')
+    const current = sessionGuard()
     place(entry.id, entry)
     try {
       const saved = await getRepositories().meals.save(entry)
-      place(saved.id, saved)
+      if (current()) place(saved.id, saved)
       return { ok: true, value: saved }
     } catch (error) {
-      place(entry.id, before)
+      if (current()) place(entry.id, before)
       return fail(userMessageFor(error, action))
     }
   }
@@ -107,12 +113,14 @@ export const useMealsStore = create<MealsState>()((set, get) => {
       const current = get().days[date]
       if (!options.force && (current?.status === 'ready' || current?.status === 'loading')) return
       const token = (loadTokens.get(date) ?? 0) + 1
-      const run = generation
+      const sameSession = sessionGuard()
       loadTokens.set(date, token)
-      const stale = () => run !== generation || loadTokens.get(date) !== token
+      const stale = () => !sameSession() || loadTokens.get(date) !== token
       setDay(date, { status: 'loading', entries: current?.entries ?? [], error: null })
+      const mark = journal.mark()
       try {
-        const entries = await getRepositories().meals.listByDate(date)
+        const loaded = await getRepositories().meals.listByDate(date)
+        const entries = journal.overlay(loaded, mark, (entry) => entry.date === date)
         if (!stale()) setDay(date, { status: 'ready', entries: entries.sort(byLogged), error: null })
       } catch (error) {
         if (!stale()) setDay(date, { status: 'error', entries: current?.entries ?? [], error: userMessageFor(error, 'load your meals') })
@@ -120,14 +128,16 @@ export const useMealsStore = create<MealsState>()((set, get) => {
     },
 
     async loadRecent() {
-      const run = generation
+      const current = sessionGuard()
       set({ recentStatus: 'loading' })
+      const mark = journal.mark()
       try {
-        const entries = await getRepositories().meals.listRecent(RECENT_ENTRY_LIMIT)
-        if (run === generation) set({ recentEntries: entries.sort(newestFirst), recentStatus: 'ready' })
+        const loaded = await getRepositories().meals.listRecent(RECENT_ENTRY_LIMIT)
+        const entries = journal.overlay(loaded, mark).sort(newestFirst).slice(0, RECENT_ENTRY_LIMIT)
+        if (current()) set({ recentEntries: entries, recentStatus: 'ready' })
       } catch (error) {
         userMessageFor(error, 'load your recent foods')
-        if (run === generation) set({ recentStatus: 'error' })
+        if (current()) set({ recentStatus: 'error' })
       }
     },
 
@@ -167,12 +177,13 @@ export const useMealsStore = create<MealsState>()((set, get) => {
     async deleteEntry(id) {
       const existing = findEntry(id)
       if (!existing) return fail('This entry is no longer available.')
+      const current = sessionGuard()
       place(id, null)
       try {
         await getRepositories().meals.remove(id)
         return { ok: true, value: existing }
       } catch (error) {
-        place(id, existing)
+        if (current()) place(id, existing)
         return fail(userMessageFor(error, 'remove the entry'))
       }
     },
@@ -195,9 +206,18 @@ export const useMealsStore = create<MealsState>()((set, get) => {
       return get().addPortions(portions, mealType, toDate)
     },
 
+    async refresh() {
+      const { days, recentStatus } = get()
+      const loaded = Object.entries(days).filter(([, day]) => day.status !== 'loading').map(([date]) => date)
+      await Promise.all([
+        ...loaded.map((date) => get().load(date, { force: true })),
+        recentStatus === 'idle' ? Promise.resolve() : get().loadRecent(),
+      ])
+    },
+
     reset() {
-      generation += 1
       loadTokens.clear()
+      journal.clear()
       set(initial)
     },
   }

@@ -5,8 +5,9 @@ import { weightEntrySchema } from '@/schemas'
 import { getRepositories } from '@/services/runtime'
 import type { WeightEntry, WeightUnit } from '@/types'
 import { userMessageFor } from './errors'
+import { createChangeJournal } from './changeJournal'
 import type { LoadStatus, SaveResult } from './profileStore'
-import { registerUserStoreReset } from './registry'
+import { registerUserStoreReset, sessionGuard } from './registry'
 
 export interface WeighInInput {
   weightKg: number
@@ -28,26 +29,38 @@ interface WeightState {
   remove: (id: string) => Promise<SaveResult>
   /** Re-saves a previously removed entry (undo). */
   restore: (entry: WeightEntry) => Promise<SaveResult>
+  /** Reloads when already loaded (data changed elsewhere). */
+  refresh: () => Promise<void>
   reset: () => void
 }
 
 const initial = { entries: [] as WeightEntry[], status: 'idle' as LoadStatus, error: null }
+/** Local changes, re-applied to loads that started before them (see `ChangeJournal`). */
+const journal = createChangeJournal<WeightEntry>()
 
 function invalid(): SaveResult {
   return { ok: false, message: 'Please enter a weight between 20 and 400 kg (44–880 lb).' }
 }
 
 export const useWeightStore = create<WeightState>()((set, get) => {
+  /** Replaces (or, with null, removes) one entry; other entries — e.g. a concurrent save — are untouched. */
+  function place(id: string, entry: WeightEntry | null): void {
+    journal.record(id, entry)
+    const rest = get().entries.filter((e) => e.id !== id)
+    set({ entries: entry ? [...rest, entry] : rest })
+  }
+
   async function persist(entry: WeightEntry, action: string): Promise<SaveResult> {
     if (!weightEntrySchema.safeParse(entry).success) return invalid()
-    const previous = get().entries
-    set({ entries: [...previous.filter((e) => e.id !== entry.id), entry] })
+    const current = sessionGuard()
+    const before = get().entries.find((e) => e.id === entry.id) ?? null
+    place(entry.id, entry)
     try {
       const saved = await getRepositories().weights.save(entry)
-      set({ entries: [...get().entries.filter((e) => e.id !== saved.id), saved] })
+      if (current()) place(saved.id, saved)
       return { ok: true }
     } catch (error) {
-      set({ entries: previous })
+      if (current()) place(entry.id, before)
       return { ok: false, message: userMessageFor(error, action) }
     }
   }
@@ -56,11 +69,15 @@ export const useWeightStore = create<WeightState>()((set, get) => {
     ...initial,
 
     async load() {
+      const current = sessionGuard()
       set({ status: 'loading', error: null })
+      const mark = journal.mark()
       try {
-        set({ entries: await getRepositories().weights.list(), status: 'ready' })
+        const loaded = await getRepositories().weights.list()
+        if (current()) set({ entries: journal.overlay(loaded, mark), status: 'ready' })
       } catch (error) {
-        set({ status: 'error', error: userMessageFor(error, 'load your weigh-ins') })
+        const message = userMessageFor(error, 'load your weigh-ins')
+        if (current()) set({ status: 'error', error: message })
       }
     },
 
@@ -89,18 +106,24 @@ export const useWeightStore = create<WeightState>()((set, get) => {
     },
 
     async remove(id) {
-      const previous = get().entries
-      set({ entries: previous.filter((e) => e.id !== id) })
+      const before = get().entries.find((e) => e.id === id) ?? null
+      const current = sessionGuard()
+      place(id, null)
       try {
         await getRepositories().weights.remove(id)
         return { ok: true }
       } catch (error) {
-        set({ entries: previous })
+        if (current()) place(id, before)
         return { ok: false, message: userMessageFor(error, 'delete the weigh-in') }
       }
     },
 
+    async refresh() {
+      if (get().status !== 'idle') await get().load()
+    },
+
     reset() {
+      journal.clear()
       set(initial)
     },
   }

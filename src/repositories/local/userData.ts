@@ -11,15 +11,18 @@ import { parseStoredList, runLocal, STORE_SPECS, type UserStoreRecord } from './
 /** Raw (unvalidated) values of `userId` in `store`, in index order. */
 async function rawForUser(db: NutritionistDatabase, store: UserStoreName, userId: string): Promise<unknown[]> {
   switch (store) {
-    case 'profiles': {
-      const profile = await db.get('profiles', userId)
-      return profile === undefined ? [] : [profile]
+    case 'profiles':
+    case 'plannerSettings': {
+      const record = await db.get(store, userId)
+      return record === undefined ? [] : [record]
     }
     case 'foods':
     case 'meals':
     case 'weights':
     case 'favorites':
     case 'savedMeals':
+    case 'pantry':
+    case 'reminders':
       return db.getAllFromIndex(store, 'byUser', userId)
     case 'workouts':
     case 'scheduledWorkouts':
@@ -32,12 +35,15 @@ async function rawForUser(db: NutritionistDatabase, store: UserStoreName, userId
 async function countForUser(db: NutritionistDatabase, store: UserStoreName, userId: string): Promise<number> {
   switch (store) {
     case 'profiles':
-      return db.count('profiles', userId)
+    case 'plannerSettings':
+      return db.count(store, userId)
     case 'foods':
     case 'meals':
     case 'weights':
     case 'favorites':
     case 'savedMeals':
+    case 'pantry':
+    case 'reminders':
       return db.countFromIndex(store, 'byUser', userId)
     case 'workouts':
     case 'scheduledWorkouts':
@@ -81,7 +87,7 @@ export function clearUserData(userId: string): Promise<void> {
   return runLocal('clearUserData', async () => {
     const db = await openDatabase()
     const tx = db.transaction([...USER_STORES, 'meta'], 'readwrite')
-    const byUser = ['foods', 'meals', 'weights', 'favorites', 'savedMeals'] as const
+    const byUser = ['foods', 'meals', 'weights', 'favorites', 'savedMeals', 'pantry', 'reminders'] as const
     const byUserDate = ['workouts', 'scheduledWorkouts'] as const
     const [userKeys, dateKeys, outboxKeys] = await Promise.all([
       Promise.all(byUser.map((store) => tx.objectStore(store).index('byUser').getAllKeys(userId))),
@@ -90,6 +96,7 @@ export function clearUserData(userId: string): Promise<void> {
     ])
     await Promise.all([
       tx.objectStore('profiles').delete(userId),
+      tx.objectStore('plannerSettings').delete(userId),
       tx.objectStore('meta').delete(userMetaKeyRange(userId)),
       ...byUser.flatMap((store, i) => (userKeys[i] ?? []).map((key) => tx.objectStore(store).delete(key))),
       ...byUserDate.flatMap((store, i) => (dateKeys[i] ?? []).map((key) => tx.objectStore(store).delete(key))),

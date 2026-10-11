@@ -7,6 +7,7 @@ import type { GuestDataSummary, MigrationResult } from '@/services/migration'
 import { emptyCounts } from '@/services/migration'
 import type { CloudSync, ConnectivityMonitor, SyncStatus } from '@/services/sync'
 import type { ConnectionState } from '@/types'
+import { createDataEvents } from '@/services/dataEvents'
 import type { SessionDeps } from '../types'
 
 export function fakeAuth(initial: AuthSession | null = null) {
@@ -95,6 +96,8 @@ export function fakeDeps(overrides: Partial<SessionDeps> = {}) {
     redirectUrl: () => 'http://localhost:5173/',
     currentUrl: () => 'http://localhost:5173/',
     now: () => new Date('2026-10-05T08:00:00.000Z'),
+    events: createDataEvents(null),
+    remoteChanges: null,
     ...overrides,
   }
   return { deps, guestId, clouds, guestSummary, isPreferGuest: () => preferGuest }

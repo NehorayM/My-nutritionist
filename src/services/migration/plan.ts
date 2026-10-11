@@ -4,6 +4,8 @@ import type {
   FoodItem,
   FoodPortion,
   MealEntry,
+  PantryItem,
+  PlannerSettings,
   Profile,
   SavedMeal,
   ScheduledWorkout,
@@ -21,12 +23,14 @@ export const MIGRATION_KINDS = [
   'weights',
   'workouts',
   'scheduledWorkouts',
+  'pantry',
+  'plannerSettings',
 ] as const
 export type MigrationKind = (typeof MIGRATION_KINDS)[number]
 export type MigrationCounts = Record<MigrationKind, number>
 
 export function emptyCounts(): MigrationCounts {
-  return { profile: 0, foods: 0, meals: 0, favorites: 0, savedMeals: 0, weights: 0, workouts: 0, scheduledWorkouts: 0 }
+  return { profile: 0, foods: 0, meals: 0, favorites: 0, savedMeals: 0, weights: 0, workouts: 0, scheduledWorkouts: 0, pantry: 0, plannerSettings: 0 }
 }
 
 export interface GuestData {
@@ -38,6 +42,8 @@ export interface GuestData {
   weights: WeightEntry[]
   workouts: WorkoutEntry[]
   scheduledWorkouts: ScheduledWorkout[]
+  pantry: PantryItem[]
+  plannerSettings: PlannerSettings | null
 }
 
 /** Guest records re-keyed for the account, plus how many guest records were left out (and why). */
@@ -122,6 +128,8 @@ export async function planGuestMigration(data: GuestData, options: PlanOptions):
     weights: data.weights.map((entry) => ({ ...entry, userId, ...restamp })),
     workouts: data.workouts.map((entry) => ({ ...entry, userId, ...restamp })),
     scheduledWorkouts: data.scheduledWorkouts.map((entry) => ({ ...entry, userId, ...restamp })),
+    pantry: data.pantry.map((item) => ({ ...item, userId, ...restamp })),
+    plannerSettings: data.plannerSettings ? { ...data.plannerSettings, userId, ...restamp } : null,
     dropped,
   }
 }

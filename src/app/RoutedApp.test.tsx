@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { installMatchMedia } from '@/hooks/testMediaQuery'
 import { RoutedApp } from './RoutedApp'
 
 // Routing is under test here, not the feature screens (their teams own those bodies).
@@ -14,6 +15,7 @@ vi.mock('@/features/meals/MealsScreen', () => ({
 }))
 vi.mock('@/features/progress/ProgressScreen', () => ({ ProgressScreen: () => <h1>Progress</h1> }))
 vi.mock('@/features/activity/ActivityScreen', () => ({ ActivityScreen: () => <h1>Activity</h1> }))
+vi.mock('@/features/kitchen/KitchenScreen', () => ({ KitchenScreen: () => <h1>Kitchen</h1> }))
 vi.mock('@/features/profile/ProfileScreen', () => ({
   ProfileScreen: () => {
     throw new Error('profile exploded')
@@ -23,6 +25,33 @@ vi.mock('@/features/profile/ProfileScreen', () => ({
 beforeEach(() => {
   window.history.replaceState(null, '', '/')
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
+})
+
+describe('RoutedApp: responsive navigation', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('shows the bottom bar on phones and the labelled sidebar from md, never both', () => {
+    const media = installMatchMedia({ '(min-width: 48rem)': false })
+    const { container } = render(<RoutedApp />)
+    expect(screen.getAllByRole('navigation', { name: 'Primary' })).toHaveLength(1)
+    expect(container.querySelector('aside')).toBeNull()
+
+    act(() => media.set('(min-width: 48rem)', true))
+    expect(screen.getAllByRole('navigation', { name: 'Primary' })).toHaveLength(1)
+    const sidebar = container.querySelector('aside')
+    expect(sidebar).not.toBeNull()
+    expect(screen.getByRole('link', { name: 'My-nutritionist, home' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /On this device/ })).toHaveAttribute('href', '#/profile')
+  })
+
+  it('opens the Kitchen tab', async () => {
+    installMatchMedia({ '(min-width: 48rem)': true })
+    render(<RoutedApp />)
+    await userEvent.click(screen.getByRole('link', { name: 'Kitchen' }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Kitchen' })).toBeInTheDocument()
+  })
 })
 
 describe('RoutedApp', () => {

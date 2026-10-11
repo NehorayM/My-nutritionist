@@ -30,8 +30,8 @@ function servingPortion(food: FoodItem, grams: number): Portion | null {
   return best
 }
 
-/** `roundPortion` with the food's range already known. */
-function roundWithin(food: FoodItem, grams: number, range: GramRange, householdUnits: boolean): Portion {
+/** `roundPortion` with the range already known (e.g. the food's range narrowed to what is left at home). */
+export function roundWithin(food: FoodItem, grams: number, range: GramRange, householdUnits: boolean): Portion {
   const wanted = clamp(grams, range)
   const serving = householdUnits ? servingPortion(food, wanted) : null
   if (serving) return serving

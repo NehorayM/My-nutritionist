@@ -1,4 +1,5 @@
 import type { OutboxMutation } from '@/types'
+import type { SyncRecord } from './outboxStore'
 import type { EnqueueInput } from './coalesce'
 import type { OutboxCounts } from './outboxIndex'
 import type { Clock } from './timers'
@@ -40,8 +41,13 @@ export interface Outbox {
   scheduleRetry(id: string, retry: RetrySchedule): Promise<OutboxMutation | null>
   /** Marks a mutation as failed (needs the user's Retry/Discard). Null when it is gone. */
   markFailed(id: string, error: string): Promise<OutboxMutation | null>
-  /** Removes a mutation the server applied. False when it was already replaced or removed. */
-  ack(mutation: Pick<OutboxMutation, 'id' | 'entity' | 'recordId'>): Promise<boolean>
+  /**
+   * Removes a mutation the server applied. False when it was already replaced or removed. With `server`
+   * (the server kept a different version, or the record stays deleted) the cached record becomes the
+   * server's state in the same transaction — unless a newer local change for it is queued; the result
+   * then says whether the cache was updated.
+   */
+  ack(mutation: Pick<OutboxMutation, 'id' | 'entity' | 'recordId'>, server?: { record: SyncRecord | null }): Promise<boolean>
   /** Removes a mutation without sending it. */
   remove(id: string): Promise<boolean>
   /** Failed → pending with fresh bookkeeping (all failed, or only `ids`). Returns how many changed. */

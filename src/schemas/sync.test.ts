@@ -7,6 +7,9 @@ import {
   makeOutbox,
   makeProfile,
   makeSavedMeal,
+  makePantryItem,
+  makePlannerSettings,
+  makeReminder,
   makeScheduled,
   makeWeight,
   makeWorkout,
@@ -53,6 +56,9 @@ const samples: { [E in keyof EntityRecordMap]: EntityRecordMap[E] } = {
   scheduled_workouts: makeScheduled(),
   favorites: makeFavorite(),
   saved_meals: makeSavedMeal(),
+  pantry_items: makePantryItem(),
+  planner_settings: makePlannerSettings(),
+  reminder_schedules: makeReminder(),
 }
 
 describe('ENTITY_SCHEMAS', () => {

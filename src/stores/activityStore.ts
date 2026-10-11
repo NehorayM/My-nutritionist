@@ -7,8 +7,10 @@ import { LIMITS, scheduledWorkoutSchema, TEXT_LIMITS, workoutEntrySchema } from 
 import { getRepositories } from '@/services/runtime'
 import type { ScheduledWorkout, WorkoutEntry } from '@/types'
 import { userMessageFor } from './errors'
+import { byDate, inRange, persist, replace, touch, type ListSpec, type Saved } from './activityLists'
+import { createChangeJournal } from './changeJournal'
 import type { LoadStatus, SaveResult } from './profileStore'
-import { registerUserStoreReset } from './registry'
+import { registerUserStoreReset, sessionGuard } from './registry'
 
 /** What the user logs. `kcal` is what they typed; null → informational estimate from `weightKg` (if known). */
 export type WorkoutInput = Pick<WorkoutEntry, 'date' | 'type' | 'durationMin' | 'intensity' | 'notes'> & {
@@ -16,7 +18,6 @@ export type WorkoutInput = Pick<WorkoutEntry, 'date' | 'type' | 'durationMin' | 
   weightKg: number | null
 }
 
-type Saved<T> = { ok: true; entry: T } | { ok: false; message: string }
 export type WorkoutResult = Saved<WorkoutEntry>
 
 interface ActivityState {
@@ -38,49 +39,16 @@ interface ActivityState {
   completeScheduled: (id: string, actual?: Partial<WorkoutInput>) => Promise<WorkoutResult>
   dismissScheduled: (id: string) => Promise<SaveResult>
   restoreScheduled: (session: ScheduledWorkout) => Promise<SaveResult> // undo of a skip
+  /** Reloads the loaded week (data changed elsewhere); a no-op before the first load. */
+  refresh: () => Promise<void>
   reset: () => void
-}
-
-type Dated = { id: string; date: string; createdAt: string; updatedAt: string }
-
-/** One loaded list (workouts or scheduled sessions) and how its records are checked, saved and ordered. */
-interface ListSpec<T extends Dated> {
-  list: () => T[]
-  apply: (list: T[]) => void
-  save: (record: T) => Promise<T>
-  valid: (record: T) => boolean
-  range: () => DateRange | undefined
-  order: (a: T, b: T) => number
-  invalid: string
 }
 
 const initial = { window: null, workouts: [], scheduled: [], status: 'idle' as LoadStatus, error: null }
 let loadToken = 0
-
-const byDate = (a: Dated, b: Dated) => compareDateKeys(a.date, b.date) || a.createdAt.localeCompare(b.createdAt)
-const touch = <T extends Dated>(record: T): T => ({ ...record, updatedAt: new Date().toISOString() })
-const inRange = (date: string, range?: DateRange) => !range || (date >= range.from && date <= range.to)
-
-/** Replaces the record with `id` by `item` (dropping it when `item` is null or outside the loaded range). */
-function replace<T extends Dated>(spec: ListSpec<T>, id: string, item: T | null): void {
-  const rest = spec.list().filter((existing) => existing.id !== id)
-  spec.apply((item && inRange(item.date, spec.range()) ? [...rest, item] : rest).sort(spec.order))
-}
-
-/** Optimistic upsert with rollback of just this record on failure. */
-async function persist<T extends Dated>(spec: ListSpec<T>, record: T, action: string): Promise<Saved<T>> {
-  if (!spec.valid(record)) return { ok: false, message: spec.invalid }
-  const before = spec.list().find((existing) => existing.id === record.id) ?? null
-  replace(spec, record.id, record)
-  try {
-    const saved = await spec.save(record)
-    replace(spec, saved.id, saved)
-    return { ok: true, entry: saved }
-  } catch (error) {
-    replace(spec, record.id, before)
-    return { ok: false, message: userMessageFor(error, action) }
-  }
-}
+let lastLoad: { today: string; weekStartsOn: 0 | 1 } | null = null
+const workoutJournal = createChangeJournal<WorkoutEntry>()
+const scheduledJournal = createChangeJournal<ScheduledWorkout>()
 
 function workoutFields(input: WorkoutInput): Omit<WorkoutEntry, 'id' | 'userId' | 'scheduledWorkoutId' | 'createdAt' | 'updatedAt'> {
   const notes = input.notes?.trim() || null
@@ -100,6 +68,7 @@ export const useActivityStore = create<ActivityState>()((set, get) => {
     valid: (record) => compareDateKeys(record.date, todayKey()) <= 0 && workoutEntrySchema.safeParse(record).success,
     order: compareWorkouts,
     invalid: 'Please check the workout: a date up to today and a duration of 1–600 minutes.',
+    journal: workoutJournal,
   }
   const scheduled: ListSpec<ScheduledWorkout> = {
     list: () => get().scheduled,
@@ -109,6 +78,7 @@ export const useActivityStore = create<ActivityState>()((set, get) => {
     valid: (record) => scheduledWorkoutSchema.safeParse(record).success,
     order: byDate,
     invalid: "Couldn't save the session. Please try again.",
+    journal: scheduledJournal,
   }
 
   const saveWorkout = (entry: WorkoutEntry, action: string) => persist(workouts, entry, action)
@@ -125,20 +95,28 @@ export const useActivityStore = create<ActivityState>()((set, get) => {
     ...initial,
 
     async load(today, weekStartsOn, options = {}) {
+      lastLoad = { today, weekStartsOn }
       const week = getWeekWindow(today, weekStartsOn)
-      const current = get()
-      const sameWeek = current.window?.weekStart === week.start
-      if (!options.force && sameWeek && current.status !== 'error') return
+      const state = get()
+      const sameWeek = state.window?.weekStart === week.start
+      if (!options.force && sameWeek && state.status !== 'error') return
       const range = { from: week.start, to: week.end }
       const window = { weekStart: week.start, workouts: { ...range, from: addDays(week.start, -7) }, scheduled: range }
       const token = ++loadToken
+      const sameSession = sessionGuard()
+      const current = () => sameSession() && token === loadToken
       set({ window, status: 'loading', error: null, ...(sameWeek ? {} : { workouts: [], scheduled: [] }) })
+      const marks = { workouts: workoutJournal.mark(), scheduled: scheduledJournal.mark() }
       try {
         const { workouts: logs, scheduledWorkouts: plans } = getRepositories()
         const [logged, planned] = await Promise.all([logs.listRange(window.workouts), plans.listRange(window.scheduled)])
-        if (token === loadToken) set({ workouts: logged.sort(compareWorkouts), scheduled: planned.sort(byDate), status: 'ready' })
+        if (!current()) return
+        const workoutList = workoutJournal.overlay(logged, marks.workouts, (w) => inRange(w.date, window.workouts))
+        const sessionList = scheduledJournal.overlay(planned, marks.scheduled, (s) => inRange(s.date, window.scheduled))
+        set({ workouts: workoutList.sort(compareWorkouts), scheduled: sessionList.sort(byDate), status: 'ready' })
       } catch (error) {
-        if (token === loadToken) set({ status: 'error', error: userMessageFor(error, 'load your activity') })
+        const message = userMessageFor(error, 'load your activity')
+        if (current()) set({ status: 'error', error: message })
       }
     },
 
@@ -152,11 +130,12 @@ export const useActivityStore = create<ActivityState>()((set, get) => {
     async deleteWorkout(id) {
       const entry = get().workouts.find((w) => w.id === id)
       if (!entry) return { ok: true }
+      const current = sessionGuard()
       replace(workouts, id, null)
       try {
         await getRepositories().workouts.remove(id)
       } catch (error) {
-        replace(workouts, id, entry)
+        if (current()) replace(workouts, id, entry)
         return { ok: false, message: userMessageFor(error, 'delete the workout') }
       }
       const session = linkedSession(entry)
@@ -202,8 +181,14 @@ export const useActivityStore = create<ActivityState>()((set, get) => {
     },
 
     restoreScheduled: (session) => saveSession(touch(session), 'restore the session'),
+    async refresh() {
+      if (lastLoad && get().window) await get().load(lastLoad.today, lastLoad.weekStartsOn, { force: true })
+    },
     reset() {
+      lastLoad = null
       loadToken += 1
+      workoutJournal.clear()
+      scheduledJournal.clear()
       set(initial)
     },
   }

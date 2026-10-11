@@ -74,6 +74,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"pantry_items": {
+                  Row: {
+                    "cook_minutes": number | null,"created_at": string,"food": NonNullable<Json>,"grams": number | null,"id": string,"methods": (string)[],"prep": string,"serving_grams": number | null,"serving_label": string | null,"updated_at": string,"use_by": string | null,"user_id": string
+                  }
+                  Insert: {
+                    "cook_minutes"?: number | null,"created_at"?: string,"food": NonNullable<Json>,"grams"?: number | null,"id": string,"methods"?: (string)[],"prep": string,"serving_grams"?: number | null,"serving_label"?: string | null,"updated_at"?: string,"use_by"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "cook_minutes"?: number | null,"created_at"?: string,"food"?: NonNullable<Json>,"grams"?: number | null,"id"?: string,"methods"?: (string)[],"prep"?: string,"serving_grams"?: number | null,"serving_label"?: string | null,"updated_at"?: string,"use_by"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"planner_settings": {
+                  Row: {
+                    "created_at": string,"daily_kcal_max": number | null,"daily_kcal_min": number | null,"day_equipment": (string)[],"equipment_scope": string,"id": string,"meals": NonNullable<Json>,"updated_at": string
+                  }
+                  Insert: {
+                    "created_at"?: string,"daily_kcal_max"?: number | null,"daily_kcal_min"?: number | null,"day_equipment"?: (string)[],"equipment_scope"?: string,"id": string,"meals": NonNullable<Json>,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"daily_kcal_max"?: number | null,"daily_kcal_min"?: number | null,"day_equipment"?: (string)[],"equipment_scope"?: string,"id"?: string,"meals"?: NonNullable<Json>,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"profiles": {
                   Row: {
                     "activity_level": string,"allergies": (string)[],"birth_date": string | null,"cardio_sessions_per_week": number,"cooking_skill": string,"created_at": string,"current_weight_kg": number | null,"diet_type": string,"dislikes": (string)[],"display_name": string,"goal": string,"goal_pace": string,"height_cm": number | null,"id": string,"max_prep_minutes": number,"preferred_cuisines": (string)[],"preferred_workout_minutes": number,"reminders": NonNullable<Json>,"sex": string,"strength_sessions_per_week": number,"target_weight_kg": number | null,"unit_system": string,"updated_at": string,"week_starts_on": number
@@ -83,6 +109,38 @@ isOneToOne: false
                   }
                   Update: {
                     "activity_level"?: string,"allergies"?: (string)[],"birth_date"?: string | null,"cardio_sessions_per_week"?: number,"cooking_skill"?: string,"created_at"?: string,"current_weight_kg"?: number | null,"diet_type"?: string,"dislikes"?: (string)[],"display_name"?: string,"goal"?: string,"goal_pace"?: string,"height_cm"?: number | null,"id"?: string,"max_prep_minutes"?: number,"preferred_cuisines"?: (string)[],"preferred_workout_minutes"?: number,"reminders"?: NonNullable<Json>,"sex"?: string,"strength_sessions_per_week"?: number,"target_weight_kg"?: number | null,"unit_system"?: string,"updated_at"?: string,"week_starts_on"?: number
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"reminder_dispatches": {
+                  Row: {
+                    "attempts": number,"created_at": string,"detail": string | null,"due_at": string,"id": string,"local_date": string,"provider_message_id": string | null,"schedule_id": string,"status": string,"updated_at": string,"user_id": string
+                  }
+                  Insert: {
+                    "attempts"?: number,"created_at"?: string,"detail"?: string | null,"due_at": string,"id"?: string,"local_date": string,"provider_message_id"?: string | null,"schedule_id": string,"status"?: string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "attempts"?: number,"created_at"?: string,"detail"?: string | null,"due_at"?: string,"id"?: string,"local_date"?: string,"provider_message_id"?: string | null,"schedule_id"?: string,"status"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "reminder_dispatches_schedule_id_fkey"
+      columns: ["schedule_id"]
+isOneToOne: false
+      referencedRelation: "reminder_schedules"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"reminder_schedules": {
+                  Row: {
+                    "created_at": string,"days": (number)[],"enabled": boolean,"id": string,"kind": string,"local_time": string,"meal_type": string | null,"skip_if_logged": boolean,"timezone": string,"updated_at": string,"user_id": string
+                  }
+                  Insert: {
+                    "created_at"?: string,"days": (number)[],"enabled"?: boolean,"id": string,"kind": string,"local_time": string,"meal_type"?: string | null,"skip_if_logged"?: boolean,"timezone": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"days"?: (number)[],"enabled"?: boolean,"id"?: string,"kind"?: string,"local_time"?: string,"meal_type"?: string | null,"skip_if_logged"?: boolean,"timezone"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -145,7 +203,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "is_valid_nutrient_map":
+            "claim_due_reminders":
+{ Args: { "p_limit"?: number,"p_now"?: string,"p_window_minutes"?: number }; Returns: {
+              "already_logged": boolean,"dispatch_id": string,"email": string,"kind": string,"local_date": string,"local_time": string,"meal_type": string,"schedule_id": string,"skip_if_logged": boolean,"timezone": string,"user_id": string
+            }[]
+                           },
+"is_valid_nutrient_map":
 { Args: { "value": Json }; Returns: boolean
                            }
           }

@@ -1,6 +1,7 @@
 import { Plus } from 'lucide-react'
 import { useEffect } from 'react'
 import { ScreenHeader } from '@/app/ScreenHeader'
+import { ScreenBody } from '@/app/ScreenLayout'
 import { Button, ErrorState, LoadingState, Skeleton } from '@/components/ui'
 import { compareDateKeys } from '@/domain/dates'
 import { mealTypeForTime } from '@/domain/meals'
@@ -49,7 +50,7 @@ export function MealsScreen() {
       >
         <DaySwitcher date={date} today={today} />
       </ScreenHeader>
-      <div className="space-y-4 px-5 pb-6 pt-1">
+      <ScreenBody>
         {day.status === 'error' ? (
           <ErrorState
             title="Couldn't load this day's meals"
@@ -70,7 +71,7 @@ export function MealsScreen() {
             <Skeleton className="h-32 rounded-card" />
           </div>
         )}
-      </div>
+      </ScreenBody>
       <AddFoodSheet
         key={`add-${sheets.addFood.key}`}
         open={sheets.addFood.open}

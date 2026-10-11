@@ -16,8 +16,23 @@ next meal, adaptive recommendation*. Minors (<18 from birth date) receive genera
 deficit/surplus and no weight trajectory. Weight goals use gentle/moderate paces with capped rates and calorie floors.
 Estimated calorie burn is informational only and never changes food targets.
 
-## Navigation (bottom bar, 4 tabs)
-1. **Meals** (home, current day) 2. **Progress** (weight) 3. **Activity** (weekly plan) 4. **Profile**
+## Navigation (5 tabs: bottom bar on phones, side navigation on tablets/desktop)
+1. **Meals** (home, current day) 2. **Kitchen** (pantry + meal planning) 3. **Progress** (weight) 4. **Activity**
+(weekly plan) 5. **Profile**
+
+## Kitchen
+- List what is at home (search in English or Hebrew), how much (or "not tracked"), how it is eaten (ready / warm up /
+  cook from raw with time and equipment) and a use-by date.
+- "Kitchen & time": heating equipment for the whole day or per meal; per meal: planned or not, can cook, minutes,
+  calorie range; daily calorie range (defaults from the targets).
+- "Today's plan": one card per meal built only from the kitchen, within every limit, with other options; "Log to …"
+  logs it to today and (by default) takes the amounts out of the kitchen, with Undo. Meals that can't be planned say
+  why; items never used are listed with the reason.
+
+## Email reminders (signed-in users, Profile)
+Log a meal (skipped when already logged), drink water, plan meals, weigh-in — at a local time on chosen weekdays in a
+chosen time zone. Suggested set, test email, recent deliveries, one-click unsubscribe from every email. Neutral,
+supportive wording.
 
 ## Meals
 - Day header with date switcher (today ± history), calorie ring and macro bars (protein, carbs, fat, fiber), and

@@ -29,7 +29,8 @@ describe('database catalog', () => {
       `select c.relname as table_name, c.relrowsecurity as rls_enabled from pg_class c
        where c.relnamespace = 'public'::regnamespace and c.relkind = 'r' order by 1`,
     )
-    expect(rows.map((row) => row.table_name).sort()).toEqual([...USER_TABLES].sort())
+    // reminder_dispatches is server-written (the delivery log), so it is not a synchronized user table.
+    expect(rows.map((row) => row.table_name).sort()).toEqual([...USER_TABLES, 'reminder_dispatches'].sort())
     expect(rows.filter((row) => !row.rls_enabled)).toEqual([])
   })
 

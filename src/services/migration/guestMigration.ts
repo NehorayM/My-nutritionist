@@ -53,6 +53,8 @@ const STORE_OF: Record<MigrationKind, EntityStoreName> = {
   weights: 'weights',
   workouts: 'workouts',
   scheduledWorkouts: 'scheduledWorkouts',
+  pantry: 'pantry',
+  plannerSettings: 'plannerSettings',
 }
 
 const SYSTEM_FOOD_IDS: ReadonlySet<string> = new Set(SYSTEM_FOOD_ROWS.map((row) => row.id))
@@ -70,7 +72,7 @@ export async function countGuestData(guestId: string): Promise<GuestDataSummary>
 }
 
 async function loadGuestData(guestId: string): Promise<GuestData> {
-  const [profiles, foods, meals, favorites, savedMeals, weights, workouts, scheduledWorkouts] = await Promise.all([
+  const [profiles, foods, meals, favorites, savedMeals, weights, workouts, scheduledWorkouts, pantry, plannerSettings] = await Promise.all([
     listAllForUser('profiles', guestId),
     listAllForUser('foods', guestId),
     listAllForUser('meals', guestId),
@@ -79,12 +81,28 @@ async function loadGuestData(guestId: string): Promise<GuestData> {
     listAllForUser('weights', guestId),
     listAllForUser('workouts', guestId),
     listAllForUser('scheduledWorkouts', guestId),
+    listAllForUser('pantry', guestId),
+    listAllForUser('plannerSettings', guestId),
   ])
-  return { profile: profiles[0] ?? null, foods, meals, favorites, savedMeals, weights, workouts, scheduledWorkouts }
+  return {
+    profile: profiles[0] ?? null,
+    foods,
+    meals,
+    favorites,
+    savedMeals,
+    weights,
+    workouts,
+    scheduledWorkouts,
+    pantry,
+    plannerSettings: plannerSettings[0] ?? null,
+  }
 }
 
-const loadedCount = (data: GuestData, kind: MigrationKind): number =>
-  kind === 'profile' ? (data.profile ? 1 : 0) : data[kind].length
+const loadedCount = (data: GuestData, kind: MigrationKind): number => {
+  if (kind === 'profile') return data.profile ? 1 : 0
+  if (kind === 'plannerSettings') return data.plannerSettings ? 1 : 0
+  return data[kind].length
+}
 
 interface ImportContext {
   target: Repositories
@@ -115,6 +133,15 @@ async function importPlan(plan: MigrationPlan, { target, accountHasProfile, migr
   await saveAll('weights', plan.weights, (entry) => target.weights.save(entry))
   await saveAll('workouts', plan.workouts, (entry) => target.workouts.save(entry))
   await saveAll('scheduledWorkouts', plan.scheduledWorkouts, (entry) => target.scheduledWorkouts.save(entry))
+  await saveAll('pantry', plan.pantry, (item) => target.pantry.save(item))
+  // Like the profile: the guest's planner settings never replace settings the account already has.
+  if (plan.plannerSettings) {
+    if ((await target.plannerSettings.get()) !== null) skipped.plannerSettings += 1
+    else {
+      await target.plannerSettings.save(plan.plannerSettings)
+      migrated.plannerSettings += 1
+    }
+  }
 }
 
 /**

@@ -2,6 +2,7 @@ import { FakeSupabase } from '@/repositories/supabase/__fixtures__/fakeSupabase'
 import { createRemoteTables } from '@/repositories/supabase'
 import { makeMeal, testId, USER_A } from '@/schemas/__fixtures__/records'
 import { SYNC_ENTITIES, type ConnectionState, type MealEntry, type SyncEntity } from '@/types'
+import type { LockRunner } from '../locks'
 import { createOutbox, type Outbox } from '../outbox'
 import { createSyncEngine, type SyncEngine, type SyncEvent } from '../syncEngine'
 import type { RemoteWriter, RemoteWriters } from '../syncSend'
@@ -34,10 +35,10 @@ function instrument(tables: RemoteWriters, sends: string[], hold: EngineHarness[
     // Each table validates the record itself, so the test wrapper can forward any record shape.
     const table = tables[entity] as RemoteWriter<object>
     return {
-      upsert: async (record) => {
+      write: async (record) => {
         sends.push(`upsert:${recordIdOf(record)}`)
         await hold.promise
-        return table.upsert(record)
+        return table.write(record)
       },
       remove: async (id) => {
         sends.push(`delete:${id}`)
@@ -53,19 +54,24 @@ export interface EngineHarnessOptions {
   connection?: ConnectionState
   /** Replace parts of the real outbox (e.g. to simulate a storage failure). */
   wrapOutbox?: (outbox: Outbox) => Outbox
+  /** Share one server (and lock) between harnesses to model several tabs of the same user. */
+  db?: FakeSupabase
+  lock?: LockRunner
+  /** First mutation number (ids are `testId(n)`); give each simulated tab its own range. */
+  idBase?: number
 }
 
-export function createEngineHarness({ connection = 'connected', wrapOutbox }: EngineHarnessOptions = {}): EngineHarness {
-  const db = new FakeSupabase()
+export function createEngineHarness(options: EngineHarnessOptions = {}): EngineHarness {
+  const { connection = 'connected', wrapOutbox, db = new FakeSupabase(), lock, idBase = 900 } = options
   const timers = createManualTimers()
-  let mutationNo = 900
+  let mutationNo = idBase
   const real = createOutbox(USER_A, { clock: timers.clock, newId: () => testId((mutationNo += 1)) })
   const outbox = wrapOutbox ? wrapOutbox(real) : real
   const connectivity = createFakeConnectivity(connection)
   const sends: string[] = []
   const hold: EngineHarness['hold'] = { promise: null }
   const remote = instrument(createRemoteTables(db, USER_A), sends, hold)
-  const engine = createSyncEngine({ outbox, remote, connectivity, userId: USER_A, clock: timers.clock, timers })
+  const engine = createSyncEngine({ outbox, remote, connectivity, userId: USER_A, clock: timers.clock, timers, lock })
   const events: SyncEvent[] = []
   engine.onEvent((event) => events.push(event))
   return { db, outbox: real, timers, connectivity, sends, events, engine, hold }

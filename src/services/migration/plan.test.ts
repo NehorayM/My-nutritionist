@@ -8,7 +8,19 @@ const NOW = '2026-10-04T10:00:00.000Z'
 const noSystemFoods = () => false
 
 function guestData(overrides: Partial<GuestData> = {}): GuestData {
-  return { profile: null, foods: [], meals: [], favorites: [], savedMeals: [], weights: [], workouts: [], scheduledWorkouts: [], ...overrides }
+  return {
+    profile: null,
+    foods: [],
+    meals: [],
+    favorites: [],
+    savedMeals: [],
+    weights: [],
+    workouts: [],
+    scheduledWorkouts: [],
+    pantry: [],
+    plannerSettings: null,
+    ...overrides,
+  }
 }
 
 describe('planGuestMigration', () => {

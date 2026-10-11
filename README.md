@@ -2,7 +2,7 @@
 
 A mobile-first nutrition and wellness web app that adapts to what you actually eat. Log real meals, see where
 today stands, get practical suggestions for the rest of the day, and track weight and weekly activity against your
-own plan. It works fully offline as a guest and syncs to Supabase when configured.
+own plan. It works fully offline as a guest and syncs to Supabase when configured — live across tabs and devices.
 
 > Wellness assistant, not medical advice. Targets and suggestions are general estimates. People under 18 get
 > general wellness targets only.
@@ -11,10 +11,11 @@ own plan. It works fully offline as a guest and syncs to Supabase when configure
 
 | Tab | What it does |
 |---|---|
-| **Meals** | Day view with calorie ring, macro bars and **micronutrient coverage** (missing data shown, never zero-filled). Breakfast, lunch, dinner and snacks cards with add, edit, delete (Undo), "Repeat yesterday" and "Save as meal". Add Food has five tabs: debounced search over the bundled USDA-sourced catalog and your foods, USDA FoodData Central when signed in, and an explicit Open Food Facts packaged-product search and barcode lookup. The other tabs are Recent, Favorites, Saved meals and Custom foods. **Smart options for the rest of today** come from the Adaptive Nutrition Engine. You can log them to any meal, save them, dismiss them (with Undo), or ask for other options. |
+| **Meals** | Search foods in **English or Hebrew** (Hebrew is translated to English for the food databases). Day view with calorie ring, macro bars and **micronutrient coverage** (missing data shown, never zero-filled). Breakfast, lunch, dinner and snacks cards with add, edit, delete (Undo), "Repeat yesterday" and "Save as meal". Add Food has five tabs: debounced search over the bundled USDA-sourced catalog and your foods, USDA FoodData Central when signed in, and an explicit Open Food Facts packaged-product search and barcode lookup. The other tabs are Recent, Favorites, Saved meals and Custom foods. **Smart options for the rest of today** come from the Adaptive Nutrition Engine. You can log them to any meal, save them, dismiss them (with Undo), or ask for other options. |
+| **Kitchen** | List what's in your fridge and pantry (amount, ready / warm up / cook from raw, use-by date) and what's possible: heating equipment for the day or per meal, whether you can cook, time per meal and calorie limits per meal and per day. **Today's plan** builds every meal only from your kitchen within those limits, offers other options, and logs a meal while taking it out of the kitchen. |
 | **Progress** | Quick morning weigh-in (kg/lb). Stats include current, weekly change, total change, distance to goal and trend. The chart has 7-day, 30-day and all-time ranges, with a 7-day moving-average trend and a safe target trajectory for adults only, plus an accessible data table. History with edit and delete, goal settings, and an in-app reminder. |
 | **Activity** | Weekly plan (strength/cardio sessions), workout log with an informational MET estimate, weekly progress and adherence. **Smart Catch-Up** suggestions respect recovery spacing; you can accept and schedule them, complete, dismiss, or see another option. |
-| **Profile** | Sign up, sign in, sign out and password reset (Supabase Auth), or guest mode. **Personal Profile**, food preferences (diet pattern, allergies, dislikes, cuisines, prep time), goals, weekly plan, units, theme and reminders. Connection status shows "Connected to Supabase" only after a verified request, or "Running in Offline/Local Mode". It also shows pending synchronization and failed changes with retry/discard, guest-data import, "How targets are calculated", and JSON export. |
+| **Profile** | Sign up, sign in, sign out and password reset (Supabase Auth), or guest mode. **Personal Profile**, food preferences (diet pattern, allergies, dislikes, cuisines, prep time), goals, weekly plan, units, theme and reminders. Connection status shows "Connected to Supabase" only after a verified request, or "Running in Offline/Local Mode". It also shows pending synchronization and failed changes with retry/discard, guest-data import, "How targets are calculated", and JSON export. **Email reminders** (signed in): log a meal, drink water, plan meals, weigh-in — at your local times and weekdays, with a test email, recent deliveries and one-click unsubscribe. |
 
 ## Quick start (guest / offline mode)
 
@@ -37,7 +38,8 @@ npm run dev
 
 Only the project URL and the **publishable** key belong in the browser. Secret/service-role keys and `FDC_API_KEY`
 must never be in a `VITE_*` variable; the app refuses secret keys. Hosted setup, Auth settings, Edge Function
-deployment and RLS testing are covered in [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md).
+deployment, email reminders (Resend, pg_cron, Vault) and RLS testing are covered in
+[docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md).
 
 ## Deploy to GitHub Pages
 
@@ -67,21 +69,24 @@ Variables), and add the Pages URL to Supabase Auth redirect URLs.
 src/
   app/            shell, bottom nav, hash routing, session gate, error boundaries
   components/ui/  design-system primitives (Radix Dialog sheets, fields, progress, toasts…)
-  features/       meals · progress · activity · profile · onboarding (screens, components, hooks)
-  domain/         pure engines: nutrition, adaptive, weight, activity; dates, units, nutrients
+  features/       meals · kitchen · progress · activity · profile (+ reminders) · onboarding · reminders (unsubscribe)
+  domain/         pure engines: nutrition, adaptive, planner, weight, activity; dates, units, nutrients
   stores/         Zustand stores (one per concern) + derived hooks
   repositories/   interfaces + local (IndexedDB) · supabase · synced (cache + outbox) implementations
-  services/       food providers & search, sync engine, auth, session, guest migration
+  services/       food providers & search, translation (Hebrew → English), sync engine + live refresh, auth,
+                  session, guest migration, reminders
   schemas/        Zod schemas and limits mirroring the database checks
   data/           USDA-sourced system food catalog (70 foods) and SQL seed generator
   lib/            env, lazy Supabase client, ids, logger, formatting, notifications
 supabase/
-  migrations/     001 schema · 002 RLS + grants · 003 seed foods (generated)
-  functions/      food-search Edge Function (USDA proxy) + shared USDA normalization
+  migrations/     001 schema · 002 RLS + grants · 003 seed foods · 004 sync integrity (tombstones, Realtime)
+                  · 005 kitchen + reminders tables · 006 reminder delivery (claiming, pg_cron)
+  functions/      food-search (USDA proxy) · reminders (scheduled emails) · _shared (auth, env, USDA normalization)
   tests/database/ pgTAP policy tests
 tests/
   db/             security tests against the local stack
-  e2e/            Playwright flows
+  e2e/            Playwright flows (guest, signed-in, Hebrew search, kitchen, responsive, reminders)
+  design/         design-token checks (WCAG contrast)
 docs/             product spec, architecture, design system, Supabase setup, food data, testing
 ```
 

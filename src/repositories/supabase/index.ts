@@ -6,7 +6,10 @@ import {
   createSupabaseFavoriteRepository,
   createSupabaseFoodRepository,
   createSupabaseMealRepository,
+  createSupabasePantryRepository,
+  createSupabasePlannerSettingsRepository,
   createSupabaseProfileRepository,
+  createSupabaseReminderRepository,
   createSupabaseSavedMealRepository,
   createSupabaseScheduledWorkoutRepository,
   createSupabaseWeightRepository,
@@ -35,6 +38,9 @@ export function createSupabaseRepositories(
     scheduledWorkouts: createSupabaseScheduledWorkoutRepository(tables),
     favorites: createSupabaseFavoriteRepository(tables),
     savedMeals: createSupabaseSavedMealRepository(tables),
+    pantry: createSupabasePantryRepository(tables),
+    plannerSettings: createSupabasePlannerSettingsRepository(tables, userId),
+    reminders: createSupabaseReminderRepository(tables),
   }
 }
 
@@ -58,4 +64,5 @@ export {
   type RemoteTable,
   type RemoteTables,
   type SelectOptions,
+  type WriteOutcome,
 } from './remoteTable'

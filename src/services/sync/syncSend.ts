@@ -1,15 +1,22 @@
-import { SupabaseRepositoryError, toRepositoryError, type RemoteErrorKind } from '@/repositories/supabase'
+import { SupabaseRepositoryError, toRepositoryError, type RemoteErrorKind, type WriteOutcome } from '@/repositories/supabase'
 import { RepositoryError } from '@/repositories/types'
 import { invalidFieldPaths, RECORD_SPECS, type EntityRecordMap } from '@/schemas'
 import type { OutboxMutation, SyncEntity } from '@/types'
 
 /** Per-table server writes used by the sync engine (the Supabase `RemoteTable`s satisfy this). */
 export interface RemoteWriter<T> {
-  /** Idempotent upsert by id. */
-  upsert(record: T): Promise<unknown>
+  /** Idempotent upsert by id, reporting what the server kept (see `WriteOutcome`). */
+  write(record: T): Promise<WriteOutcome<T>>
   /** Idempotent delete by id (a missing record is not an error). */
   remove(id: string): Promise<void>
 }
+
+/**
+ * The server's state of a record after a write, when it differs from what this device sent: the version
+ * the server kept (a newer one from another device, or a clamped timestamp), or `null` when the record
+ * stays deleted. The sync pass copies it into the local cache.
+ */
+export type ServerState = { record: EntityRecordMap[SyncEntity] | null }
 
 export type RemoteWriters = { [E in SyncEntity]: RemoteWriter<EntityRecordMap[E]> }
 
@@ -19,7 +26,7 @@ export type RemoteWriters = { [E in SyncEntity]: RemoteWriter<EntityRecordMap[E]
  * - `reject`: the server will never accept it as is (validation, RLS, constraint) → mark failed
  */
 export type SendResult =
-  | { outcome: 'sent' }
+  | { outcome: 'sent'; server: ServerState | null }
   | { outcome: 'retry'; kind: RetryKind; error: string }
   | { outcome: 'reject'; error: string }
 
@@ -44,13 +51,16 @@ export function rejectedMessage(count: number): string {
     : `${count} changes couldn’t be saved to your account. You can retry or discard them in Profile.`
 }
 
-async function upsertPayload<E extends SyncEntity>(remote: RemoteWriters, entity: E, payload: unknown): Promise<void> {
+async function upsertPayload<E extends SyncEntity>(remote: RemoteWriters, entity: E, payload: unknown): Promise<ServerState | null> {
   const spec = RECORD_SPECS[entity]
   const parsed = spec.schema.safeParse(payload)
   if (!parsed.success) {
     throw new RepositoryError(`Invalid ${spec.label}: check ${invalidFieldPaths(parsed.error)}`, { retryable: false })
   }
-  await remote[entity].upsert(parsed.data)
+  const outcome = await remote[entity].write(parsed.data)
+  if (outcome.status === 'deleted') return { record: null }
+  if (outcome.status === 'superseded' || outcome.record.updatedAt !== parsed.data.updatedAt) return { record: outcome.record }
+  return null
 }
 
 /** Classifies a failed send. Messages come from `RepositoryError`s, which never contain row values. */
@@ -73,9 +83,11 @@ function classify(error: unknown, mutation: OutboxMutation): SendResult {
 /** Sends one queued mutation (validated again right before it leaves the device). */
 export async function sendMutation(remote: RemoteWriters, mutation: OutboxMutation): Promise<SendResult> {
   try {
-    if (mutation.op === 'delete') await remote[mutation.entity].remove(mutation.recordId)
-    else await upsertPayload(remote, mutation.entity, mutation.payload)
-    return { outcome: 'sent' }
+    if (mutation.op === 'delete') {
+      await remote[mutation.entity].remove(mutation.recordId)
+      return { outcome: 'sent', server: null }
+    }
+    return { outcome: 'sent', server: await upsertPayload(remote, mutation.entity, mutation.payload) }
   } catch (error) {
     return classify(error, mutation)
   }

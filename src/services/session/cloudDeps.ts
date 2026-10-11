@@ -3,15 +3,17 @@ import { createAuthService } from '@/services/auth'
 import { countGuestData, migrateGuestData } from '@/services/migration'
 import { createCloudSync } from '@/services/sync/cloudSync'
 import type { ConnectivityMonitor } from '@/services/sync/connectivity'
+import { createRealtimeChanges } from '@/services/sync/realtimeChanges'
 import type { SessionDeps } from './types'
 
 /** Cloud-mode dependencies. Loaded with a dynamic import, so Offline/Local mode never downloads them. */
 export function createCloudDeps(
   client: SupabaseClient,
   connectivity: ConnectivityMonitor,
-): Pick<SessionDeps, 'auth' | 'createCloud' | 'countGuestData' | 'migrateGuestData'> {
+): Pick<SessionDeps, 'auth' | 'createCloud' | 'countGuestData' | 'migrateGuestData' | 'remoteChanges'> {
   return {
     auth: createAuthService(client),
+    remoteChanges: createRealtimeChanges(client),
     createCloud: (userId) => createCloudSync({ client, userId, connectivity }),
     countGuestData,
     migrateGuestData,

@@ -1,5 +1,7 @@
+import type { SyncEntity } from '@/types'
 import type { BackoffPolicy } from './backoff'
 import type { ConnectivityMonitor } from './connectivity'
+import type { LockRunner } from './locks'
 import type { Outbox } from './outbox'
 import type { RemoteWriters } from './syncSend'
 import type { Clock, Timers } from './timers'
@@ -17,8 +19,14 @@ export interface SyncStatus {
   lastError: string | null
 }
 
-/** One-off notifications for toasts: `count` mutations were synced / newly marked failed in one pass. */
-export type SyncEvent = { type: 'synced'; count: number } | { type: 'failed'; count: number }
+/**
+ * One-off notifications: `count` mutations were synced / newly marked failed in one pass (toasts), or the
+ * server kept a different version of records of `entities`, now in the cache (screens reload them).
+ */
+export type SyncEvent =
+  | { type: 'synced'; count: number }
+  | { type: 'failed'; count: number }
+  | { type: 'reconciled'; entities: SyncEntity[] }
 
 export interface SyncEngineOptions {
   outbox: Outbox
@@ -28,6 +36,8 @@ export interface SyncEngineOptions {
   clock?: Clock
   timers?: Timers
   backoff?: BackoffPolicy
+  /** Cross-tab exclusive lock around each pass (default: Web Locks when available). */
+  lock?: LockRunner
 }
 
 export interface FlushOptions {

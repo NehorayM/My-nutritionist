@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger'
 import { backoffDelayMs, DEFAULT_BACKOFF } from './backoff'
 import { createListenerSet } from './listeners'
+import { browserLock, syncLockName } from './locks'
 import type { OutboxCounts } from './outboxIndex'
 import { runSendPass } from './syncPass'
 import { rejectedMessage, RETRY_MESSAGES, WAITING_MESSAGE } from './syncSend'
@@ -24,6 +25,8 @@ export function createSyncEngine(options: SyncEngineOptions): SyncEngine {
   const clock = options.clock ?? systemClock
   const timers = options.timers ?? browserTimers
   const policy = options.backoff ?? DEFAULT_BACKOFF
+  const lock = options.lock ?? browserLock
+  const lockName = syncLockName(options.userId)
   const statusListeners = createListenerSet<SyncStatus>('sync')
   const eventListeners = createListenerSet<SyncEvent>('sync')
 
@@ -86,7 +89,8 @@ export function createSyncEngine(options: SyncEngineOptions): SyncEngine {
     running = true
     publish()
     try {
-      const result = await runSendPass({ outbox, remote, clock, policy, force, isCancelled: () => disposed })
+      // One pass at a time across tabs: a second tab waits, then re-reads the queue.
+      const result = await lock(lockName, () => runSendPass({ outbox, remote, clock, policy, force, isCancelled: () => disposed }))
       storageErrors = 0
       waiting = result.retryAt !== null
       if (result.retryKind !== null) retryProblem = RETRY_MESSAGES[result.retryKind]
@@ -98,6 +102,7 @@ export function createSyncEngine(options: SyncEngineOptions): SyncEngine {
       }
       if (result.sent > 0) eventListeners.emit({ type: 'synced', count: result.sent })
       if (result.rejected > 0) eventListeners.emit({ type: 'failed', count: result.rejected })
+      if (result.reconciled.length > 0) eventListeners.emit({ type: 'reconciled', entities: result.reconciled })
     } catch (error) {
       // Local storage failed (the queue could not be read or updated): try again later.
       logger.warn('sync', 'A sync pass could not complete', error)

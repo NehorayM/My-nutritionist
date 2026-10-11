@@ -4,7 +4,7 @@ import { createSupabaseRepositories, type RemoteOptions, type SupabaseDataClient
 import type { Repositories } from '@/repositories/types'
 import { normalizeLimit } from '@/schemas'
 import { readThrough, syncedWriter, type SyncedContext } from './access'
-import { dateScope, ownedFoodScope, profileScope, recentMealsScope, userScope } from './cache'
+import { dateScope, ownedFoodScope, profileScope, recentMealsScope, singletonScope, userScope } from './cache'
 
 export interface SyncedRepositoriesOptions extends SyncedContext {
   client: SupabaseClient | SupabaseDataClient
@@ -137,6 +137,39 @@ export function createSyncedRepositories(options: SyncedRepositoriesOptions): Re
           fetch: () => remote.savedMeals.list(),
           scope: userScope('savedMeals', userId),
           local: () => cache.savedMeals.list(),
+        }),
+    },
+    pantry: {
+      ...syncedWriter(ctx, 'pantry_items'),
+      list: () =>
+        readThrough(ctx, {
+          operation: 'pantry_items.list',
+          entity: 'pantry_items',
+          fetch: () => remote.pantry.list(),
+          scope: userScope('pantry', userId),
+          local: () => cache.pantry.list(),
+        }),
+    },
+    plannerSettings: {
+      get: () =>
+        readThrough(ctx, {
+          operation: 'planner_settings.get',
+          entity: 'planner_settings',
+          fetch: async () => asList(await remote.plannerSettings.get()),
+          scope: singletonScope('plannerSettings', userId),
+          local: () => cache.plannerSettings.get(),
+        }),
+      save: syncedWriter(ctx, 'planner_settings').save,
+    },
+    reminders: {
+      ...syncedWriter(ctx, 'reminder_schedules'),
+      list: () =>
+        readThrough(ctx, {
+          operation: 'reminder_schedules.list',
+          entity: 'reminder_schedules',
+          fetch: () => remote.reminders.list(),
+          scope: userScope('reminders', userId),
+          local: () => cache.reminders.list(),
         }),
     },
   }

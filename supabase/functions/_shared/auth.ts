@@ -1,5 +1,5 @@
 /**
- * Caller authentication for `food-search`: only signed-in Supabase users may spend the shared USDA quota.
+ * Caller authentication for Edge Functions (`food-search`, `reminders`): only signed-in Supabase users.
  *
  * The user's session JWT arrives as `Authorization: Bearer <jwt>` (added by `supabase.functions.invoke`).
  * It is verified with supabase-js `auth.getClaims(jwt)`: with asymmetric signing keys the signature is checked

@@ -8,6 +8,7 @@ import type { TabRoute } from './routes'
  */
 export const SCREENS: Record<TabRoute, ScreenEntry> = {
   meals: eagerScreen(MealsScreen),
+  kitchen: lazyScreen(() => import('@/features/kitchen/KitchenScreen').then((m) => ({ default: m.KitchenScreen }))),
   progress: lazyScreen(() => import('@/features/progress/ProgressScreen').then((m) => ({ default: m.ProgressScreen }))),
   activity: lazyScreen(() => import('@/features/activity/ActivityScreen').then((m) => ({ default: m.ActivityScreen }))),
   profile: lazyScreen(() => import('@/features/profile/ProfileScreen').then((m) => ({ default: m.ProfileScreen }))),

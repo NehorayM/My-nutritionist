@@ -7,6 +7,7 @@ import { useFoodSearch, usePackagedSearch } from '../hooks/useFoodSearch'
 import { BarcodeLookup } from './BarcodeLookup'
 import { FoodList } from './FoodList'
 import { ProviderNotes } from './ProviderNotes'
+import { TranslationNote } from './TranslationNote'
 
 interface SearchTabProps {
   query: string
@@ -36,9 +37,10 @@ export function SearchTab({ query, onQueryChange, onSelect, onCreateCustom }: Se
       <Field label="Search foods" hideLabel>
         <Input
           type="search"
+          dir="auto"
           value={query}
           leading={<Search />}
-          placeholder="Search foods, e.g. oats or hummus"
+          placeholder="Search foods, e.g. oats, hummus or חזה עוף"
           autoComplete="off"
           enterKeyHint="search"
           onChange={(event) => onQueryChange(event.target.value)}
@@ -54,7 +56,9 @@ export function SearchTab({ query, onQueryChange, onSelect, onCreateCustom }: Se
         </output>
       )}
       {trimmed === '' ? (
-        <p className="text-sm text-text-muted">Search everyday foods from the catalog, foods you created, and USDA data when it’s available.</p>
+        <p className="text-sm text-text-muted">
+          Search everyday foods from the catalog, foods you created, and USDA data when it’s available. You can type in Hebrew too.
+        </p>
       ) : (
         <section aria-label="Search results" className="space-y-3">
           {search.status === 'error' ? (
@@ -65,6 +69,7 @@ export function SearchTab({ query, onQueryChange, onSelect, onCreateCustom }: Se
               </Button>
             </div>
           ) : null}
+          {busy ? null : <TranslationNote translation={search.result?.translation} />}
           <ProviderNotes result={search.result} providers={['local', 'usda']} />
           {search.items.length > 0 ? <FoodList foods={search.items} onSelect={onSelect} label="Matching foods" /> : null}
           {busy && search.items.length === 0 ? (
@@ -75,7 +80,7 @@ export function SearchTab({ query, onQueryChange, onSelect, onCreateCustom }: Se
           {showEmpty ? (
             <EmptyState
               compact
-              title={`No matches for “${trimmed}”`}
+              title={<>No matches for “<bdi>{trimmed}</bdi>”</>}
               description="Try a shorter or different name, search packaged products, or create your own food."
               actions={
                 <Button size="sm" variant="secondary" leadingIcon={<Plus />} onClick={onCreateCustom}>
@@ -99,7 +104,10 @@ export function SearchTab({ query, onQueryChange, onSelect, onCreateCustom }: Se
             </Button>
           ) : (
             <>
-              <h3 className="text-sm font-bold text-text">Packaged products for “{packaged.query}”</h3>
+              <h3 className="text-sm font-bold text-text">
+                Packaged products for “<bdi>{packaged.query}</bdi>”
+              </h3>
+              <TranslationNote translation={packaged.result?.translation} />
               <ProviderNotes result={packaged.result} providers={['off']} />
               {packaged.status === 'loading' ? (
                 <p className="flex items-center gap-2 text-sm text-text-muted">

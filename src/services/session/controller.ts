@@ -1,11 +1,15 @@
 import { logger } from '@/lib/logger'
+import { observeWrites } from '@/repositories/observed'
 import type { AuthEvent, AuthResult, AuthSession } from '@/services/auth'
 import { deferAuthWork } from '@/services/auth/defer'
 import { setRepositories } from '@/services/runtime'
+import { refreshStores } from '@/stores/refresh'
 import { resetUserStores } from '@/stores/registry'
 import { useSessionStore } from '@/stores/sessionStore'
 import { useSyncStore } from '@/stores/syncStore'
+import { SYNC_ENTITIES } from '@/types'
 import { createCloudSession } from './cloudSession'
+import { startLiveRefresh } from './liveRefresh'
 import { loadSharedData } from './sharedData'
 import type { ActionResult, SessionDeps } from './types'
 
@@ -35,7 +39,8 @@ export function createSessionController(deps: SessionDeps) {
     cloud.stop()
     const guestId = await deps.guestIds.getOrCreate()
     resetUserStores()
-    setRepositories(deps.createLocal(guestId))
+    // Other tabs of this guest reload what this tab writes.
+    setRepositories(observeWrites(deps.createLocal(guestId), (entity) => deps.events.notifyOtherTabs({ userId: guestId, entities: [entity] })))
     useSessionStore.setState({ phase: 'ready', mode: 'guest', userId: guestId, email: null })
     loadSharedData()
   }
@@ -59,7 +64,16 @@ export function createSessionController(deps: SessionDeps) {
   }
 
   async function start(): Promise<void> {
-    deps.connectivity.subscribe((connection) => useSyncStore.setState({ connection }))
+    startLiveRefresh({ events: deps.events, currentUserId: () => useSessionStore.getState().userId, refresh: refreshStores })
+    let wasOffline = false
+    deps.connectivity.subscribe((connection) => {
+      useSyncStore.setState({ connection })
+      // Back online: other devices may have changed data meanwhile.
+      const userId = useSessionStore.getState().userId
+      if (connection === 'connected' && wasOffline && userId) deps.events.notifyThisTab({ userId, entities: [...SYNC_ENTITIES] })
+      if (connection === 'offline') wasOffline = true
+      else if (connection === 'connected') wasOffline = false
+    })
     useSyncStore.setState({ connection: deps.connectivity.getState() })
     const { auth } = deps
     if (!auth) {

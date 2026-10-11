@@ -3,7 +3,10 @@ import type {
   FavoriteRepository,
   FoodRepository,
   MealRepository,
+  PantryRepository,
+  PlannerSettingsRepository,
   ProfileRepository,
+  ReminderRepository,
   SavedMealRepository,
   ScheduledWorkoutRepository,
   WeightRepository,
@@ -101,6 +104,31 @@ export function createSupabaseSavedMealRepository(tables: RemoteTables): SavedMe
   return {
     list: () => table.select(),
     save: (meal) => table.upsert(meal),
+    remove: (id) => table.remove(id),
+  }
+}
+
+export function createSupabasePantryRepository(tables: RemoteTables): PantryRepository {
+  const table = tables.pantry_items
+  return {
+    list: () => table.select(),
+    save: (item) => table.upsert(item),
+    remove: (id) => table.remove(id),
+  }
+}
+
+export function createSupabasePlannerSettingsRepository(tables: RemoteTables, userId: string): PlannerSettingsRepository {
+  return {
+    get: () => tables.planner_settings.getById(userId),
+    save: (settings) => tables.planner_settings.upsert(settings),
+  }
+}
+
+export function createSupabaseReminderRepository(tables: RemoteTables): ReminderRepository {
+  const table = tables.reminder_schedules
+  return {
+    list: () => table.select(),
+    save: (schedule) => table.upsert(schedule),
     remove: (id) => table.remove(id),
   }
 }

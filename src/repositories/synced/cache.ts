@@ -15,10 +15,18 @@ export type ScopeKeys<T> = (tx: SyncTransaction, server: readonly T[]) => Promis
 const none = (): Promise<IDBValidKey[]> => Promise.resolve([])
 
 export function profileScope(userId: string): ScopeKeys<unknown> {
-  return (tx) => tx.objectStore('profiles').getAllKeys(userId)
+  return singletonScope('profiles', userId)
 }
 
-export function userScope(store: 'foods' | 'weights' | 'favorites' | 'savedMeals' | 'meals', userId: string): ScopeKeys<unknown> {
+/** The one record a user has in a store keyed by the user (profile, planner settings). */
+export function singletonScope(store: 'profiles' | 'plannerSettings', userId: string): ScopeKeys<unknown> {
+  return (tx) => tx.objectStore(store).getAllKeys(userId)
+}
+
+export function userScope(
+  store: 'foods' | 'weights' | 'favorites' | 'savedMeals' | 'meals' | 'pantry' | 'reminders',
+  userId: string,
+): ScopeKeys<unknown> {
   return (tx) => tx.objectStore(store).index('byUser').getAllKeys(userId)
 }
 

@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react'
+import { ScreenColumns } from '@/app/ScreenLayout'
 import { addDays, type DateKey } from '@/domain/dates'
 import { DEFAULT_MEAL_SLOTS } from '@/domain/meals'
 import { formatDateLabel } from '@/lib/format'
@@ -21,7 +22,10 @@ interface MealsContentProps {
   recommendations?: ReactNode
 }
 
-/** The selected day: nutrition summary, the recommendations slot, then the four meal cards. */
+/**
+ * The selected day. Phones: nutrition summary, recommendations, then the four meal cards. Desktop: the meal
+ * cards on the left, summary and recommendations beside them.
+ */
 export function MealsContent({ day, today, sheets, recommendations }: MealsContentProps) {
   const mealsHeadingId = useId()
   const previousDate = addDays(day.date, -1)
@@ -34,37 +38,43 @@ export function MealsContent({ day, today, sheets, recommendations }: MealsConte
   }
 
   return (
-    <>
-      <NutritionSummary
-        dayLabel={dayLabel}
-        totals={day.totals}
-        targets={day.targets}
-        coverage={day.coverage}
-        entryCount={day.entries.length}
-      />
-      {recommendations}
-      <section aria-labelledby={mealsHeadingId} className="space-y-4">
-        <h2 id={mealsHeadingId} className="sr-only">
-          Meals, {dayLabel}
-        </h2>
-        {DEFAULT_MEAL_SLOTS.map(({ key: mealType }) => {
-          const entries = day.entries.filter((entry) => entry.mealType === mealType)
-          return (
-            <MealCard
-              key={mealType}
-              mealType={mealType}
-              entries={entries}
-              totals={day.totals.byMeal[mealType]}
-              repeatLabel={repeatLabel(mealType)}
-              onAdd={sheets.openAddFood}
-              onRepeat={(meal) => repeatMeal(previousDate, day.date, meal, repeatedMessageFor(meal, previousLabel))}
-              onEdit={sheets.openEdit}
-              onDelete={(entry) => void removeEntry(entry)}
-              onSaveMeal={(meal) => sheets.openSaveMeal(meal, entries)}
-            />
-          )
-        })}
-      </section>
-    </>
+    <ScreenColumns
+      lead={
+        <>
+          <NutritionSummary
+            dayLabel={dayLabel}
+            totals={day.totals}
+            targets={day.targets}
+            coverage={day.coverage}
+            entryCount={day.entries.length}
+          />
+          {recommendations}
+        </>
+      }
+      main={
+        <section aria-labelledby={mealsHeadingId} className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+          <h2 id={mealsHeadingId} className="sr-only">
+            Meals, {dayLabel}
+          </h2>
+          {DEFAULT_MEAL_SLOTS.map(({ key: mealType }) => {
+            const entries = day.entries.filter((entry) => entry.mealType === mealType)
+            return (
+              <MealCard
+                key={mealType}
+                mealType={mealType}
+                entries={entries}
+                totals={day.totals.byMeal[mealType]}
+                repeatLabel={repeatLabel(mealType)}
+                onAdd={sheets.openAddFood}
+                onRepeat={(meal) => repeatMeal(previousDate, day.date, meal, repeatedMessageFor(meal, previousLabel))}
+                onEdit={sheets.openEdit}
+                onDelete={(entry) => void removeEntry(entry)}
+                onSaveMeal={(meal) => sheets.openSaveMeal(meal, entries)}
+              />
+            )
+          })}
+        </section>
+      }
+    />
   )
 }

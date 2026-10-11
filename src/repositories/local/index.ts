@@ -6,6 +6,7 @@ import {
   createLocalProfileRepository,
   createLocalSavedMealRepository,
 } from './library'
+import { createLocalPantryRepository, createLocalPlannerSettingsRepository, createLocalReminderRepository } from './kitchen'
 import { createLocalMealRepository } from './meals'
 
 /**
@@ -24,6 +25,9 @@ export function createLocalRepositories(userId: string): Repositories {
     scheduledWorkouts: createLocalScheduledWorkoutRepository(userId),
     favorites: createLocalFavoriteRepository(userId),
     savedMeals: createLocalSavedMealRepository(userId),
+    pantry: createLocalPantryRepository(userId),
+    plannerSettings: createLocalPlannerSettingsRepository(userId),
+    reminders: createLocalReminderRepository(userId),
   }
 }
 
@@ -31,7 +35,10 @@ export {
   createLocalFavoriteRepository,
   createLocalFoodRepository,
   createLocalMealRepository,
+  createLocalPantryRepository,
+  createLocalPlannerSettingsRepository,
   createLocalProfileRepository,
+  createLocalReminderRepository,
   createLocalSavedMealRepository,
   createLocalScheduledWorkoutRepository,
   createLocalWeightRepository,

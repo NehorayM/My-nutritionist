@@ -16,11 +16,14 @@ export interface DataExport {
   scheduledWorkouts: Awaited<ReturnType<Repositories['scheduledWorkouts']['listRange']>>
   favorites: Awaited<ReturnType<Repositories['favorites']['list']>>
   savedMeals: Awaited<ReturnType<Repositories['savedMeals']['list']>>
+  pantry: Awaited<ReturnType<Repositories['pantry']['list']>>
+  plannerSettings: Awaited<ReturnType<Repositories['plannerSettings']['get']>>
+  reminders: Awaited<ReturnType<Repositories['reminders']['list']>>
 }
 
 /** All of the current user's records, as one JSON-serializable document. */
 export async function collectExport(repos: Repositories, now: Date): Promise<DataExport> {
-  const [profile, foods, meals, weights, workouts, scheduledWorkouts, favorites, savedMeals] = await Promise.all([
+  const [profile, foods, meals, weights, workouts, scheduledWorkouts, favorites, savedMeals, pantry, plannerSettings, reminders] = await Promise.all([
     repos.profile.get(),
     repos.foods.list(),
     repos.meals.listRange(ALL_DATES),
@@ -29,6 +32,9 @@ export async function collectExport(repos: Repositories, now: Date): Promise<Dat
     repos.scheduledWorkouts.listRange(ALL_DATES),
     repos.favorites.list(),
     repos.savedMeals.list(),
+    repos.pantry.list(),
+    repos.plannerSettings.get(),
+    repos.reminders.list(),
   ])
   return {
     app: 'My-nutritionist',
@@ -43,6 +49,9 @@ export async function collectExport(repos: Repositories, now: Date): Promise<Dat
     scheduledWorkouts,
     favorites,
     savedMeals,
+    pantry,
+    plannerSettings,
+    reminders,
   }
 }
 

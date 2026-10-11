@@ -13,6 +13,9 @@ export const USER_TABLES = [
   'scheduled_workouts',
   'favorites',
   'saved_meals',
+  'pantry_items',
+  'planner_settings',
+  'reminder_schedules',
 ] as const
 export type UserTable = (typeof USER_TABLES)[number]
 
@@ -130,6 +133,45 @@ export const TABLE_SPECS: readonly TableSpec[] = [
       items: [{ foodName: 'Oats', grams: 40 }],
     }),
     patch: () => ({ name: 'Renamed breakfast' }),
+  },
+  {
+    table: 'pantry_items',
+    ownerColumn: 'user_id',
+    build: (ownerId) => ({
+      id: randomUUID(),
+      user_id: ownerId,
+      food: { name: 'Cooked rice', per100g: { calories: 130 } },
+      grams: 400,
+      prep: 'reheat',
+      methods: ['microwave'],
+    }),
+    patch: () => ({ grams: 250 }),
+  },
+  {
+    table: 'planner_settings',
+    ownerColumn: 'id',
+    build: (ownerId) => ({
+      id: ownerId,
+      day_equipment: ['microwave'],
+      daily_kcal_min: null,
+      daily_kcal_max: null,
+      meals: { lunch: { enabled: true } },
+    }),
+    patch: () => ({ daily_kcal_min: 1500, daily_kcal_max: 1900 }),
+  },
+  {
+    table: 'reminder_schedules',
+    ownerColumn: 'user_id',
+    build: (ownerId) => ({
+      id: randomUUID(),
+      user_id: ownerId,
+      kind: 'meal_log',
+      meal_type: 'lunch',
+      local_time: '12:30:00',
+      days: [1, 2, 3, 4, 5],
+      timezone: 'Asia/Jerusalem',
+    }),
+    patch: () => ({ local_time: '13:00:00' }),
   },
 ]
 

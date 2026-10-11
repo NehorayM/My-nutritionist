@@ -201,3 +201,44 @@ For a hosted project, run the database advisors after every migration:
 | `food-search` returns 503 `not_configured` | `FDC_API_KEY` secret not set (`npx supabase secrets set …`) |
 | `food-search` returns 429 | The api.data.gov hourly quota is used up; wait for `Retry-After` |
 | Password-reset link opens the wrong site | Redirect URL not in the allow list; the Site URL is used instead |
+
+## 8. Live sync, kitchen and email reminders (migrations 004–006)
+
+- **004_sync_integrity** — delete tombstones (`private.sync_tombstones`, pruned after 90 days), the stale-write guard
+  also rejecting old re-inserts, and change notifications: a trigger broadcasts `{ table }` on the private Realtime
+  topic `user:<owner>`; the policy on `realtime.messages` lets users join only their own topic. Locally Realtime must
+  be enabled (`[realtime] enabled = true` in `supabase/config.toml`, already set).
+- **005_kitchen_and_reminders** — `pantry_items`, `planner_settings`, `reminder_schedules` (RLS own rows; time zones
+  validated against `pg_timezone_names`; ≤ 24 schedules per user) and `reminder_dispatches` (written by the server,
+  read-only for the owner).
+- **006_reminder_delivery** — `claim_due_reminders()` (service role only), `pg_cron` jobs `dispatch-reminders`
+  (every 5 min) and `prune-sync-history` (daily), and `private.invoke_reminders()` which reads its target from Vault.
+
+### Email reminders setup (hosted)
+1. Deploy the function (it authenticates every route itself):
+   ```bash
+   npx supabase functions deploy reminders --project-ref <ref> --no-verify-jwt --use-api
+   ```
+2. Function secrets (generate the two random values once, e.g. `openssl rand -hex 32`):
+   ```bash
+   npx supabase secrets set --project-ref <ref> REMINDERS_CRON_SECRET=<random> REMINDERS_SIGNING_KEY=<random> \
+     APP_URL=https://<user>.github.io/<repo>/
+   ```
+3. Tell pg_cron where to call (SQL editor, once — values live in Vault, never in migrations):
+   ```sql
+   select vault.create_secret('https://<ref>.supabase.co/functions/v1/reminders/dispatch', 'reminders_dispatch_url');
+   select vault.create_secret('<same REMINDERS_CRON_SECRET>', 'reminders_cron_secret');
+   ```
+4. Email provider: create a free [Resend](https://resend.com) account and an API key, then
+   `npx supabase secrets set --project-ref <ref> RESEND_API_KEY=re_…`. Until a domain is verified in Resend, emails can
+   only go to the Resend account's own address (sender `onboarding@resend.dev`); after verifying a domain set
+   `REMINDERS_FROM="My-nutritionist <reminders@your-domain>"`. Without `RESEND_API_KEY` deliveries are recorded as
+   skipped ("email delivery isn't set up") and the test email explains it.
+
+### Email reminders locally
+`supabase/functions/.env` (gitignored) holds `REMINDERS_CRON_SECRET`, `REMINDERS_SIGNING_KEY`,
+`MAILPIT_URL=http://supabase_inbucket_<project_id>:8025` and `APP_URL=http://localhost:5173/`; restart the stack after
+changing it. Emails land in Mailpit (http://127.0.0.1:54324). Trigger a run by hand:
+```bash
+curl -X POST http://127.0.0.1:54321/functions/v1/reminders/dispatch -H "x-reminders-secret: $REMINDERS_CRON_SECRET"
+```

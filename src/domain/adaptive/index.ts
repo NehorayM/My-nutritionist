@@ -23,7 +23,7 @@ export {
 export { microGapsOf, varietySignals, type RankingContext, type VarietySignals } from './context'
 export { optionTotals, scoreOption, subScores, type ScoredOption } from './ranking'
 export { PORTION_GRAMS, SIDE_ENERGY_SHARE, portionRange, sideShare, type GramRange } from './portionRanges'
-export { portionOption, roundPortion, sideGrams } from './portions'
+export { portionOption, roundPortion, roundWithin, sideGrams } from './portions'
 export { ID_SEPARATOR, dishName, dishSignature, dismissedSignatures, optionId } from './dishes'
 export { STYLE_RULES, stylesByRelevance, type StyleRule, type StyleSignals } from './styles'
 export { buildMealOptions, type BuildOptionsInput, type BuiltOptions, type OptionDraft } from './builder'

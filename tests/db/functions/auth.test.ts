@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { bearerToken, createUserVerifier, type ClaimsResult } from '../../../supabase/functions/food-search/auth.ts'
+import { bearerToken, createUserVerifier, type ClaimsResult } from '../../../supabase/functions/_shared/auth.ts'
 import { pickPublishableKey, readFdcApiKey, readFunctionEnv } from '../../../supabase/functions/food-search/config.ts'
 
 const JWT = 'eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ1In0.c2lnbmF0dXJl'

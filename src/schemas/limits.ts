@@ -38,6 +38,15 @@ export const LIMITS = {
   nutrientValue: { min: 0, max: 100000 },
   /** Calories per 100 g (is_valid_nutrient_map; pure fat is ~900 kcal). */
   caloriesPer100g: { min: 0, max: 1000 },
+  /** pantry_items.grams: amount at home, > 0 (005). */
+  pantryGrams: { exclusiveMin: 0, max: 100000 },
+  /** pantry_items.cook_minutes (005). */
+  cookMinutes: { min: 1, max: 600 },
+  /** planner_settings.daily_kcal_min/max (005). */
+  dailyKcal: { min: 500, max: 6000 },
+  /** App-level limits of one meal's calorie range and preparation time (planner_settings.meals jsonb). */
+  mealKcal: { min: 50, max: 3000 },
+  mealMinutes: { min: 0, max: 240 },
 } as const
 
 /**
@@ -68,6 +77,10 @@ export const COUNT_LIMITS = {
   foodMealTypes: 10,
   dislikes: 50,
   savedMealItems: { min: 1, max: 20 },
+  /** reminder_schedules.days (005). */
+  reminderDays: { min: 1, max: 7 },
+  /** Schedules per user (005 trigger). */
+  reminderSchedules: 24,
 } as const
 
 /** food_items.barcode: 6–14 digits (UPC/EAN/GTIN). */

@@ -2,7 +2,10 @@ import type {
   Favorite,
   FoodItem,
   MealEntry,
+  PantryItem,
+  PlannerSettings,
   Profile,
+  ReminderSchedule,
   SavedMeal,
   ScheduledWorkout,
   WeightEntry,
@@ -77,6 +80,25 @@ export interface SavedMealRepository {
   remove(id: string): Promise<void>
 }
 
+export interface PantryRepository {
+  list(): Promise<PantryItem[]>
+  save(item: PantryItem): Promise<PantryItem>
+  remove(id: string): Promise<void>
+}
+
+/** One record per user (like the profile). */
+export interface PlannerSettingsRepository {
+  get(): Promise<PlannerSettings | null>
+  save(settings: PlannerSettings): Promise<PlannerSettings>
+}
+
+/** Email reminder schedules (meaningful for signed-in users only: the server sends the emails). */
+export interface ReminderRepository {
+  list(): Promise<ReminderSchedule[]>
+  save(schedule: ReminderSchedule): Promise<ReminderSchedule>
+  remove(id: string): Promise<void>
+}
+
 export interface Repositories {
   /** The user every repository is bound to. */
   userId: string
@@ -88,6 +110,9 @@ export interface Repositories {
   scheduledWorkouts: ScheduledWorkoutRepository
   favorites: FavoriteRepository
   savedMeals: SavedMealRepository
+  pantry: PantryRepository
+  plannerSettings: PlannerSettingsRepository
+  reminders: ReminderRepository
 }
 
 /** Error raised by repositories; `retryable` tells the sync layer whether to queue and retry. */

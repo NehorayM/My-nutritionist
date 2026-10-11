@@ -1,6 +1,7 @@
 import { clearUserData } from '@/repositories/local/userData'
 import { createLocalRepositories } from '@/repositories/local'
 import { getSupabase, supabaseConfig } from '@/lib/supabase'
+import { dataEvents } from '@/services/dataEvents'
 import { createConnectivityMonitor } from '@/services/sync/connectivity'
 import { createSessionController, type SessionController } from './controller'
 import { getOrCreateGuestId, peekGuestId } from './guestId'
@@ -43,6 +44,8 @@ function createLocalDeps(): SessionDeps {
     redirectUrl: () => `${window.location.origin}${window.location.pathname}`,
     currentUrl: () => window.location.href,
     now: () => new Date(),
+    events: dataEvents(),
+    remoteChanges: null,
   }
 }
 

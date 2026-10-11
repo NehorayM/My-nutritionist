@@ -53,6 +53,12 @@ Code: `src/services/food/` and `supabase/functions/_shared/usda/` (USDA mapping 
 
 ## Search behaviour (`FoodSearchService`)
 
+- **Hebrew queries** are translated first (`services/translation`): the built-in dictionary works offline and
+  instantly; only words it doesn't know are sent to MyMemory (`api.mymemory.translated.net`, free, no key, about
+  5,000 characters/day per network) — the search text only, nothing else, and only when online. USDA and Open Food
+  Facts receive the English text; the local search uses both the Hebrew and the English text. When nothing can be
+  translated, remote providers are skipped and only local foods are shown.
+
 - `search(text, { page, signal, usdaScope })`: local results always (20 per page), plus USDA (15 per page) when it
   is available and the trimmed query has ≥ 2 characters. Local results come first; remote results that duplicate
   a food already shown (same barcode ignoring leading zeros, same provider record — including the USDA record a
