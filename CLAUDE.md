@@ -82,8 +82,9 @@ stack after editing). Local reminder emails land in Mailpit: http://127.0.0.1:54
   `npx supabase functions deploy reminders --project-ref ucboymoqcfllaoobdcgd --no-verify-jwt --use-api`.
   Secret `FDC_API_KEY` is currently USDA's rate-limited `DEMO_KEY` (replace with a real api.data.gov key).
 - Reminders (hosted): secrets `REMINDERS_CRON_SECRET`, `REMINDERS_SIGNING_KEY`, `APP_URL` are set; Vault holds
-  `reminders_dispatch_url` + `reminders_cron_secret` for pg_cron. Emails need `RESEND_API_KEY` (the user's Resend
-  account) — without it deliveries are recorded as skipped. See docs/SUPABASE_SETUP.md §8.
+  `reminders_dispatch_url` + `reminders_cron_secret` for pg_cron. `RESEND_API_KEY` (the user's Resend account) is set
+  and verified with a test email (2026-10-11). No domain is verified in Resend yet, so emails reach only the Resend
+  account owner's address; verify a domain and set `REMINDERS_FROM` before inviting others. See docs/SUPABASE_SETUP.md §8.
 - Auth: Site URL / redirect URLs point to the Pages URL (+ `http://localhost:5173/**`); email confirmation is set in
   the dashboard (built-in email only reaches org members — use custom SMTP before inviting others).
 
