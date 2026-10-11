@@ -68,6 +68,8 @@ stack after editing). Local reminder emails land in Mailpit: http://127.0.0.1:54
 - Repo: https://github.com/NehorayM/My-nutritionist · site: https://nehoraym.github.io/My-nutritionist/
 - `.github/workflows/deploy-pages.yml` runs typecheck, lint and tests, then `npm run build -- --base=/<repo>/`
   and publishes `dist/` on every push to `main` (or manually via "Run workflow"). Pages source must be "GitHub Actions".
+  Symptom when it was switched to "Deploy from a branch": a blank live site requesting `/src/main.tsx` and an extra
+  "pages build and deployment" run per push (it can overwrite our deploy). Fix the setting, then push again.
 - Hash routing (`#/meals`…) means no SPA 404 fallback is needed. Public assets must use relative/`base`-aware paths
   (see `public/manifest.webmanifest`).
 - Cloud mode on Pages: repository **variables** `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are set
