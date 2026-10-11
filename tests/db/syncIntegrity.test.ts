@@ -87,7 +87,14 @@ const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 describe('change notifications', () => {
   it('tells a signed-in user which of their tables changed, and nothing about other users', async () => {
-    const { status, received } = await listen(clientA, userA.accessToken, userA.id)
+    // Realtime may still be starting right after `db reset`: join again until it accepts.
+    let joined = await listen(clientA, userA.accessToken, userA.id)
+    for (let attempt = 1; attempt < 5 && joined.status !== 'SUBSCRIBED'; attempt += 1) {
+      for (const { client, channel } of channels.splice(0)) await client.removeChannel(channel)
+      await settle(2000)
+      joined = await listen(clientA, userA.accessToken, userA.id)
+    }
+    const { status, received } = joined
     expect(status).toBe('SUBSCRIBED')
 
     const other = mealLogRow(userB.id)

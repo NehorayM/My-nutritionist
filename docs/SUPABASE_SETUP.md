@@ -202,7 +202,7 @@ For a hosted project, run the database advisors after every migration:
 | `food-search` returns 429 | The api.data.gov hourly quota is used up; wait for `Retry-After` |
 | Password-reset link opens the wrong site | Redirect URL not in the allow list; the Site URL is used instead |
 
-## 8. Live sync, kitchen and email reminders (migrations 004–006)
+## 8. Live sync, kitchen and email reminders (migrations 004–007)
 
 - **004_sync_integrity** — delete tombstones (`private.sync_tombstones`, pruned after 90 days), the stale-write guard
   also rejecting old re-inserts, and change notifications: a trigger broadcasts `{ table }` on the private Realtime
@@ -213,6 +213,7 @@ For a hosted project, run the database advisors after every migration:
   read-only for the owner).
 - **006_reminder_delivery** — `claim_due_reminders()` (service role only), `pg_cron` jobs `dispatch-reminders`
   (every 5 min) and `prune-sync-history` (daily), and `private.invoke_reminders()` which reads its target from Vault.
+- **007_pg_net_schema** — keeps `pg_net` in the `extensions` schema (security advisor 0014).
 
 ### Email reminders setup (hosted)
 1. Deploy the function (it authenticates every route itself):

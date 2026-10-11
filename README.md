@@ -80,7 +80,7 @@ src/
   lib/            env, lazy Supabase client, ids, logger, formatting, notifications
 supabase/
   migrations/     001 schema · 002 RLS + grants · 003 seed foods · 004 sync integrity (tombstones, Realtime)
-                  · 005 kitchen + reminders tables · 006 reminder delivery (claiming, pg_cron)
+                  · 005 kitchen + reminders tables · 006 reminder delivery (claiming, pg_cron) · 007 pg_net schema
   functions/      food-search (USDA proxy) · reminders (scheduled emails) · _shared (auth, env, USDA normalization)
   tests/database/ pgTAP policy tests
 tests/
