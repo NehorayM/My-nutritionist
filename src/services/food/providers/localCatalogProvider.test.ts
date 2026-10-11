@@ -32,6 +32,19 @@ describe('local catalog search ranking', () => {
     ])
   })
 
+  it('prefers the name in the typed word order, and everyday foods over occasional ones', async () => {
+    const foods = [
+      testFood('Milk chocolate', { category: 'sweet' }),
+      testFood('Chocolate milk (shoko)', { category: 'beverage' }),
+      testFood('Potato chips', { category: 'snack', per100g: { ...testFood('x').per100g, fat: 34, fiber: 3 } }),
+      testFood('Potato, boiled', { category: 'vegetable' }),
+    ]
+    const local = createLocalCatalogProvider({ catalog: foods, getUserFoods: () => [] })
+    const search = async (text: string) => (await local.search({ text, page: 1, pageSize: 10 })).items.map((item) => item.name)
+    expect(await search('chocolate milk')).toEqual(['Chocolate milk (shoko)', 'Milk chocolate'])
+    expect(await search('potato')).toEqual(['Potato, boiled', 'Potato chips'])
+  })
+
   it('matches word prefixes while typing and requires every query word', async () => {
     // Same score: the shorter (more specific) name first.
     expect(await names('chick')).toEqual([

@@ -90,6 +90,8 @@ export const EXCLUSION_REASONS = [
   'incomplete_nutrition',
   'no_energy',
   'occasional',
+  'condiment',
+  'alcohol',
   'allergen_unknown',
   'allergen',
   'diet',

@@ -54,6 +54,10 @@ export const FOOD_TAGS = [
   'high_fiber',
   'vegetarian',
   'vegan',
+  /** Goes with a meal (ketchup, mustard, mayonnaise, soy sauce): never suggested or planned as an item. */
+  'condiment',
+  /** Alcoholic drink: loggable, never suggested or planned. */
+  'alcohol',
 ] as const
 export type FoodTag = (typeof FOOD_TAGS)[number]
 

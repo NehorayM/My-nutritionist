@@ -61,7 +61,7 @@ Variables), and add the Pages URL to Supabase Auth redirect URLs.
 | `npm run test:db` | RLS/security/constraint tests against the local Supabase stack + Edge Function tests |
 | `npm run test:e2e` | Playwright (system Chrome): guest flow, and signed-in flow when the local stack runs |
 | `npm run db:start` · `db:stop` · `db:reset` · `db:types` | Local Supabase lifecycle and type generation |
-| `npm run seed:sql` | Regenerate `supabase/migrations/003_seed_foods.sql` from `src/data/system-foods.json` |
+| `npm run seed:sql` | Regenerate the seed migration (`supabase/migrations/008_system_foods_v2.sql`) from `src/data/system-foods.json` |
 
 ## Project structure
 
@@ -76,11 +76,12 @@ src/
   services/       food providers & search, translation (Hebrew → English), sync engine + live refresh, auth,
                   session, guest migration, reminders
   schemas/        Zod schemas and limits mirroring the database checks
-  data/           USDA-sourced system food catalog (70 foods) and SQL seed generator
+  data/           USDA-sourced system food catalog (173 foods) and SQL seed generator
   lib/            env, lazy Supabase client, ids, logger, formatting, notifications
 supabase/
   migrations/     001 schema · 002 RLS + grants · 003 seed foods · 004 sync integrity (tombstones, Realtime)
                   · 005 kitchen + reminders tables · 006 reminder delivery (claiming, pg_cron) · 007 pg_net schema
+                  · 008 system foods v2 (173 foods: schnitzel, omelet, challah, majadra, labneh…)
   functions/      food-search (USDA proxy) · reminders (scheduled emails) · _shared (auth, env, USDA normalization)
   tests/database/ pgTAP policy tests
 tests/

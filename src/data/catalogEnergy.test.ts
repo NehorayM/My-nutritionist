@@ -13,6 +13,8 @@ interface SpecificFactors {
   protein: number
   fat: number
   carbs: number
+  /** Energy includes alcohol (7 kcal/g), which the macro columns don't carry: up to `alcoholGrams` per 100 g. */
+  alcoholGrams?: number
 }
 
 const FRUIT: SpecificFactors = {
@@ -32,13 +34,33 @@ const VEGETABLE: SpecificFactors = {
  * Foods outside the general 4/4/9 tolerance, each with the reason (SR Legacy food_calorie_conversion_factor).
  * The test below proves every reason by recomputing energy with those factors.
  */
+const ALCOHOL: SpecificFactors = {
+  reason: 'Alcoholic drinks: energy includes ethanol (about 7 kcal/g), which is not one of the macros',
+  protein: 4,
+  fat: 9,
+  carbs: 4,
+  alcoholGrams: 15,
+}
+
 const ENERGY_WHITELIST: Readonly<Record<string, SpecificFactors>> = {
   apple: FRUIT,
   banana: FRUIT,
   blueberries: FRUIT,
   medjool_dates: FRUIT,
+  mango: FRUIT,
+  plum: FRUIT,
+  pomegranate: FRUIT,
+  clementine: FRUIT,
+  raisins: FRUIT,
+  figs: FRUIT,
+  persimmon: FRUIT,
   spinach_raw: VEGETABLE,
   broccoli_cooked: VEGETABLE,
+  cauliflower_cooked: VEGETABLE,
+  corn_sweet_canned: VEGETABLE,
+  beer: ALCOHOL,
+  wine_red: ALCOHOL,
+  wine_white: ALCOHOL,
 }
 
 function macros(food: SystemFoodRecord): { kcal: number; protein: number; carbs: number; fat: number } {
@@ -77,6 +99,8 @@ describe('system food catalog — energy plausibility (4/4/9)', () => {
       if (!food || factors.reason.length === 0) return true
       const { kcal, protein, carbs, fat } = macros(food)
       const estimate = factors.protein * protein + factors.carbs * carbs + factors.fat * fat
+      // Alcohol: the remaining energy must be positive and plausible for the drink's alcohol content.
+      if (factors.alcoholGrams !== undefined) return kcal - estimate <= 0 || kcal - estimate > 7 * factors.alcoholGrams
       return Math.abs(kcal - estimate) / kcal > SPECIFIC_FACTOR_TOLERANCE
     })
     expect(unproven.map(([slug]) => slug)).toEqual([])

@@ -53,7 +53,9 @@ picks the mode, builds repositories, calls `services/runtime.setRepositories()`,
 `domain/adaptive/` — **Adaptive Nutrition Engine** (`engine.ts: buildAdaptivePlan(input: AdaptiveInput): AdaptivePlan`)
 - `diets.ts` diet-pattern rules (compatibility + macro emphasis), extensible per `DietType`.
 - `candidates.ts` — **Recommendation Candidate Engine**: filters by allergies (unknown allergen info excluded when the
-  user has allergies), diet (unknown flags excluded for vegetarian/vegan), dislikes, meal compatibility, prep time.
+  user has allergies), diet (unknown flags excluded for vegetarian/vegan), dislikes (name, category, tags, and the
+  fish/shellfish food groups), meal compatibility, prep time. Occasional foods only when favorited; condiments and
+  alcohol (catalog tags `condiment`, `alcohol`) are never suggested — the kitchen planner skips them too.
 - `allocation.ts` — **Meal Allocation Engine**: splits the remaining day across remaining meal slots → `MealBudget`.
 - `ranking.ts` — **Recommendation Ranking Engine**: multi-dimension score (calorie fit, macro fit, fiber,
   micronutrients, preference, practicality, variety). Never ranks on a single nutrient.

@@ -1,5 +1,6 @@
 /**
- * Regenerates supabase/migrations/003_seed_foods.sql from src/data/system-foods.json.
+ * Regenerates the current catalog seed migration (supabase/migrations/<SEED_MIGRATION>) from src/data/system-foods.json.
+ * Earlier releases (003_seed_foods.sql) are applied migrations and stay untouched.
  *
  *   node scripts/generate-seed-sql.ts           write the migration (npm run seed:sql)
  *   node scripts/generate-seed-sql.ts --check   exit 1 when the committed migration is out of date
@@ -9,9 +10,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { SYSTEM_FOOD_ROWS } from '../src/data/catalog.ts'
-import { generateSeedSql } from '../src/data/seedSql.ts'
+import { generateSeedSql, SEED_MIGRATION } from '../src/data/seedSql.ts'
 
-const target = fileURLToPath(new URL('../supabase/migrations/003_seed_foods.sql', import.meta.url))
+const target = fileURLToPath(new URL(`../supabase/migrations/${SEED_MIGRATION}`, import.meta.url))
 const sql = generateSeedSql(SYSTEM_FOOD_ROWS)
 
 if (process.argv.includes('--check')) {

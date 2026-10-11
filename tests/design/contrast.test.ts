@@ -64,6 +64,8 @@ const PAIRS: [string, string, number][] = [
   ['warning', 'surface', 4.5],
   ['info', 'surface', 4.5],
   ['accent-foreground', 'accent', 4.5],
+  ['accent-ink', 'surface', 4.5],
+  ['accent-ink', 'bg', 4.5],
 ]
 
 describe.each<Theme>(['light', 'dark'])('%s theme contrast (WCAG 2.2)', (theme) => {

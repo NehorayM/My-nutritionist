@@ -1,43 +1,46 @@
 /* ---------------------------------------------------------------------------
  * Design tokens (light values; dark overrides in the base layer below). docs/DESIGN_SYSTEM.md.
- * Palette: cool "sage" neutrals, a deep emerald primary and an apricot accent. Contrast (WCAG 2.2, checked in
- * tests/design/contrast.test.ts): text/bg ≥ 14, text-muted/bg ≥ 6, text-muted/surface-2 ≥ 5.5,
- * primary-foreground/primary ≥ 6, semantic text colors on surface ≥ 4.5 in both themes.
+ * Palette "bright & fresh": white cards on a light gray page, a vivid green primary (#16A34A family; buttons use a
+ * deeper shade so white labels stay readable) and a peach accent (#FB923C). Dark theme: neutral graphite grays.
+ * Contrast (WCAG 2.2, checked in tests/design/contrast.test.ts): text/bg ≥ 12, text-muted/bg ≥ 5.5,
+ * text-muted/surface-2 ≥ 4.5, primary-foreground/primary ≥ 5.5, semantic text colors on surface ≥ 4.5 in both themes.
  * Nutrient hues are graphic colors; pair them with numbers and use the *-ink variants for small text.
  * ------------------------------------------------------------------------- */
 @theme {
   --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
 
-  --color-backdrop: oklch(0.955 0.01 155);
-  --color-bg: oklch(0.975 0.007 150);
-  --color-surface: oklch(0.998 0.002 150);
-  --color-surface-2: oklch(0.955 0.011 150);
-  --color-border: oklch(0.9 0.013 152);
-  --color-text: oklch(0.225 0.02 162);
-  --color-text-muted: oklch(0.455 0.02 160);
-  --color-ring: oklch(0.52 0.12 162);
+  --color-backdrop: oklch(0.958 0.005 165);
+  --color-bg: oklch(0.974 0.002 165);
+  --color-surface: oklch(1 0 0);
+  --color-surface-2: oklch(0.961 0.005 165);
+  --color-border: oklch(0.926 0.008 165);
+  --color-text: oklch(0.21 0.032 265);
+  --color-text-muted: oklch(0.446 0.026 257);
+  --color-ring: oklch(0.627 0.17 149);
 
-  --color-primary: oklch(0.47 0.105 163);
-  --color-primary-foreground: oklch(0.99 0.004 150);
-  --color-accent: oklch(0.79 0.13 62);
-  --color-accent-foreground: oklch(0.3 0.06 45);
+  --color-primary: oklch(0.5 0.145 150);
+  --color-primary-foreground: oklch(1 0 0);
+  --color-accent: oklch(0.758 0.159 56);
+  --color-accent-foreground: oklch(0.266 0.076 36);
 
-  --color-success: oklch(0.5 0.12 150);
-  --color-warning: oklch(0.53 0.12 62);
-  --color-danger: oklch(0.52 0.17 27);
-  --color-danger-foreground: oklch(0.99 0.004 150);
-  --color-info: oklch(0.5 0.12 245);
+  --color-success: oklch(0.527 0.137 150);
+  --color-warning: oklch(0.555 0.146 49);
+  --color-danger: oklch(0.577 0.215 27);
+  --color-danger-foreground: oklch(1 0 0);
+  --color-info: oklch(0.546 0.215 263);
 
-  --color-energy: oklch(0.66 0.16 48);
-  --color-protein: oklch(0.52 0.16 277);
-  --color-carbs: oklch(0.65 0.145 68);
-  --color-fat: oklch(0.63 0.17 8);
-  --color-fiber: oklch(0.6 0.14 148);
-  --color-micro: oklch(0.6 0.1 195);
+  --color-energy: oklch(0.705 0.187 48);
+  --color-protein: oklch(0.585 0.204 277);
+  --color-carbs: oklch(0.769 0.165 70);
+  --color-fat: oklch(0.645 0.215 16);
+  --color-fiber: oklch(0.723 0.192 150);
+  --color-micro: oklch(0.715 0.126 215);
+
+  /* Peach for small text: a deeper orange (light) / lighter peach (dark) that stays readable. */
+  --color-accent-ink: oklch(0.553 0.174 38);
 
   /* Text-safe "ink" variants: the hue mixed toward the text color (works in both themes). */
-  --color-accent-ink: color-mix(in oklab, var(--color-accent) 50%, var(--color-text));
   --color-energy-ink: color-mix(in oklab, var(--color-energy) 58%, var(--color-text));
   --color-protein-ink: color-mix(in oklab, var(--color-protein) 80%, var(--color-text));
   --color-carbs-ink: color-mix(in oklab, var(--color-carbs) 55%, var(--color-text));
@@ -103,8 +106,8 @@
 @layer base {
   :root {
     color-scheme: light;
-    --shadow-tint: oklch(0.3 0.03 160 / 0.06);
-    --shadow-tint-strong: oklch(0.3 0.04 160 / 0.16);
+    --shadow-tint: oklch(0.21 0.03 265 / 0.05);
+    --shadow-tint-strong: oklch(0.21 0.03 265 / 0.12);
 
     /* Shell geometry (AppShell, navigation, Toaster): bottom bar on phones, rail on tablets, sidebar on desktop. */
     --nav-height: 4.25rem;
@@ -122,34 +125,35 @@
 
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --shadow-tint: oklch(0 0 0 / 0.32);
-    --shadow-tint-strong: oklch(0 0 0 / 0.55);
+    --shadow-tint: oklch(0 0 0 / 0.3);
+    --shadow-tint-strong: oklch(0 0 0 / 0.5);
 
-    --color-backdrop: oklch(0.15 0.01 165);
-    --color-bg: oklch(0.175 0.012 165);
-    --color-surface: oklch(0.215 0.014 165);
-    --color-surface-2: oklch(0.255 0.016 165);
-    --color-border: oklch(0.315 0.016 165);
-    --color-text: oklch(0.955 0.008 150);
-    --color-text-muted: oklch(0.765 0.014 150);
-    --color-ring: oklch(0.8 0.11 162);
+    --color-backdrop: oklch(0.154 0.005 260);
+    --color-bg: oklch(0.185 0.005 250);
+    --color-surface: oklch(0.229 0.007 250);
+    --color-surface-2: oklch(0.27 0.009 250);
+    --color-border: oklch(0.327 0.013 253);
+    --color-text: oklch(0.967 0.003 265);
+    --color-text-muted: oklch(0.751 0.018 256);
+    --color-ring: oklch(0.8 0.182 152);
 
-    --color-primary: oklch(0.79 0.11 163);
-    --color-primary-foreground: oklch(0.2 0.03 163);
-    --color-accent: oklch(0.8 0.12 62);
-    --color-accent-foreground: oklch(0.25 0.05 45);
+    --color-primary: oklch(0.723 0.192 150);
+    --color-primary-foreground: oklch(0.266 0.063 153);
+    --color-accent: oklch(0.758 0.159 56);
+    --color-accent-foreground: oklch(0.266 0.076 36);
+    --color-accent-ink: oklch(0.837 0.117 66);
 
-    --color-success: oklch(0.78 0.13 150);
-    --color-warning: oklch(0.81 0.12 75);
-    --color-danger: oklch(0.73 0.15 25);
-    --color-danger-foreground: oklch(0.2 0.03 25);
-    --color-info: oklch(0.76 0.11 245);
+    --color-success: oklch(0.8 0.182 152);
+    --color-warning: oklch(0.837 0.164 84);
+    --color-danger: oklch(0.711 0.166 22);
+    --color-danger-foreground: oklch(0.258 0.089 26);
+    --color-info: oklch(0.714 0.143 255);
 
-    --color-energy: oklch(0.78 0.13 55);
-    --color-protein: oklch(0.73 0.13 277);
-    --color-carbs: oklch(0.82 0.13 78);
-    --color-fat: oklch(0.75 0.14 8);
-    --color-fiber: oklch(0.77 0.14 148);
-    --color-micro: oklch(0.78 0.1 195);
+    --color-energy: oklch(0.758 0.159 56);
+    --color-protein: oklch(0.68 0.158 277);
+    --color-carbs: oklch(0.837 0.164 84);
+    --color-fat: oklch(0.719 0.169 13);
+    --color-fiber: oklch(0.8 0.182 152);
+    --color-micro: oklch(0.797 0.134 212);
   }
 }

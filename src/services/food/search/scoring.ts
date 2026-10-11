@@ -1,15 +1,18 @@
+import { isOccasionalFood } from '@/domain/adaptive/candidates'
 import type { FoodItem } from '@/types'
 import { normalizeSearchText, searchTokens } from './text'
 
 /**
- * Local search ranking: exact name > name prefix > every word matched > substring.
- * Within a tier, names whose first word matches and shorter (more specific) names rank higher;
- * the user's own foods get a boost that never lifts them above a better tier of match.
+ * Local search ranking: exact name > name prefix > same words in another order > every word matched > substring.
+ * ("chocolate milk" finds "Chocolate milk (shoko)" before "Milk chocolate".) Within a tier, names whose first word
+ * matches and shorter (more specific) names rank higher, and everyday foods come before occasional ones
+ * ("potato" → "Potato, boiled" before "Potato chips"). The user's own foods get a boost that never lifts them above
+ * a better tier of match.
  */
 export const SCORE = {
   exact: 1000,
-  exactAnyOrder: 950,
   prefix: 700,
+  exactAnyOrder: 650,
   words: 400,
   partialWords: 150,
   substring: 100,
@@ -17,12 +20,15 @@ export const SCORE = {
   firstWordBonus: 40,
   extraWordPenalty: 4,
   maxExtraWordPenalty: 40,
+  occasionalPenalty: 30,
   userFoodBoost: 150,
 } as const
 
 export interface IndexedFood {
   food: FoodItem
   isUserFood: boolean
+  /** Fast food, sweets, sugary drinks (domain/adaptive): ranked after everyday foods within a tier. */
+  occasional: boolean
   nameText: string
   nameTokens: string[]
   brandTokens: string[]
@@ -37,6 +43,7 @@ export function indexFood(food: FoodItem, isUserFood: boolean): IndexedFood {
   return {
     food,
     isUserFood,
+    occasional: isOccasionalFood(food),
     nameText: normalizeSearchText(food.name),
     nameTokens: searchTokens(food.name),
     brandTokens: food.brand === null ? [] : searchTokens(food.brand),
@@ -70,8 +77,8 @@ function baseScore(query: PreparedQuery, entry: IndexedFood): number {
   const queryJoined = query.tokens.join(' ')
   const nameJoined = entry.nameTokens.join(' ')
   if (nameJoined === queryJoined) return SCORE.exact
-  if (sameTokenSet(entry.nameTokens, query.tokens)) return SCORE.exactAnyOrder
   if (nameJoined.startsWith(queryJoined)) return SCORE.prefix
+  if (sameTokenSet(entry.nameTokens, query.tokens)) return SCORE.exactAnyOrder
   let exactWords = 0
   let weakest = 3
   for (const token of query.tokens) {
@@ -98,7 +105,8 @@ export function scoreFood(query: PreparedQuery, entry: IndexedFood): number {
     firstQuery !== undefined && firstName !== undefined && firstName.startsWith(firstQuery) ? SCORE.firstWordBonus : 0
   const extraWords = Math.max(0, entry.nameTokens.length - query.tokens.length)
   const specificity = Math.min(extraWords * SCORE.extraWordPenalty, SCORE.maxExtraWordPenalty)
-  return base + firstWordBonus - specificity + (entry.isUserFood ? SCORE.userFoodBoost : 0)
+  const occasional = entry.occasional ? SCORE.occasionalPenalty : 0
+  return base + firstWordBonus - specificity - occasional + (entry.isUserFood ? SCORE.userFoodBoost : 0)
 }
 
 /** Deterministic ordering: score, shorter name, alphabetical, id. */

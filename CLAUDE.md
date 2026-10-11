@@ -29,7 +29,9 @@ Node 24 LTS lives in `~/.local/bin` (no system Node).
 - supabase-js and cloud-only code (`services/session/cloudDeps.ts` → auth, sync, migration) load lazily, only when
   Supabase is configured. Don't import them statically from guest-mode code (check with `npm run build` chunk sizes).
 - Recommendations and meal plans never suggest "occasional" foods (fast food, sweets, sugary drinks, chips) unless
-  favorited; logging is unaffected (`domain/adaptive/candidates.ts`, `domain/planner/feasibility.ts`).
+  favorited; logging is unaffected (`domain/adaptive/candidates.ts`, `domain/planner/feasibility.ts`). Condiments and
+  alcohol (catalog tags `condiment`, `alcohol`) are never suggested or planned. Local search ranks occasional foods
+  after everyday ones within a match tier.
 - Stores: every optimistic change goes through the store's `ChangeJournal` (loads overlay it) and every async
   continuation checks `sessionGuard()` (stores/registry.ts); roll back one record, never a whole list snapshot.
   A store that shows synced data gets a `refresh()` and an entry in `stores/refresh.ts`.
@@ -38,11 +40,16 @@ Node 24 LTS lives in `~/.local/bin` (no system Node).
   `ENTITY_OF_REPOSITORY`, guest migration (if guests can have it), export, migration with RLS + grants + the 004
   triggers (guard, tombstone, notify), pgTAP + `tests/db/support/rows.ts`, then `npm run db:types`.
 - Hebrew search: queries go through `services/translation` (dictionary first, MyMemory for unknown words); remote
-  providers only ever get English. Add missing food words to `services/translation/dictionary/*`.
+  providers only ever get English. Add missing food words to `services/translation/dictionary/*`; map them to words
+  the catalog uses (e.g. 'majadra', 'laffa') and cover them in `services/food/catalogSearch.hebrew.test.ts`.
+- System food catalog (`src/data/system-foods.json`, 173 USDA-sourced foods): a new release = new seed migration
+  (bump `SEED_MIGRATION` in `src/data/seedSql.ts`, then `npm run seed:sql`); never edit an applied seed migration.
 - The planner (`domain/planner`) must stay strict: options use only pantry items within stock, equipment, cooking,
   time and kcal limits. Keep the property test in `engine.test.ts` passing.
 - Layout: screens use `ScreenHeader` + `ScreenBody` + `ScreenColumns` (lead/main/aside); one primary navigation at a
   time (bottom bar < 48 rem, side nav from md). Colors only via tokens; `tests/design/contrast.test.ts` must pass.
+  Palette: white cards on light gray, vivid green primary, peach accent; dark theme = neutral graphite grays.
+  Theme-color hex values (`useApplyTheme.ts`, `index.html`, `manifest.webmanifest`) must equal the `bg` token.
   Absolutely positioned content inside horizontal scrollers needs a `relative` scroller (else the page overflows).
 
 ## Commands
@@ -56,7 +63,7 @@ npm run test:db        # RLS/DB tests against local Supabase (needs `npm run db:
 npm run test:e2e       # Playwright (system Chrome): guest, responsive, kitchen, Hebrew; cloud + reminders when the stack runs
 npm run build          # typecheck + production build
 npm run db:start       # supabase start (Docker)   · npm run db:reset — reapply migrations + seed
-npm run seed:sql       # regenerate supabase/migrations/003_seed_foods.sql from src/data/system-foods.json
+npm run seed:sql       # regenerate the seed migration (src/data/seedSql.ts SEED_MIGRATION, now 008) from src/data/system-foods.json
 ```
 Local cloud mode: `.env.local` (gitignored; Vitest ignores it via `test.env`) with the local stack's `API_URL` + `PUBLISHABLE_KEY` from
 `npx supabase status -o env`. Delete it to run in guest mode. Realtime is enabled in `supabase/config.toml`.

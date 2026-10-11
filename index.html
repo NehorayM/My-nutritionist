@@ -8,8 +8,8 @@
       name="description"
       content="Log real meals, see today's nutrition, get practical suggestions for the rest of the day, and track weight and weekly activity. Works offline."
     />
-    <meta name="theme-color" content="#faf6ef" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#111814" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f7f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111315" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
     <meta name="apple-mobile-web-app-title" content="My-nutritionist" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -32,7 +32,7 @@
           (theme === 'system' && !!window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
         var resolved = dark ? 'dark' : 'light'
         document.documentElement.dataset.theme = resolved
-        var color = dark ? '#111814' : '#faf6ef'
+        var color = dark ? '#111315' : '#f5f7f6'
         var metas = document.querySelectorAll('meta[name="theme-color"]')
         for (var i = 0; i < metas.length; i += 1) metas[i].setAttribute('content', color)
       })()

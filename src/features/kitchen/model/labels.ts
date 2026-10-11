@@ -37,6 +37,8 @@ export const EXCLUSION_TEXT: Record<PantryExclusion, string> = {
   incomplete_nutrition: 'calories unknown',
   expired: 'past its use-by date',
   used_up: 'almost used up',
+  condiment: 'left out of plans (a condiment — it goes with a meal rather than being one)',
+  alcohol: 'left out of plans (alcoholic drinks are never planned)',
   occasional: 'left out of plans (an occasional food — add it to favorites to include it)',
   allergen: 'contains an allergen from your profile',
   allergen_unknown: 'allergen information unknown',

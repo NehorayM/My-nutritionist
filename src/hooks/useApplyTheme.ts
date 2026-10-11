@@ -6,8 +6,8 @@ export const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)'
 
 /** Browser UI color per theme; equals the `bg` token (keep in sync with index.css and index.html). */
 export const THEME_COLORS: Record<ResolvedTheme, string> = {
-  light: '#faf6ef',
-  dark: '#111814',
+  light: '#f5f7f6',
+  dark: '#111315',
 }
 
 export function resolveTheme(preference: ThemePreference, systemPrefersDark: boolean): ResolvedTheme {

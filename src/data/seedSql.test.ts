@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import initialSchemaSql from '../../supabase/migrations/001_initial_schema.sql?raw'
-import committedSeedSql from '../../supabase/migrations/003_seed_foods.sql?raw'
+import committedSeedSql from '../../supabase/migrations/008_system_foods_v2.sql?raw'
 import { SYSTEM_FOOD_ROWS, type SystemFoodRow } from '@/data/catalog'
 import type { FoodRow } from '@/data/foodRow'
 import { FOOD_ITEM_COLUMNS, generateSeedSql } from '@/data/seedSql'

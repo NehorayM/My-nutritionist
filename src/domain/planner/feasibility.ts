@@ -1,11 +1,20 @@
 import type { Allergen, KitchenEquipment, MealConstraint, MealType, PantryItem, PlannerSettings } from '@/types'
 import { daysBetween } from '../dates'
-import { dietRule, isOccasionalFood, resolvePreferences, type AdaptivePreferences } from '../adaptive'
+import { dietRule, isOccasionalFood, nonMealFoodReason, resolvePreferences, type AdaptivePreferences } from '../adaptive'
 import { isKnownAmount } from '../nutrition'
 import { COOK_PREFERENCE, EXTRA_COOKED_ITEM_MINUTES, MIN_PORTION_GRAMS, REHEAT_MINUTES, REHEAT_PREFERENCE } from './constants'
 
 /** Why a pantry item is never planned (whole day). */
-export type PantryExclusion = 'incomplete_nutrition' | 'expired' | 'used_up' | 'occasional' | 'allergen' | 'allergen_unknown' | 'diet'
+export type PantryExclusion =
+  | 'incomplete_nutrition'
+  | 'expired'
+  | 'used_up'
+  | 'condiment'
+  | 'alcohol'
+  | 'occasional'
+  | 'allergen'
+  | 'allergen_unknown'
+  | 'diet'
 
 /** Why an item can't be part of one particular meal. */
 export type MealBlock = 'no_equipment' | 'no_cooking' | 'not_enough_time'
@@ -28,7 +37,8 @@ export function exclusionRules(profile: AdaptivePreferences | null, favoriteFood
 }
 
 /**
- * Items never planned: unknown calories, past their use-by date, (almost) used up, occasional foods that are
+ * Items never planned: unknown calories, past their use-by date, (almost) used up, condiments and alcohol,
+ * occasional foods that are
  * not favorites (same rule as everywhere in the app), allergens of the profile (unknown allergen data counts as
  * a risk when allergies are set) and foods that don't suit the diet.
  */
@@ -37,6 +47,8 @@ export function pantryExclusion(item: PantryItem, rules: ExclusionRules): Pantry
   if (!isKnownAmount(food.per100g.calories) || food.per100g.calories <= 0) return 'incomplete_nutrition'
   if (item.useBy !== null && daysBetween(rules.today, item.useBy) < 0) return 'expired'
   if (item.grams !== null && item.grams < MIN_PORTION_GRAMS) return 'used_up'
+  const nonMeal = nonMealFoodReason(food)
+  if (nonMeal !== null) return nonMeal
   if (isOccasionalFood(food) && !rules.favorites.has(food.id)) return 'occasional'
   const allergies = avoided(rules.prefs.allergies)
   if (allergies.size > 0) {

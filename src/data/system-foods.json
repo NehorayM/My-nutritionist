@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "My-nutritionist system food catalog",
-    "releasedAt": "2026-10-03T00:00:00.000Z",
+    "releasedAt": "2026-10-11T11:00:00.000Z",
     "source": "U.S. Department of Agriculture, Agricultural Research Service. FoodData Central. https://fdc.nal.usda.gov",
     "license": "Public domain under CC0 1.0 Universal. FoodData Central asks to be cited as the source.",
     "datasets": {
@@ -25,10 +25,11 @@
       "quick": "prepMinutes <= 10",
       "budget": "costTier 1, excluding snacks, sweets and beverages",
       "vegetarian/vegan": "mirror dietFlags",
-      "mediterranean/israeli": "curated per food"
+      "mediterranean/israeli": "curated per food",
+      "condiment/alcohol": "curated per food; such foods are loggable but never suggested or planned as an item"
     },
     "allergenPolicy": "Allergens list known and commonly present allergens, conservatively including brand-dependent ones (e.g. soy, sesame in buns); null when they depend entirely on the brand. Vegan/vegetarian are false when common recipes use animal-derived ingredients.",
-    "maintenance": "Edit this file, set meta.releasedAt to the current UTC time (never a future one: the database clamps future updated_at values), then run `npm run seed:sql` to regenerate supabase/migrations/003_seed_foods.sql."
+    "maintenance": "Edit this file, set meta.releasedAt to the current UTC time (never a future one: the database clamps future updated_at values), then run `npm run seed:sql` to regenerate the LATEST seed migration (see scripts/generate-seed-sql.ts). Applied migrations are never edited: a new catalog release gets a new seed migration that upserts every system food."
   },
   "foods": [
     {
@@ -3972,6 +3973,5615 @@
       "mealTypes": [
         "lunch",
         "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "3137415c-2b7d-5df0-a523-44da687bfda3",
+      "slug": "chicken_schnitzel",
+      "name": "Chicken schnitzel (breaded, fried)",
+      "category": "protein",
+      "tags": [
+        "israeli",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2705975,
+        "dataType": "survey_fndds",
+        "description": "Chicken breast, fried, coated, prepared skinless, coating eaten, from raw",
+        "match": "close",
+        "note": "FNDDS fried coated skinless chicken breast (coating eaten) — the Israeli schnitzel."
+      },
+      "per100g": {
+        "calories": 219,
+        "protein": 24.6,
+        "carbs": 6,
+        "fat": 10,
+        "fiber": 0.2,
+        "sugars": 0.1,
+        "saturatedFat": 1.6,
+        "sodium": 318,
+        "potassium": 292,
+        "calcium": 13,
+        "iron": 0.8,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 medium schnitzel (60 g)",
+          "grams": 60
+        },
+        {
+          "label": "1 large schnitzel (165 g)",
+          "grams": 165
+        }
+      ],
+      "allergens": [
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 25,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "0cafb6e1-7bc9-585f-8fa2-144e483341cf",
+      "slug": "chicken_nuggets",
+      "name": "Chicken nuggets",
+      "category": "protein",
+      "tags": [],
+      "usda": {
+        "fdcId": 2706096,
+        "dataType": "survey_fndds",
+        "description": "Chicken nuggets, from frozen",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 298,
+        "protein": 13.4,
+        "carbs": 17.9,
+        "fat": 19.2,
+        "fiber": 1.8,
+        "sugars": 0.8,
+        "saturatedFat": 4,
+        "sodium": 600,
+        "potassium": 229,
+        "calcium": 52,
+        "iron": 1.1,
+        "vitaminC": 0.4,
+        "vitaminD": 0.3
+      },
+      "servings": [
+        {
+          "label": "1 nugget (16 g)",
+          "grams": 16
+        },
+        {
+          "label": "1 serving (80 g)",
+          "grams": 80
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 15,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "8adcb912-8557-50d6-97c6-b5a76411c114",
+      "slug": "omelet",
+      "name": "Omelet or scrambled eggs (made with oil)",
+      "category": "protein",
+      "tags": [
+        "israeli",
+        "quick",
+        "budget",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2707200,
+        "dataType": "survey_fndds",
+        "description": "Egg omelet or scrambled egg, made with oil",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 192,
+        "protein": 11.6,
+        "carbs": 0.9,
+        "fat": 15.8,
+        "fiber": 0,
+        "sugars": 0.2,
+        "saturatedFat": 3.9,
+        "sodium": 228,
+        "potassium": 123,
+        "calcium": 45,
+        "iron": 1.6,
+        "vitaminC": 0,
+        "vitaminD": 2.3
+      },
+      "servings": [
+        {
+          "label": "1 egg omelet (55 g)",
+          "grams": 55
+        },
+        {
+          "label": "2 egg omelet (110 g)",
+          "grams": 110
+        }
+      ],
+      "allergens": [
+        "egg"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 8,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "bb181499-089a-5afd-8e65-9555e23fd175",
+      "slug": "egg_fried",
+      "name": "Fried egg (with oil)",
+      "category": "protein",
+      "tags": [
+        "quick",
+        "budget",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2707158,
+        "dataType": "survey_fndds",
+        "description": "Egg, whole, fried with oil",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 192,
+        "protein": 11.6,
+        "carbs": 0.9,
+        "fat": 15.8,
+        "fiber": 0,
+        "sugars": 0.2,
+        "saturatedFat": 3.9,
+        "sodium": 228,
+        "potassium": 123,
+        "calcium": 45,
+        "iron": 1.6,
+        "vitaminC": 0,
+        "vitaminD": 2.3
+      },
+      "servings": [
+        {
+          "label": "1 egg (55 g)",
+          "grams": 55
+        }
+      ],
+      "allergens": [
+        "egg"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 5,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "daf69b3d-c348-5977-9f25-3737f837a44f",
+      "slug": "chicken_drumstick",
+      "name": "Chicken drumstick, roasted (skinless)",
+      "category": "protein",
+      "tags": [
+        "budget",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2706003,
+        "dataType": "survey_fndds",
+        "description": "Chicken drumstick, baked, broiled, or roasted, skin not eaten, from raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 154,
+        "protein": 24.1,
+        "carbs": 0,
+        "fat": 5.7,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 1.5,
+        "sodium": 358,
+        "potassium": 254,
+        "calcium": 11,
+        "iron": 1.1,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 medium drumstick (50 g)",
+          "grams": 50
+        },
+        {
+          "label": "1 large drumstick (65 g)",
+          "grams": 65
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 40,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "2b98d6d8-e8ad-5f19-825a-9414ce5a3083",
+      "slug": "chicken_wings",
+      "name": "Chicken wings, baked",
+      "category": "protein",
+      "tags": [
+        "budget",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2706057,
+        "dataType": "survey_fndds",
+        "description": "Chicken wing, baked, broiled, or roasted, from raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 252,
+        "protein": 23.6,
+        "carbs": 0,
+        "fat": 16.7,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 4.9,
+        "sodium": 404,
+        "potassium": 210,
+        "calcium": 18,
+        "iron": 0.8,
+        "vitaminC": 0,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 wing (35 g)",
+          "grams": 35
+        },
+        {
+          "label": "2 wings (70 g)",
+          "grams": 70
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 35,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "10224e94-4edb-519c-a9cd-82d0cdb36cbe",
+      "slug": "turkey_breast_deli",
+      "name": "Turkey breast, sliced (deli)",
+      "category": "protein",
+      "tags": [
+        "no_cook",
+        "quick",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 172941,
+        "dataType": "sr_legacy",
+        "description": "Turkey breast, sliced, prepackaged",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 106,
+        "protein": 14.8,
+        "carbs": 2.2,
+        "fat": 3.8,
+        "fiber": 0,
+        "sugars": 0.9,
+        "saturatedFat": 0.9,
+        "sodium": 898,
+        "potassium": 371,
+        "calcium": 14,
+        "iron": 0.4,
+        "vitaminC": 0,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 slice (16 g)",
+          "grams": 16
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "5c33a387-6257-5de3-a46c-9c3fcf1afcbd",
+      "slug": "turkey_pastrami",
+      "name": "Turkey pastrami",
+      "category": "protein",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 172927,
+        "dataType": "sr_legacy",
+        "description": "Pastrami, turkey",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 139,
+        "protein": 16.3,
+        "carbs": 3.3,
+        "fat": 6.2,
+        "fiber": 0.1,
+        "sugars": 3.3,
+        "saturatedFat": 1.4,
+        "sodium": 1123,
+        "potassium": 345,
+        "calcium": 11,
+        "iron": 4.2,
+        "vitaminC": 8.1,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "2 slices (57 g)",
+          "grams": 57
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "376fe77c-7782-5d83-898d-524026bca071",
+      "slug": "hot_dog",
+      "name": "Hot dog sausage",
+      "category": "protein",
+      "tags": [
+        "quick",
+        "budget"
+      ],
+      "usda": {
+        "fdcId": 2706166,
+        "dataType": "survey_fndds",
+        "description": "Hot dog, NFS",
+        "match": "exact",
+        "note": "Sausage only, no bun."
+      },
+      "per100g": {
+        "calories": 310,
+        "protein": 11.7,
+        "carbs": 2.9,
+        "fat": 28,
+        "fiber": 0,
+        "sugars": 1.3,
+        "saturatedFat": 11.4,
+        "sodium": 828,
+        "potassium": 326,
+        "calcium": 15,
+        "iron": 1.1,
+        "vitaminC": 0,
+        "vitaminD": 0.9
+      },
+      "servings": [
+        {
+          "label": "1 sausage (57 g)",
+          "grams": 57
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 5,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "8d8eddf5-7e21-5314-9665-a8c64cb38021",
+      "slug": "meatballs_in_sauce",
+      "name": "Meatballs in tomato sauce",
+      "category": "prepared",
+      "tags": [
+        "israeli",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2706467,
+        "dataType": "survey_fndds",
+        "description": "Meatballs, NS as to type of meat, with sauce",
+        "match": "close",
+        "note": "FNDDS meatballs with sauce (meat unspecified)."
+      },
+      "per100g": {
+        "calories": 186,
+        "protein": 18,
+        "carbs": 0.2,
+        "fat": 12,
+        "fiber": 0,
+        "sugars": 0.1,
+        "saturatedFat": 4.6,
+        "sodium": 801,
+        "potassium": 212,
+        "calcium": 22,
+        "iron": 1.8,
+        "vitaminC": 0,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 meatball with sauce (43 g)",
+          "grams": 43
+        },
+        {
+          "label": "1 cup (235 g)",
+          "grams": 235
+        }
+      ],
+      "allergens": [
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 40,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "c67a7670-6a22-5429-b071-1913b49a8237",
+      "slug": "kebab_grilled",
+      "name": "Kebab (grilled ground lamb)",
+      "category": "protein",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 172544,
+        "dataType": "sr_legacy",
+        "description": "Lamb, ground, cooked, broiled",
+        "match": "proxy",
+        "note": "Broiled ground lamb; Israeli kebab often mixes lamb and beef with herbs and onion."
+      },
+      "per100g": {
+        "calories": 283,
+        "protein": 24.8,
+        "carbs": 0,
+        "fat": 19.7,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 8.1,
+        "sodium": 81,
+        "potassium": 339,
+        "calcium": 22,
+        "iron": 1.8,
+        "vitaminC": 0,
+        "vitaminD": 0.1
+      },
+      "servings": [
+        {
+          "label": "3 oz (85 g)",
+          "grams": 85
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 20,
+      "requiresCooking": true,
+      "costTier": 3,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "300740a7-9437-58c5-9e43-0e69252d4ada",
+      "slug": "beef_patty",
+      "name": "Hamburger patty (beef)",
+      "category": "protein",
+      "tags": [
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2705855,
+        "dataType": "survey_fndds",
+        "description": "Beef, ground, patty",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 272,
+        "protein": 25.5,
+        "carbs": 0,
+        "fat": 18.2,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 7,
+        "sodium": 383,
+        "potassium": 294,
+        "calcium": 27,
+        "iron": 2.4,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 medium patty (85 g)",
+          "grams": 85
+        },
+        {
+          "label": "1 large patty (120 g)",
+          "grams": 120
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 15,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "f60cebd0-da87-5907-86a1-40c6ad309c34",
+      "slug": "tilapia_baked",
+      "name": "Tilapia (St. Peter's fish), baked",
+      "category": "protein",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2706319,
+        "dataType": "survey_fndds",
+        "description": "Fish, tilapia, baked or broiled",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 160,
+        "protein": 25,
+        "carbs": 0,
+        "fat": 6.7,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 1.9,
+        "sodium": 280,
+        "potassium": 376,
+        "calcium": 13,
+        "iron": 0.7,
+        "vitaminC": 0,
+        "vitaminD": 3.9
+      },
+      "servings": [
+        {
+          "label": "1 fillet (90 g)",
+          "grams": 90
+        },
+        {
+          "label": "1 large fillet (135 g)",
+          "grams": 135
+        }
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 20,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "9d69e82e-bb6d-5ba9-88dd-693e5eb67c2e",
+      "slug": "tuna_salad",
+      "name": "Tuna salad with mayonnaise",
+      "category": "prepared",
+      "tags": [
+        "no_cook",
+        "quick",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2706828,
+        "dataType": "survey_fndds",
+        "description": "Tuna salad, made with mayonnaise",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 194,
+        "protein": 10.1,
+        "carbs": 2.9,
+        "fat": 15.8,
+        "fiber": 0.4,
+        "sugars": 2.1,
+        "saturatedFat": 2.5,
+        "sodium": 418,
+        "potassium": 155,
+        "calcium": 21,
+        "iron": 1,
+        "vitaminC": 0.7,
+        "vitaminD": 0.7
+      },
+      "servings": [
+        {
+          "label": "1/2 cup (119 g)",
+          "grams": 119
+        },
+        {
+          "label": "1 cup (238 g)",
+          "grams": 238
+        }
+      ],
+      "allergens": [
+        "egg",
+        "fish"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 5,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "55256e9f-0f40-59e6-b535-f4b4f6974581",
+      "slug": "chicken_liver",
+      "name": "Chicken livers, cooked",
+      "category": "protein",
+      "tags": [
+        "israeli",
+        "budget",
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2706154,
+        "dataType": "survey_fndds",
+        "description": "Liver, chicken",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 189,
+        "protein": 20,
+        "carbs": 6.5,
+        "fat": 8.7,
+        "fiber": 0.2,
+        "sugars": 0,
+        "saturatedFat": 2.6,
+        "sodium": 453,
+        "potassium": 232,
+        "calcium": 11,
+        "iron": 10.1,
+        "vitaminC": 16.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 liver (22 g)",
+          "grams": 22
+        },
+        {
+          "label": "1 serving (85 g)",
+          "grams": 85
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 15,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "f8c77d37-6424-5103-bfc9-a345496331af",
+      "slug": "chicken_soup",
+      "name": "Chicken soup",
+      "category": "prepared",
+      "tags": [
+        "israeli",
+        "budget"
+      ],
+      "usda": {
+        "fdcId": 2707134,
+        "dataType": "survey_fndds",
+        "description": "Soup, chicken",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 40,
+        "protein": 3.4,
+        "carbs": 4,
+        "fat": 1.1,
+        "fiber": 0.8,
+        "sugars": 1.1,
+        "saturatedFat": 0.3,
+        "sodium": 249,
+        "potassium": 151,
+        "calcium": 11,
+        "iron": 0.2,
+        "vitaminC": 6.8,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (245 g)",
+          "grams": 245
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 90,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "469b19c6-a122-5657-91e0-6034e3bd9804",
+      "slug": "yogurt_plain",
+      "name": "Plain yogurt (whole milk)",
+      "category": "dairy",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705418,
+        "dataType": "survey_fndds",
+        "description": "Yogurt, whole milk, plain",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 78,
+        "protein": 3.8,
+        "carbs": 5.6,
+        "fat": 4.5,
+        "fiber": 0,
+        "sugars": 4.1,
+        "saturatedFat": 2.3,
+        "sodium": 42,
+        "potassium": 164,
+        "calcium": 127,
+        "iron": 0,
+        "vitaminC": 0.5,
+        "vitaminD": 1.2
+      },
+      "servings": [
+        {
+          "label": "1 container, 6 oz (170 g)",
+          "grams": 170
+        },
+        {
+          "label": "1 cup (245 g)",
+          "grams": 245
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "b2013525-db98-51c6-b44e-51436bc0cef9",
+      "slug": "yogurt_fruit",
+      "name": "Fruit yogurt (low-fat)",
+      "category": "dairy",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705427,
+        "dataType": "survey_fndds",
+        "description": "Yogurt, low fat milk, fruit",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 93,
+        "protein": 4.6,
+        "carbs": 15.7,
+        "fat": 1.3,
+        "fiber": 0.2,
+        "sugars": 12.8,
+        "saturatedFat": 0.9,
+        "sodium": 65,
+        "potassium": 212,
+        "calcium": 160,
+        "iron": 0.1,
+        "vitaminC": 1.9,
+        "vitaminD": 1.2
+      },
+      "servings": [
+        {
+          "label": "1 container, 6 oz (170 g)",
+          "grams": 170
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "7dac4f4b-72c4-5004-87f0-fe4ea38b65a7",
+      "slug": "parmesan",
+      "name": "Parmesan, grated",
+      "category": "dairy",
+      "tags": [
+        "no_cook",
+        "quick",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705728,
+        "dataType": "survey_fndds",
+        "description": "Cheese, Parmesan, dry grated",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 412,
+        "protein": 29.9,
+        "carbs": 8.4,
+        "fat": 28.8,
+        "fiber": 0,
+        "sugars": 0.4,
+        "saturatedFat": 16.4,
+        "sodium": 1398,
+        "potassium": 129,
+        "calcium": 917,
+        "iron": 0.3,
+        "vitaminC": 0,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (6.2 g)",
+          "grams": 6.2
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 3,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "ef83936e-0e2c-58b8-b24a-2dbbd4f8e3d5",
+      "slug": "yellow_cheese",
+      "name": "Yellow cheese (Gouda/Edam)",
+      "category": "dairy",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705717,
+        "dataType": "survey_fndds",
+        "description": "Cheese, Gouda or Edam",
+        "match": "exact",
+        "note": "Israeli 'yellow cheese' (Emek, Gilboa) is a Gouda/Edam-type semi-hard cheese; fat varies 9–28%."
+      },
+      "per100g": {
+        "calories": 356,
+        "protein": 24.9,
+        "carbs": 2.2,
+        "fat": 27.4,
+        "fiber": 0,
+        "sugars": 2.2,
+        "saturatedFat": 17.6,
+        "sodium": 819,
+        "potassium": 121,
+        "calcium": 700,
+        "iron": 0.2,
+        "vitaminC": 0,
+        "vitaminD": 0.5
+      },
+      "servings": [
+        {
+          "label": "1 slice (21 g)",
+          "grams": 21
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "45761347-78d4-598f-a205-b5683d25feb3",
+      "slug": "goat_cheese",
+      "name": "Goat cheese",
+      "category": "dairy",
+      "tags": [
+        "no_cook",
+        "quick",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705716,
+        "dataType": "survey_fndds",
+        "description": "Cheese, goat",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 364,
+        "protein": 21.6,
+        "carbs": 0.1,
+        "fat": 29.8,
+        "fiber": 0,
+        "sugars": 0.1,
+        "saturatedFat": 20.6,
+        "sodium": 415,
+        "potassium": 158,
+        "calcium": 298,
+        "iron": 1.6,
+        "vitaminC": 0,
+        "vitaminD": 0.5
+      },
+      "servings": [
+        {
+          "label": "1 oz (21 g)",
+          "grams": 21
+        },
+        {
+          "label": "1 cup, crumbled (140 g)",
+          "grams": 140
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 3,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "950536af-08dc-5d81-87b5-894e6cbbd8ef",
+      "slug": "sour_cream",
+      "name": "Sour cream",
+      "category": "dairy",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705614,
+        "dataType": "survey_fndds",
+        "description": "Sour cream, regular",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 196,
+        "protein": 3.1,
+        "carbs": 5.6,
+        "fat": 18,
+        "fiber": 0,
+        "sugars": 3.4,
+        "saturatedFat": 10.7,
+        "sodium": 50,
+        "potassium": 154,
+        "calcium": 107,
+        "iron": 0,
+        "vitaminC": 0.9,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (15 g)",
+          "grams": 15
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "758a8325-f745-50ce-bb58-b37ba76fe826",
+      "slug": "chocolate_milk",
+      "name": "Chocolate milk (shoko)",
+      "category": "dairy",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705468,
+        "dataType": "survey_fndds",
+        "description": "Chocolate milk, reduced fat (2%)",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 76,
+        "protein": 3,
+        "carbs": 12.1,
+        "fat": 1.9,
+        "fiber": 0.7,
+        "sugars": 9.6,
+        "saturatedFat": 1.2,
+        "sodium": 66,
+        "potassium": 169,
+        "calcium": 109,
+        "iron": 0.2,
+        "vitaminC": 0,
+        "vitaminD": 1.2
+      },
+      "servings": [
+        {
+          "label": "1 cup (248 g)",
+          "grams": 248
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "600953b0-66d8-5cba-bad4-edc489212e3a",
+      "slug": "kefir",
+      "name": "Kefir",
+      "category": "dairy",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705394,
+        "dataType": "survey_fndds",
+        "description": "Kefir",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 52,
+        "protein": 3.6,
+        "carbs": 7.5,
+        "fat": 1,
+        "fiber": 0,
+        "sugars": 6.9,
+        "saturatedFat": 0.6,
+        "sodium": 38,
+        "potassium": 159,
+        "calcium": 124,
+        "iron": 0,
+        "vitaminC": 0.8,
+        "vitaminD": 1
+      },
+      "servings": [
+        {
+          "label": "1 cup (244 g)",
+          "grams": 244
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "16995170-baa5-5b75-9330-42f0c78c244c",
+      "slug": "ice_cream_vanilla",
+      "name": "Ice cream, vanilla",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705630,
+        "dataType": "survey_fndds",
+        "description": "Ice cream, vanilla",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 207,
+        "protein": 3.5,
+        "carbs": 23.6,
+        "fat": 11,
+        "fiber": 0.7,
+        "sugars": 21.2,
+        "saturatedFat": 6.8,
+        "sodium": 80,
+        "potassium": 199,
+        "calcium": 128,
+        "iron": 0.1,
+        "vitaminC": 0.6,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 small cup (120 g)",
+          "grams": 120
+        },
+        {
+          "label": "1 cup (135 g)",
+          "grams": 135
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "f7a2a56f-dd7f-5957-8ea0-664ab5c05f13",
+      "slug": "soy_milk",
+      "name": "Soy milk, unsweetened",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2705405,
+        "dataType": "survey_fndds",
+        "description": "Soy milk, unsweetened",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 38,
+        "protein": 3.6,
+        "carbs": 1.3,
+        "fat": 2.1,
+        "fiber": 0,
+        "sugars": 0.6,
+        "saturatedFat": 0.3,
+        "sodium": 34,
+        "potassium": 158,
+        "calcium": 101,
+        "iron": 0.5,
+        "vitaminC": 0,
+        "vitaminD": 0.7
+      },
+      "servings": [
+        {
+          "label": "1 cup (244 g)",
+          "grams": 244
+        }
+      ],
+      "allergens": [
+        "soy"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "e7421acc-9b2a-5457-9f99-ac67e8a7ac5a",
+      "slug": "almond_milk",
+      "name": "Almond milk, unsweetened",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2705409,
+        "dataType": "survey_fndds",
+        "description": "Almond milk, unsweetened",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 15,
+        "protein": 0.6,
+        "carbs": 0.3,
+        "fat": 1.2,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 0.1,
+        "sodium": 60,
+        "potassium": 31,
+        "calcium": 173,
+        "iron": 0.3,
+        "vitaminC": 0,
+        "vitaminD": 0.9
+      },
+      "servings": [
+        {
+          "label": "1 cup (244 g)",
+          "grams": 244
+        }
+      ],
+      "allergens": [
+        "tree_nuts"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "9b563c70-0837-5e48-bfd5-e2c7d4bdce29",
+      "slug": "oat_milk",
+      "name": "Oat milk",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2705412,
+        "dataType": "survey_fndds",
+        "description": "Oat milk",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 45,
+        "protein": 0.7,
+        "carbs": 5.4,
+        "fat": 2.3,
+        "fiber": 0.5,
+        "sugars": 2,
+        "saturatedFat": 0.2,
+        "sodium": 43,
+        "potassium": 18,
+        "calcium": 155,
+        "iron": 0.2,
+        "vitaminC": 0,
+        "vitaminD": 1.7
+      },
+      "servings": [
+        {
+          "label": "1 cup (244 g)",
+          "grams": 244
+        }
+      ],
+      "allergens": [
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "96d1d48e-7c56-5027-be21-992fd0cb1072",
+      "slug": "challah",
+      "name": "Challah",
+      "category": "grain",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2707624,
+        "dataType": "survey_fndds",
+        "description": "Bread, egg, Challah",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 287,
+        "protein": 9.5,
+        "carbs": 47.8,
+        "fat": 6,
+        "fiber": 2.3,
+        "sugars": 1.8,
+        "saturatedFat": 1.6,
+        "sodium": 380,
+        "potassium": 115,
+        "calcium": 93,
+        "iron": 3,
+        "vitaminC": 0,
+        "vitaminD": 0.4
+      },
+      "servings": [
+        {
+          "label": "1 slice (31 g)",
+          "grams": 31
+        },
+        {
+          "label": "1 thick slice (43 g)",
+          "grams": 43
+        }
+      ],
+      "allergens": [
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "0c4d5606-7ddc-55e8-a4ed-03bcf5ff103a",
+      "slug": "bagel",
+      "name": "Bagel",
+      "category": "grain",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2707684,
+        "dataType": "survey_fndds",
+        "description": "Bagel",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 264,
+        "protein": 10.6,
+        "carbs": 52.4,
+        "fat": 1.3,
+        "fiber": 1.6,
+        "sugars": 8.4,
+        "saturatedFat": 0.4,
+        "sodium": 422,
+        "potassium": 107,
+        "calcium": 70,
+        "iron": 3.6,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 bagel (105 g)",
+          "grams": 105
+        },
+        {
+          "label": "1 small bagel (69 g)",
+          "grams": 69
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch"
+      ]
+    },
+    {
+      "id": "32e8237f-aea7-5fa2-9cd8-e87253180625",
+      "slug": "croissant",
+      "name": "Croissant",
+      "category": "grain",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2707678,
+        "dataType": "survey_fndds",
+        "description": "Croissant",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 406,
+        "protein": 8.2,
+        "carbs": 45.8,
+        "fat": 21,
+        "fiber": 2.6,
+        "sugars": 11.3,
+        "saturatedFat": 11.7,
+        "sodium": 300,
+        "potassium": 118,
+        "calcium": 37,
+        "iron": 2,
+        "vitaminC": 0.2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 medium croissant (57 g)",
+          "grams": 57
+        },
+        {
+          "label": "1 mini croissant (28 g)",
+          "grams": 28
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "76533a69-fcb5-50f5-9af1-f6389ba81833",
+      "slug": "tortilla_flour",
+      "name": "Laffa / tortilla wrap (flour)",
+      "category": "grain",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2707824,
+        "dataType": "survey_fndds",
+        "description": "Tortilla, flour",
+        "match": "close",
+        "note": "Flour tortilla; Israeli laffa is similar per 100 g but larger (about 100–120 g)."
+      },
+      "per100g": {
+        "calories": 306,
+        "protein": 8.2,
+        "carbs": 49.4,
+        "fat": 8,
+        "fiber": 3.5,
+        "sugars": 3.7,
+        "saturatedFat": 2.9,
+        "sodium": 700,
+        "potassium": 125,
+        "calcium": 146,
+        "iron": 3.6,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 large wrap (71 g)",
+          "grams": 71
+        },
+        {
+          "label": "1 medium tortilla (45 g)",
+          "grams": 45
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "bdc52304-ac34-55e4-b520-252e1e7e44a3",
+      "slug": "crackers_saltine",
+      "name": "Crackers",
+      "category": "grain",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708167,
+        "dataType": "survey_fndds",
+        "description": "Crackers, saltine",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 418,
+        "protein": 9.5,
+        "carbs": 74.1,
+        "fat": 8.6,
+        "fiber": 2.8,
+        "sugars": 1.3,
+        "saturatedFat": 1.7,
+        "sodium": 941,
+        "potassium": 152,
+        "calcium": 19,
+        "iron": 5.6,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cracker (3 g)",
+          "grams": 3
+        },
+        {
+          "label": "6 crackers (18 g)",
+          "grams": 18
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "d41056ea-df2e-5c3d-b884-d94eae9e056b",
+      "slug": "rice_cake",
+      "name": "Rice cake",
+      "category": "grain",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708162,
+        "dataType": "survey_fndds",
+        "description": "Rice cake",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 392,
+        "protein": 7.1,
+        "carbs": 81.1,
+        "fat": 4.3,
+        "fiber": 4.2,
+        "sugars": 0.9,
+        "saturatedFat": 0.9,
+        "sodium": 71,
+        "potassium": 428,
+        "calcium": 11,
+        "iron": 1.5,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 rice cake (3 g)",
+          "grams": 3
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "7448f4e7-4502-5cb7-bddd-d755cf911195",
+      "slug": "bulgur_cooked",
+      "name": "Bulgur, cooked",
+      "category": "grain",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708438,
+        "dataType": "survey_fndds",
+        "description": "Bulgur, no added fat",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 83,
+        "protein": 3.1,
+        "carbs": 18.5,
+        "fat": 0.2,
+        "fiber": 4.5,
+        "sugars": 0.1,
+        "saturatedFat": 0,
+        "sodium": 219,
+        "potassium": 68,
+        "calcium": 10,
+        "iron": 1,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (140 g)",
+          "grams": 140
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 15,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "036fccdc-a542-5621-89a3-dd0e4e7c2099",
+      "slug": "oatmeal_milk",
+      "name": "Oatmeal porridge (with milk)",
+      "category": "grain",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2708383,
+        "dataType": "survey_fndds",
+        "description": "Oatmeal, regular or quick, made with milk, no added fat",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 116,
+        "protein": 5.6,
+        "carbs": 16.2,
+        "fat": 3.3,
+        "fiber": 1.7,
+        "sugars": 5.1,
+        "saturatedFat": 1.4,
+        "sodium": 105,
+        "potassium": 215,
+        "calcium": 135,
+        "iron": 0.7,
+        "vitaminC": 0.1,
+        "vitaminD": 1.1
+      },
+      "servings": [
+        {
+          "label": "1 cup (240 g)",
+          "grams": 240
+        }
+      ],
+      "allergens": [
+        "milk",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast"
+      ]
+    },
+    {
+      "id": "ce5075fa-d1c2-5822-813b-95dcdbab825b",
+      "slug": "pancakes",
+      "name": "Pancakes",
+      "category": "grain",
+      "tags": [
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2708294,
+        "dataType": "survey_fndds",
+        "description": "Pancakes, NFS",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 282,
+        "protein": 7.4,
+        "carbs": 35.3,
+        "fat": 12.1,
+        "fiber": 2.1,
+        "sugars": 7.1,
+        "saturatedFat": 3,
+        "sodium": 508,
+        "potassium": 174,
+        "calcium": 206,
+        "iron": 1.5,
+        "vitaminC": 0,
+        "vitaminD": 1
+      },
+      "servings": [
+        {
+          "label": "1 medium pancake (50 g)",
+          "grams": 50
+        },
+        {
+          "label": "1 large pancake (90 g)",
+          "grams": 90
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 20,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast"
+      ]
+    },
+    {
+      "id": "2748f08e-fec4-5473-acce-84f68dd17bfe",
+      "slug": "waffle",
+      "name": "Waffle",
+      "category": "grain",
+      "tags": [
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2708325,
+        "dataType": "survey_fndds",
+        "description": "Waffle, plain",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 373,
+        "protein": 8.7,
+        "carbs": 41.5,
+        "fat": 18.8,
+        "fiber": 2.5,
+        "sugars": 8.3,
+        "saturatedFat": 4.2,
+        "sodium": 597,
+        "potassium": 205,
+        "calcium": 242,
+        "iron": 1.7,
+        "vitaminC": 0,
+        "vitaminD": 1.1
+      },
+      "servings": [
+        {
+          "label": "1 small waffle (40 g)",
+          "grams": 40
+        },
+        {
+          "label": "1 Belgian waffle (135 g)",
+          "grams": 135
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "853eeb95-6d92-54ba-8489-9486f20da12f",
+      "slug": "pretzels",
+      "name": "Pretzels",
+      "category": "snack",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708249,
+        "dataType": "survey_fndds",
+        "description": "Pretzels, hard, plain, salted",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 384,
+        "protein": 10,
+        "carbs": 80.4,
+        "fat": 2.9,
+        "fiber": 3.4,
+        "sugars": 2.2,
+        "saturatedFat": 0.4,
+        "sodium": 1120,
+        "potassium": 223,
+        "calcium": 27,
+        "iron": 4.6,
+        "vitaminC": 2.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 oz (28 g)",
+          "grams": 28
+        },
+        {
+          "label": "1 bag (57 g)",
+          "grams": 57
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "6305e60e-18ac-52d0-a012-d9c04ca03f49",
+      "slug": "matzah",
+      "name": "Matzah",
+      "category": "grain",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708158,
+        "dataType": "survey_fndds",
+        "description": "Crackers, matzo",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 395,
+        "protein": 10,
+        "carbs": 83.7,
+        "fat": 1.4,
+        "fiber": 3,
+        "sugars": 0.3,
+        "saturatedFat": 0.2,
+        "sodium": 0,
+        "potassium": 112,
+        "calcium": 13,
+        "iron": 3.2,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 matzah (28 g)",
+          "grams": 28
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "b753063b-1bf0-5d15-a2b6-ea209e4afbd8",
+      "slug": "egg_noodles",
+      "name": "Egg noodles, cooked",
+      "category": "grain",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 169732,
+        "dataType": "sr_legacy",
+        "description": "Noodles, egg, enriched, cooked",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 138,
+        "protein": 4.5,
+        "carbs": 25.2,
+        "fat": 2.1,
+        "fiber": 1.2,
+        "sugars": 0.4,
+        "saturatedFat": 0.4,
+        "sodium": 5,
+        "potassium": 38,
+        "calcium": 12,
+        "iron": 1.5,
+        "vitaminC": 0,
+        "vitaminD": 0.1
+      },
+      "servings": [
+        {
+          "label": "1 cup (160 g)",
+          "grams": 160
+        }
+      ],
+      "allergens": [
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "b2069a60-1a06-57b2-a982-9da8e80498cd",
+      "slug": "pasta_whole_grain",
+      "name": "Whole-grain pasta, cooked",
+      "category": "grain",
+      "tags": [
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708358,
+        "dataType": "survey_fndds",
+        "description": "Pasta, whole grain, cooked",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 148,
+        "protein": 6,
+        "carbs": 29.9,
+        "fat": 1.7,
+        "fiber": 3.9,
+        "sugars": 0.8,
+        "saturatedFat": 0.2,
+        "sodium": 235,
+        "potassium": 95,
+        "calcium": 13,
+        "iron": 1.7,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (140 g)",
+          "grams": 140
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 12,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "3c6590c3-b244-5d1b-bdec-925f6feb42b2",
+      "slug": "pasta_tomato_sauce",
+      "name": "Pasta with tomato sauce",
+      "category": "prepared",
+      "tags": [
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2708831,
+        "dataType": "survey_fndds",
+        "description": "Pasta with tomato-based sauce, home recipe",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 106,
+        "protein": 3.7,
+        "carbs": 19.9,
+        "fat": 1.2,
+        "fiber": 1.8,
+        "sugars": 2.9,
+        "saturatedFat": 0.2,
+        "sodium": 202,
+        "potassium": 176,
+        "calcium": 17,
+        "iron": 1,
+        "vitaminC": 1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (250 g)",
+          "grams": 250
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 20,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "3dca9f2c-cc24-5642-9345-5349f694e0ed",
+      "slug": "french_toast",
+      "name": "French toast",
+      "category": "grain",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2708335,
+        "dataType": "survey_fndds",
+        "description": "French toast, plain",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 273,
+        "protein": 10.4,
+        "carbs": 32.3,
+        "fat": 11.4,
+        "fiber": 1.2,
+        "sugars": 10.1,
+        "saturatedFat": 3.3,
+        "sodium": 302,
+        "potassium": 135,
+        "calcium": 143,
+        "iron": 2.4,
+        "vitaminC": 0,
+        "vitaminD": 1.2
+      },
+      "servings": [
+        {
+          "label": "1 slice (65 g)",
+          "grams": 65
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast"
+      ]
+    },
+    {
+      "id": "ceecdf47-18cd-5841-819d-4893fbc93495",
+      "slug": "lasagna_meat",
+      "name": "Lasagna with meat",
+      "category": "prepared",
+      "tags": [
+        "high_protein"
+      ],
+      "usda": {
+        "fdcId": 2708753,
+        "dataType": "survey_fndds",
+        "description": "Lasagna with meat, home recipe",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 206,
+        "protein": 13.6,
+        "carbs": 13.1,
+        "fat": 10.9,
+        "fiber": 1.1,
+        "sugars": 1.5,
+        "saturatedFat": 5.6,
+        "sodium": 416,
+        "potassium": 168,
+        "calcium": 272,
+        "iron": 0.9,
+        "vitaminC": 3,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 piece (206 g)",
+          "grams": 206
+        },
+        {
+          "label": "1 cup (250 g)",
+          "grams": 250
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 60,
+      "requiresCooking": true,
+      "costTier": 2,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "77b868e6-4b7f-522f-8402-66a66f9e6158",
+      "slug": "sushi_california",
+      "name": "Sushi, California roll",
+      "category": "prepared",
+      "tags": [
+        "no_cook",
+        "quick"
+      ],
+      "usda": {
+        "fdcId": 2708961,
+        "dataType": "survey_fndds",
+        "description": "Sushi roll, California",
+        "match": "exact",
+        "note": "California roll (imitation crab, avocado); allergens include common sesame/soy."
+      },
+      "per100g": {
+        "calories": 94,
+        "protein": 2.9,
+        "carbs": 18.4,
+        "fat": 0.7,
+        "fiber": 1,
+        "sugars": 2.1,
+        "saturatedFat": 0.1,
+        "sodium": 428,
+        "potassium": 48,
+        "calcium": 6,
+        "iron": 0.2,
+        "vitaminC": 0.9,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 piece (30 g)",
+          "grams": 30
+        },
+        {
+          "label": "6 pieces (180 g)",
+          "grams": 180
+        }
+      ],
+      "allergens": [
+        "fish",
+        "shellfish",
+        "soy",
+        "sesame"
+      ],
+      "dietFlags": {
+        "vegetarian": false,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 3,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "0d1129d3-30c2-5ef3-bfae-90e96e680382",
+      "slug": "majadra",
+      "name": "Majadra (rice with lentils)",
+      "category": "israeli",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709030,
+        "dataType": "survey_fndds",
+        "description": "Rice, white, with lentils, fat added",
+        "match": "close",
+        "note": "FNDDS white rice with lentils, fat added; majadra also has fried onions."
+      },
+      "per100g": {
+        "calories": 150,
+        "protein": 5.5,
+        "carbs": 21.4,
+        "fat": 4.8,
+        "fiber": 4.1,
+        "sugars": 1.3,
+        "saturatedFat": 0.7,
+        "sodium": 189,
+        "potassium": 207,
+        "calcium": 17,
+        "iron": 2.2,
+        "vitaminC": 1.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (207 g)",
+          "grams": 207
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 40,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "38482cc5-f0f7-5cb4-850f-4e86ca3a4356",
+      "slug": "potato_boiled",
+      "name": "Potato, boiled",
+      "category": "vegetable",
+      "tags": [
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709388,
+        "dataType": "survey_fndds",
+        "description": "Potato, boiled, from fresh, peel not eaten, no added fat",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 93,
+        "protein": 2,
+        "carbs": 21.5,
+        "fat": 0.1,
+        "fiber": 1.5,
+        "sugars": 1.7,
+        "saturatedFat": 0,
+        "sodium": 159,
+        "potassium": 389,
+        "calcium": 5,
+        "iron": 0.4,
+        "vitaminC": 12.7,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 medium potato (170 g)",
+          "grams": 170
+        },
+        {
+          "label": "1 cup (160 g)",
+          "grams": 160
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 25,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "d8551146-466b-5fb9-a722-3ed3163672e6",
+      "slug": "mashed_potatoes",
+      "name": "Mashed potatoes",
+      "category": "vegetable",
+      "tags": [
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2709496,
+        "dataType": "survey_fndds",
+        "description": "Potato, mashed, from fresh, made with milk",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 114,
+        "protein": 2.2,
+        "carbs": 17.6,
+        "fat": 4.1,
+        "fiber": 1.2,
+        "sugars": 2.1,
+        "saturatedFat": 2.1,
+        "sodium": 210,
+        "potassium": 330,
+        "calcium": 25,
+        "iron": 0.3,
+        "vitaminC": 10.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (250 g)",
+          "grams": 250
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 30,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "6a782fb9-5209-5be2-a645-fe3fd908f728",
+      "slug": "corn_sweet_canned",
+      "name": "Sweet corn, canned",
+      "category": "vegetable",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 168397,
+        "dataType": "sr_legacy",
+        "description": "Corn, sweet, yellow, canned, drained solids, rinsed with tap water",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 64,
+        "protein": 2.2,
+        "carbs": 13,
+        "fat": 1.4,
+        "fiber": 1.7,
+        "sugars": 4.1,
+        "saturatedFat": 0.2,
+        "sodium": 163,
+        "potassium": 116,
+        "calcium": 2,
+        "iron": 0.2,
+        "vitaminC": 1.7,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (150 g)",
+          "grams": 150
+        },
+        {
+          "label": "1 can (266 g)",
+          "grams": 266
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "c4567687-f23e-5ac0-9d21-90da1c771728",
+      "slug": "green_peas",
+      "name": "Green peas, cooked",
+      "category": "legume",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 170420,
+        "dataType": "sr_legacy",
+        "description": "Peas, green, cooked, boiled, drained, without salt",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 84,
+        "protein": 5.4,
+        "carbs": 15.6,
+        "fat": 0.2,
+        "fiber": 5.5,
+        "sugars": 5.9,
+        "saturatedFat": 0,
+        "sodium": 3,
+        "potassium": 271,
+        "calcium": 27,
+        "iron": 1.5,
+        "vitaminC": 14.2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (160 g)",
+          "grams": 160
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 5,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "324efda7-54a2-5dee-b909-93ba60facf2f",
+      "slug": "green_beans",
+      "name": "Green beans, cooked",
+      "category": "vegetable",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709852,
+        "dataType": "survey_fndds",
+        "description": "Green beans, fresh, cooked, no added fat",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 42,
+        "protein": 2.1,
+        "carbs": 7.7,
+        "fat": 0.3,
+        "fiber": 3.1,
+        "sugars": 2.4,
+        "saturatedFat": 0.1,
+        "sodium": 121,
+        "potassium": 301,
+        "calcium": 42,
+        "iron": 0.7,
+        "vitaminC": 10.8,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (140 g)",
+          "grams": 140
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "d44347f9-88da-578e-b7eb-00a2b6f1589d",
+      "slug": "mushrooms",
+      "name": "Mushrooms",
+      "category": "vegetable",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709793,
+        "dataType": "survey_fndds",
+        "description": "Mushrooms, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 31,
+        "protein": 2.9,
+        "carbs": 4.1,
+        "fat": 0.4,
+        "fiber": 1.7,
+        "sugars": 2,
+        "saturatedFat": 0.1,
+        "sodium": 6,
+        "potassium": 371,
+        "calcium": 5,
+        "iron": 0.2,
+        "vitaminC": 2.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (70 g)",
+          "grams": 70
+        },
+        {
+          "label": "1 mushroom (18 g)",
+          "grams": 18
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "d765eb40-614f-534d-a178-ef9f00b0a30f",
+      "slug": "eggplant_cooked",
+      "name": "Eggplant, cooked",
+      "category": "vegetable",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709929,
+        "dataType": "survey_fndds",
+        "description": "Eggplant, cooked, no added fat",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 27,
+        "protein": 1.1,
+        "carbs": 6.3,
+        "fat": 0.2,
+        "fiber": 3.2,
+        "sugars": 3.8,
+        "saturatedFat": 0,
+        "sodium": 127,
+        "potassium": 246,
+        "calcium": 10,
+        "iron": 0.3,
+        "vitaminC": 2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (95 g)",
+          "grams": 95
+        },
+        {
+          "label": "1 slice (55 g)",
+          "grams": 55
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 20,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "c0e03dec-026d-5e55-9b03-a900d8a0ef37",
+      "slug": "zucchini_cooked",
+      "name": "Zucchini, cooked",
+      "category": "vegetable",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 169292,
+        "dataType": "sr_legacy",
+        "description": "Squash, summer, zucchini, includes skin, cooked, boiled, drained, without salt",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 15,
+        "protein": 1.1,
+        "carbs": 2.7,
+        "fat": 0.4,
+        "fiber": 1,
+        "sugars": 1.7,
+        "saturatedFat": 0.1,
+        "sodium": 3,
+        "potassium": 264,
+        "calcium": 18,
+        "iron": 0.4,
+        "vitaminC": 12.9,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup, sliced (180 g)",
+          "grams": 180
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "8e4a3025-5479-5b08-a8ce-78d63939ed93",
+      "slug": "cauliflower_cooked",
+      "name": "Cauliflower, cooked",
+      "category": "vegetable",
+      "tags": [
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 170397,
+        "dataType": "sr_legacy",
+        "description": "Cauliflower, cooked, boiled, drained, without salt",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 23,
+        "protein": 1.8,
+        "carbs": 4.1,
+        "fat": 0.5,
+        "fiber": 2.3,
+        "sugars": 2.1,
+        "saturatedFat": 0.1,
+        "sodium": 15,
+        "potassium": 142,
+        "calcium": 16,
+        "iron": 0.3,
+        "vitaminC": 44.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1/2 cup (62 g)",
+          "grams": 62
+        },
+        {
+          "label": "3 florets (54 g)",
+          "grams": 54
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 10,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "09cc965e-f726-5910-b1db-6710fa4e151e",
+      "slug": "cabbage",
+      "name": "Cabbage",
+      "category": "vegetable",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709773,
+        "dataType": "survey_fndds",
+        "description": "Cabbage, green, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 31,
+        "protein": 1,
+        "carbs": 6.4,
+        "fat": 0.2,
+        "fiber": 2.5,
+        "sugars": 3.2,
+        "saturatedFat": 0,
+        "sodium": 16,
+        "potassium": 207,
+        "calcium": 42,
+        "iron": 0.1,
+        "vitaminC": 40.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup, shredded (90 g)",
+          "grams": 90
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "38d9cc64-2e36-580e-8843-eed5a643c863",
+      "slug": "beets_cooked",
+      "name": "Beets, cooked",
+      "category": "vegetable",
+      "tags": [
+        "israeli",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 169146,
+        "dataType": "sr_legacy",
+        "description": "Beets, cooked, boiled, drained",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 44,
+        "protein": 1.7,
+        "carbs": 10,
+        "fat": 0.2,
+        "fiber": 2,
+        "sugars": 8,
+        "saturatedFat": 0,
+        "sodium": 77,
+        "potassium": 305,
+        "calcium": 16,
+        "iron": 0.8,
+        "vitaminC": 3.6,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1/2 cup slices (85 g)",
+          "grams": 85
+        },
+        {
+          "label": "2 beets (100 g)",
+          "grams": 100
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 40,
+      "requiresCooking": true,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "ad215ae9-e355-508c-9699-da56cd8341ba",
+      "slug": "pickles",
+      "name": "Pickled cucumbers",
+      "category": "vegetable",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 168558,
+        "dataType": "sr_legacy",
+        "description": "Pickles, cucumber, dill or kosher dill",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 12,
+        "protein": 0.5,
+        "carbs": 2.4,
+        "fat": 0.3,
+        "fiber": 1,
+        "sugars": 1.1,
+        "saturatedFat": 0.1,
+        "sodium": 809,
+        "potassium": 117,
+        "calcium": 57,
+        "iron": 0.3,
+        "vitaminC": 2.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 small pickle (35 g)",
+          "grams": 35
+        },
+        {
+          "label": "1 large pickle (135 g)",
+          "grams": 135
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "ec9c7ae3-0fb0-5dff-831a-e3c105ecad33",
+      "slug": "olives_green",
+      "name": "Olives",
+      "category": "fat",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710089,
+        "dataType": "survey_fndds",
+        "description": "Olives, green",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 145,
+        "protein": 1,
+        "carbs": 3.8,
+        "fat": 15.3,
+        "fiber": 3.3,
+        "sugars": 0.5,
+        "saturatedFat": 2,
+        "sodium": 1556,
+        "potassium": 42,
+        "calcium": 52,
+        "iron": 0.5,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 olive (4 g)",
+          "grams": 4
+        },
+        {
+          "label": "4 olives (15 g)",
+          "grams": 15
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "7e92613b-8610-5f7d-88c1-f556ad6d179d",
+      "slug": "coleslaw",
+      "name": "Coleslaw (cabbage salad)",
+      "category": "vegetable",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2709815,
+        "dataType": "survey_fndds",
+        "description": "Coleslaw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 117,
+        "protein": 0.9,
+        "carbs": 10.5,
+        "fat": 8,
+        "fiber": 1.9,
+        "sugars": 7.4,
+        "saturatedFat": 1.2,
+        "sodium": 280,
+        "potassium": 172,
+        "calcium": 33,
+        "iron": 0.1,
+        "vitaminC": 26.9,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 container (150 g)",
+          "grams": 150
+        },
+        {
+          "label": "1 cup (220 g)",
+          "grams": 220
+        }
+      ],
+      "allergens": [
+        "egg"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 10,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "0f6c950f-58f3-59ff-bdc3-961a7f1bdfe0",
+      "slug": "eggplant_dip",
+      "name": "Eggplant dip (baba ghanoush)",
+      "category": "israeli",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710049,
+        "dataType": "survey_fndds",
+        "description": "Eggplant dip",
+        "match": "close",
+        "note": "FNDDS eggplant dip; Israeli versions use tahini or mayonnaise."
+      },
+      "per100g": {
+        "calories": 183,
+        "protein": 4.8,
+        "carbs": 8.2,
+        "fat": 15,
+        "fiber": 3.9,
+        "sugars": 2.8,
+        "saturatedFat": 2.2,
+        "sodium": 209,
+        "potassium": 264,
+        "calcium": 35,
+        "iron": 1.7,
+        "vitaminC": 7.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (15 g)",
+          "grams": 15
+        },
+        {
+          "label": "1 container (70 g)",
+          "grams": 70
+        }
+      ],
+      "allergens": [
+        "sesame"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "2e7dfae4-edd2-547f-8bec-ee9a42a1fbd9",
+      "slug": "tabbouleh",
+      "name": "Tabbouleh",
+      "category": "israeli",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "no_cook",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709131,
+        "dataType": "survey_fndds",
+        "description": "Tabbouleh",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 127,
+        "protein": 1.6,
+        "carbs": 9.7,
+        "fat": 9.7,
+        "fiber": 1.8,
+        "sugars": 1.3,
+        "saturatedFat": 1.5,
+        "sodium": 495,
+        "potassium": 154,
+        "calcium": 20,
+        "iron": 0.7,
+        "vitaminC": 15.8,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (160 g)",
+          "grams": 160
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 20,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "2d8de04c-634f-5f61-8fa0-10ab9824a6bf",
+      "slug": "grapes",
+      "name": "Grapes",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709237,
+        "dataType": "survey_fndds",
+        "description": "Grapes, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 83,
+        "protein": 0.9,
+        "carbs": 19.4,
+        "fat": 0.2,
+        "fiber": 0.9,
+        "sugars": 16.7,
+        "saturatedFat": 0.1,
+        "sodium": 5,
+        "potassium": 224,
+        "calcium": 10,
+        "iron": 0.2,
+        "vitaminC": 3.2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (150 g)",
+          "grams": 150
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "24a3678a-d7e2-5a74-9636-94f670e5cbfe",
+      "slug": "watermelon",
+      "name": "Watermelon",
+      "category": "fruit",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709270,
+        "dataType": "survey_fndds",
+        "description": "Watermelon, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 30,
+        "protein": 0.6,
+        "carbs": 7.6,
+        "fat": 0.2,
+        "fiber": 0.4,
+        "sugars": 6.2,
+        "saturatedFat": 0,
+        "sodium": 1,
+        "potassium": 112,
+        "calcium": 7,
+        "iron": 0.2,
+        "vitaminC": 8.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup, diced (155 g)",
+          "grams": 155
+        },
+        {
+          "label": "1 slice (218 g)",
+          "grams": 218
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "216874e6-fd20-5c88-9732-52c233628da6",
+      "slug": "melon",
+      "name": "Melon (cantaloupe)",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709226,
+        "dataType": "survey_fndds",
+        "description": "Cantaloupe, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 38,
+        "protein": 0.8,
+        "carbs": 8.2,
+        "fat": 0.2,
+        "fiber": 0.8,
+        "sugars": 7.9,
+        "saturatedFat": 0.1,
+        "sodium": 30,
+        "potassium": 157,
+        "calcium": 9,
+        "iron": 0.4,
+        "vitaminC": 10.9,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 wedge (70 g)",
+          "grams": 70
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "35dbfbd0-ad85-53b9-b107-f455ab022354",
+      "slug": "mango",
+      "name": "Mango",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709242,
+        "dataType": "survey_fndds",
+        "description": "Mango, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 60,
+        "protein": 0.8,
+        "carbs": 15,
+        "fat": 0.4,
+        "fiber": 1.6,
+        "sugars": 13.7,
+        "saturatedFat": 0.1,
+        "sodium": 1,
+        "potassium": 168,
+        "calcium": 11,
+        "iron": 0.2,
+        "vitaminC": 36.4,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 mango (210 g)",
+          "grams": 210
+        },
+        {
+          "label": "1 cup (165 g)",
+          "grams": 165
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "eba0fb16-6c52-5de8-a9b9-2802cfeec75e",
+      "slug": "pear",
+      "name": "Pear",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709254,
+        "dataType": "survey_fndds",
+        "description": "Pear, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 59,
+        "protein": 0.4,
+        "carbs": 15.2,
+        "fat": 0.2,
+        "fiber": 3.1,
+        "sugars": 9.7,
+        "saturatedFat": 0,
+        "sodium": 3,
+        "potassium": 104,
+        "calcium": 9,
+        "iron": 0.2,
+        "vitaminC": 4.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 pear (180 g)",
+          "grams": 180
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "cc4601b4-70ba-561f-b666-37dc4f9e2dd1",
+      "slug": "peach",
+      "name": "Peach",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709249,
+        "dataType": "survey_fndds",
+        "description": "Peach, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 46,
+        "protein": 0.9,
+        "carbs": 10.1,
+        "fat": 0.3,
+        "fiber": 1.5,
+        "sugars": 8.4,
+        "saturatedFat": 0,
+        "sodium": 13,
+        "potassium": 122,
+        "calcium": 4,
+        "iron": 0.3,
+        "vitaminC": 4.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 peach (150 g)",
+          "grams": 150
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "761909d6-d8fa-5c5b-93f5-5031a5b0b188",
+      "slug": "plum",
+      "name": "Plum",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709265,
+        "dataType": "survey_fndds",
+        "description": "Plum, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 46,
+        "protein": 0.7,
+        "carbs": 11.4,
+        "fat": 0.3,
+        "fiber": 1.4,
+        "sugars": 9.9,
+        "saturatedFat": 0,
+        "sodium": 0,
+        "potassium": 157,
+        "calcium": 6,
+        "iron": 0.2,
+        "vitaminC": 9.5,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 plum (75 g)",
+          "grams": 75
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "78bf4c6d-51e6-5dc5-a0b8-34261dd273e0",
+      "slug": "kiwi",
+      "name": "Kiwi",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709239,
+        "dataType": "survey_fndds",
+        "description": "Kiwi fruit, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 64,
+        "protein": 1.1,
+        "carbs": 14,
+        "fat": 0.4,
+        "fiber": 3,
+        "sugars": 9,
+        "saturatedFat": 0,
+        "sodium": 5,
+        "potassium": 198,
+        "calcium": 35,
+        "iron": 0.2,
+        "vitaminC": 74.7,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 kiwi (75 g)",
+          "grams": 75
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "01e975d8-f399-5c61-b40b-5c46f00be4f5",
+      "slug": "pineapple",
+      "name": "Pineapple",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709260,
+        "dataType": "survey_fndds",
+        "description": "Pineapple, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 60,
+        "protein": 0.5,
+        "carbs": 14.1,
+        "fat": 0.2,
+        "fiber": 0.9,
+        "sugars": 11.4,
+        "saturatedFat": 0,
+        "sodium": 0,
+        "potassium": 137,
+        "calcium": 12,
+        "iron": 0.1,
+        "vitaminC": 58.6,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (165 g)",
+          "grams": 165
+        },
+        {
+          "label": "1 slice (56 g)",
+          "grams": 56
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "c1dd3c74-e244-5419-992d-1bd724ae34b1",
+      "slug": "pomegranate",
+      "name": "Pomegranate",
+      "category": "fruit",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709267,
+        "dataType": "survey_fndds",
+        "description": "Pomegranate, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 83,
+        "protein": 1.7,
+        "carbs": 18.7,
+        "fat": 1.2,
+        "fiber": 4,
+        "sugars": 13.7,
+        "saturatedFat": 0.1,
+        "sodium": 3,
+        "potassium": 236,
+        "calcium": 10,
+        "iron": 0.3,
+        "vitaminC": 10.2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup seeds (175 g)",
+          "grams": 175
+        },
+        {
+          "label": "1 fruit (250 g)",
+          "grams": 250
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "d166b889-19bf-51b7-800b-a4c591edfc6d",
+      "slug": "cherries",
+      "name": "Cherries",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709231,
+        "dataType": "survey_fndds",
+        "description": "Cherries, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 71,
+        "protein": 1,
+        "carbs": 16.2,
+        "fat": 0.2,
+        "fiber": 2.1,
+        "sugars": 13.9,
+        "saturatedFat": 0,
+        "sodium": 0,
+        "potassium": 230,
+        "calcium": 12,
+        "iron": 0.1,
+        "vitaminC": 10.4,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (150 g)",
+          "grams": 150
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "668912b3-3364-5ce4-88c2-58ff308ad06d",
+      "slug": "clementine",
+      "name": "Clementine / mandarin",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709164,
+        "dataType": "survey_fndds",
+        "description": "Clementine, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 53,
+        "protein": 0.8,
+        "carbs": 13.3,
+        "fat": 0.3,
+        "fiber": 1.8,
+        "sugars": 10.6,
+        "saturatedFat": 0,
+        "sodium": 2,
+        "potassium": 166,
+        "calcium": 37,
+        "iron": 0.2,
+        "vitaminC": 26.7,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 fruit (85 g)",
+          "grams": 85
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "b3e08927-152a-59c9-bd1b-b213871d9445",
+      "slug": "grapefruit",
+      "name": "Grapefruit",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709165,
+        "dataType": "survey_fndds",
+        "description": "Grapefruit, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 42,
+        "protein": 0.8,
+        "carbs": 10.7,
+        "fat": 0.1,
+        "fiber": 1.6,
+        "sugars": 6.9,
+        "saturatedFat": 0,
+        "sodium": 0,
+        "potassium": 135,
+        "calcium": 22,
+        "iron": 0.1,
+        "vitaminC": 31.2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1/2 grapefruit (154 g)",
+          "grams": 154
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "b639751d-7f55-5ec8-a866-9357cc5b3b49",
+      "slug": "raisins",
+      "name": "Raisins",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709212,
+        "dataType": "survey_fndds",
+        "description": "Raisins",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 299,
+        "protein": 3.3,
+        "carbs": 79.3,
+        "fat": 0.3,
+        "fiber": 4.5,
+        "sugars": 65.2,
+        "saturatedFat": 0.1,
+        "sodium": 26,
+        "potassium": 744,
+        "calcium": 62,
+        "iron": 1.8,
+        "vitaminC": 2.3,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 small box (43 g)",
+          "grams": 43
+        },
+        {
+          "label": "1 cup (160 g)",
+          "grams": 160
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "8f51fb0a-6887-52f9-9454-2c24338cf279",
+      "slug": "figs",
+      "name": "Figs",
+      "category": "fruit",
+      "tags": [
+        "mediterranean",
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709235,
+        "dataType": "survey_fndds",
+        "description": "Fig, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 74,
+        "protein": 0.8,
+        "carbs": 19.2,
+        "fat": 0.3,
+        "fiber": 2.9,
+        "sugars": 16.3,
+        "saturatedFat": 0.1,
+        "sodium": 1,
+        "potassium": 232,
+        "calcium": 35,
+        "iron": 0.4,
+        "vitaminC": 2,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 fig (50 g)",
+          "grams": 50
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "a9a72a4c-7f24-5360-b390-0a3ab3c3ba5c",
+      "slug": "persimmon",
+      "name": "Persimmon",
+      "category": "fruit",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709259,
+        "dataType": "survey_fndds",
+        "description": "Persimmon, raw",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 70,
+        "protein": 0.6,
+        "carbs": 18.6,
+        "fat": 0.2,
+        "fiber": 3.6,
+        "sugars": 12.5,
+        "saturatedFat": 0,
+        "sodium": 1,
+        "potassium": 161,
+        "calcium": 8,
+        "iron": 0.2,
+        "vitaminC": 7.5,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 fruit (170 g)",
+          "grams": 170
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "90994488-1017-5dd5-8c48-9a07ed7bc63f",
+      "slug": "cookie_chocolate_chip",
+      "name": "Chocolate chip cookie",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2707909,
+        "dataType": "survey_fndds",
+        "description": "Cookie, chocolate chip",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 492,
+        "protein": 5.1,
+        "carbs": 65.4,
+        "fat": 24.7,
+        "fiber": 2,
+        "sugars": 32.9,
+        "saturatedFat": 8.1,
+        "sodium": 311,
+        "potassium": 171,
+        "calcium": 21,
+        "iron": 5.6,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 medium cookie (30 g)",
+          "grams": 30
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "02d53ec5-7638-56a5-a5e4-e3073b1d82d2",
+      "slug": "sponge_cake",
+      "name": "Sponge cake",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2707886,
+        "dataType": "survey_fndds",
+        "description": "Cake, sponge",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 290,
+        "protein": 5.4,
+        "carbs": 61,
+        "fat": 2.7,
+        "fiber": 0.5,
+        "sugars": 36.7,
+        "saturatedFat": 0.8,
+        "sodium": 623,
+        "potassium": 99,
+        "calcium": 70,
+        "iron": 2.7,
+        "vitaminC": 0,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 slice (65 g)",
+          "grams": 65
+        }
+      ],
+      "allergens": [
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "a5bfd77d-b44b-577f-a06a-b1938245db42",
+      "slug": "chocolate_cake",
+      "name": "Chocolate cake",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 172697,
+        "dataType": "sr_legacy",
+        "description": "Cake, chocolate, prepared from recipe without frosting",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 371,
+        "protein": 5.3,
+        "carbs": 53.4,
+        "fat": 15.1,
+        "fiber": 1.6,
+        "sugars": null,
+        "saturatedFat": 5.4,
+        "sodium": 315,
+        "potassium": 140,
+        "calcium": 60,
+        "iron": 1.6,
+        "vitaminC": 0.2,
+        "vitaminD": null
+      },
+      "servings": [
+        {
+          "label": "1 piece (95 g)",
+          "grams": 95
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "96b02be3-ba83-5083-a5fb-b2057c8365cc",
+      "slug": "doughnut",
+      "name": "Doughnut (sufganiya)",
+      "category": "sweet",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2708062,
+        "dataType": "survey_fndds",
+        "description": "Doughnut, NFS",
+        "match": "proxy",
+        "note": "Generic doughnut; a jam-filled sufganiya is similar in energy."
+      },
+      "per100g": {
+        "calories": 426,
+        "protein": 5.5,
+        "carbs": 49.5,
+        "fat": 22.9,
+        "fiber": 1.8,
+        "sugars": 23.5,
+        "saturatedFat": 9.9,
+        "sodium": 378,
+        "potassium": 113,
+        "calcium": 69,
+        "iron": 2.4,
+        "vitaminC": 0.6,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 doughnut (75 g)",
+          "grams": 75
+        }
+      ],
+      "allergens": [
+        "milk",
+        "egg",
+        "wheat",
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "75cca43c-fc21-5b1b-b563-653dd4fe193c",
+      "slug": "granola_bar",
+      "name": "Granola bar",
+      "category": "snack",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2708101,
+        "dataType": "survey_fndds",
+        "description": "Cereal or Granola bar, NFS",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 471,
+        "protein": 10.1,
+        "carbs": 64.4,
+        "fat": 19.8,
+        "fiber": 5.3,
+        "sugars": 28.6,
+        "saturatedFat": 2.4,
+        "sodium": 294,
+        "potassium": 336,
+        "calcium": 61,
+        "iron": 3,
+        "vitaminC": 0.9,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 bar (43 g)",
+          "grams": 43
+        }
+      ],
+      "allergens": [
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "27bf68e0-50fb-546d-85d2-185bb3428fe6",
+      "slug": "halva",
+      "name": "Halva",
+      "category": "sweet",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 167996,
+        "dataType": "sr_legacy",
+        "description": "Candies, halavah, plain",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 469,
+        "protein": 12.5,
+        "carbs": 60.5,
+        "fat": 21.5,
+        "fiber": 4.5,
+        "sugars": null,
+        "saturatedFat": 4.1,
+        "sodium": 195,
+        "potassium": 187,
+        "calcium": 33,
+        "iron": 4.5,
+        "vitaminC": 0.1,
+        "vitaminD": null
+      },
+      "servings": [
+        {
+          "label": "1 oz (28.4 g)",
+          "grams": 28.4
+        }
+      ],
+      "allergens": [
+        "sesame"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "snack"
+      ]
+    },
+    {
+      "id": "f9572a5c-0eee-5b5d-82d2-902a404bca63",
+      "slug": "coffee_black",
+      "name": "Coffee, black",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710375,
+        "dataType": "survey_fndds",
+        "description": "Coffee, brewed",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 1,
+        "protein": 0.1,
+        "carbs": 0,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 0,
+        "sodium": 2,
+        "potassium": 49,
+        "calcium": 2,
+        "iron": 0,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (240 g)",
+          "grams": 240
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 3,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "7c5531f3-b869-5adf-8ddb-078bcd785cf1",
+      "slug": "cafe_latte",
+      "name": "Café latte / cappuccino (hafuch)",
+      "category": "beverage",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2710386,
+        "dataType": "survey_fndds",
+        "description": "Coffee, Latte",
+        "match": "close",
+        "note": "Coffee latte with milk; an Israeli 'hafuch' is similar."
+      },
+      "per100g": {
+        "calories": 43,
+        "protein": 2.8,
+        "carbs": 4.4,
+        "fat": 1.6,
+        "fiber": 0,
+        "sugars": 4.1,
+        "saturatedFat": 0.9,
+        "sodium": 35,
+        "potassium": 152,
+        "calcium": 105,
+        "iron": 0,
+        "vitaminC": 0.2,
+        "vitaminD": 0.9
+      },
+      "servings": [
+        {
+          "label": "1 cup (240 g)",
+          "grams": 240
+        },
+        {
+          "label": "1 small (360 g)",
+          "grams": 360
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 5,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "df91d46c-7c76-565d-b415-82ad6cd9c16f",
+      "slug": "tea_black",
+      "name": "Tea (unsweetened)",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710488,
+        "dataType": "survey_fndds",
+        "description": "Tea, hot, leaf, black",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 1,
+        "protein": 0,
+        "carbs": 0.3,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 0,
+        "sodium": 3,
+        "potassium": 37,
+        "calcium": 0,
+        "iron": 0,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (240 g)",
+          "grams": 240
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 3,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "e2147437-6a27-5cc2-aeaf-183ce8c2b785",
+      "slug": "apple_juice",
+      "name": "Apple juice",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2709320,
+        "dataType": "survey_fndds",
+        "description": "Apple juice, 100%",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 48,
+        "protein": 0.1,
+        "carbs": 11.3,
+        "fat": 0.3,
+        "fiber": 0.2,
+        "sugars": 10.1,
+        "saturatedFat": 0,
+        "sodium": 5,
+        "potassium": 97,
+        "calcium": 7,
+        "iron": 0.1,
+        "vitaminC": 38.6,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (248 g)",
+          "grams": 248
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "8ee5ef29-ee2c-5bef-bc1a-123219763254",
+      "slug": "beer",
+      "name": "Beer",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan",
+        "alcohol"
+      ],
+      "usda": {
+        "fdcId": 2710616,
+        "dataType": "survey_fndds",
+        "description": "Beer",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 43,
+        "protein": 0.5,
+        "carbs": 3.6,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 0,
+        "sodium": 4,
+        "potassium": 27,
+        "calcium": 4,
+        "iron": 0,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 bottle (330 ml) (360 g)",
+          "grams": 360
+        }
+      ],
+      "allergens": [
+        "gluten"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "f55a3ad2-6c6c-537c-a938-057c25e2da30",
+      "slug": "wine_red",
+      "name": "Red wine",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan",
+        "alcohol"
+      ],
+      "usda": {
+        "fdcId": 2710688,
+        "dataType": "survey_fndds",
+        "description": "Wine, red",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 85,
+        "protein": 0.1,
+        "carbs": 2.6,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 0.6,
+        "saturatedFat": 0,
+        "sodium": 4,
+        "potassium": 127,
+        "calcium": 8,
+        "iron": 0.5,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 glass (180 g)",
+          "grams": 180
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "dinner"
+      ]
+    },
+    {
+      "id": "2e5d2f79-869f-5798-b1f3-dae540cf1236",
+      "slug": "wine_white",
+      "name": "White wine",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan",
+        "alcohol"
+      ],
+      "usda": {
+        "fdcId": 2710689,
+        "dataType": "survey_fndds",
+        "description": "Wine, white",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 82,
+        "protein": 0.1,
+        "carbs": 2.6,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 1,
+        "saturatedFat": 0,
+        "sodium": 5,
+        "potassium": 71,
+        "calcium": 9,
+        "iron": 0.3,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 glass (180 g)",
+          "grams": 180
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "dinner"
+      ]
+    },
+    {
+      "id": "2a0b8782-7b17-5550-8b6e-110b0b62d094",
+      "slug": "water",
+      "name": "Water",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710707,
+        "dataType": "survey_fndds",
+        "description": "Water, tap",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 0,
+        "protein": 0,
+        "carbs": 0,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 0,
+        "sodium": 4,
+        "potassium": 0,
+        "calcium": 3,
+        "iron": 0,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 cup (240 g)",
+          "grams": 240
+        },
+        {
+          "label": "1 bottle (0.5 l) (507 g)",
+          "grams": 507
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "b4783fe0-69d0-514a-bb3b-7a84334b81ac",
+      "slug": "cola_diet",
+      "name": "Diet cola",
+      "category": "beverage",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710542,
+        "dataType": "survey_fndds",
+        "description": "Soft drink, cola, diet",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 2,
+        "protein": 0.1,
+        "carbs": 0.3,
+        "fat": 0,
+        "fiber": 0,
+        "sugars": 0,
+        "saturatedFat": 0,
+        "sodium": 8,
+        "potassium": 8,
+        "calcium": 3,
+        "iron": 0.1,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 can (360 g)",
+          "grams": 360
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner",
+        "snack"
+      ]
+    },
+    {
+      "id": "708d25ff-fd6c-506c-b0bc-ed9116dcb0e2",
+      "slug": "ketchup",
+      "name": "Ketchup",
+      "category": "prepared",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan",
+        "condiment"
+      ],
+      "usda": {
+        "fdcId": 2709733,
+        "dataType": "survey_fndds",
+        "description": "Ketchup",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 109,
+        "protein": 1.1,
+        "carbs": 27.1,
+        "fat": 0.3,
+        "fiber": 0.3,
+        "sugars": 21.5,
+        "saturatedFat": 0,
+        "sodium": 928,
+        "potassium": 265,
+        "calcium": 14,
+        "iron": 0.4,
+        "vitaminC": 4.1,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (17 g)",
+          "grams": 17
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "d2fb7997-9d78-57cc-8791-50f4912b2269",
+      "slug": "mayonnaise",
+      "name": "Mayonnaise",
+      "category": "fat",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "condiment"
+      ],
+      "usda": {
+        "fdcId": 2710204,
+        "dataType": "survey_fndds",
+        "description": "Mayonnaise, regular",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 680,
+        "protein": 1,
+        "carbs": 0.6,
+        "fat": 74.9,
+        "fiber": 0,
+        "sugars": 0.6,
+        "saturatedFat": 11.7,
+        "sodium": 635,
+        "potassium": 20,
+        "calcium": 8,
+        "iron": 0.2,
+        "vitaminC": 0,
+        "vitaminD": 0.2
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (13.8 g)",
+          "grams": 13.8
+        }
+      ],
+      "allergens": [
+        "egg"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "70e01088-df86-5d6d-bd97-3833e8e00a8a",
+      "slug": "honey",
+      "name": "Honey",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2710281,
+        "dataType": "survey_fndds",
+        "description": "Honey",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 304,
+        "protein": 0.3,
+        "carbs": 82.4,
+        "fat": 0,
+        "fiber": 0.2,
+        "sugars": 82.1,
+        "saturatedFat": 0,
+        "sodium": 4,
+        "potassium": 52,
+        "calcium": 6,
+        "iron": 0.4,
+        "vitaminC": 0.5,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (20 g)",
+          "grams": 20
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 2,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "7c5fd23b-7036-53e7-8c90-5f13747e1d1a",
+      "slug": "jam",
+      "name": "Jam",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710301,
+        "dataType": "survey_fndds",
+        "description": "Jam",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 278,
+        "protein": 0.4,
+        "carbs": 68.9,
+        "fat": 0.1,
+        "fiber": 1.1,
+        "sugars": 48.5,
+        "saturatedFat": 0,
+        "sodium": 32,
+        "potassium": 77,
+        "calcium": 20,
+        "iron": 0.5,
+        "vitaminC": 8.8,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (20 g)",
+          "grams": 20
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "89e58cd3-e3d8-5013-9312-9b382691eb14",
+      "slug": "sugar",
+      "name": "Sugar",
+      "category": "sweet",
+      "tags": [
+        "no_cook",
+        "quick",
+        "vegetarian",
+        "vegan"
+      ],
+      "usda": {
+        "fdcId": 2710258,
+        "dataType": "survey_fndds",
+        "description": "Sugar, white, granulated or lump",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 401,
+        "protein": 0,
+        "carbs": 99.6,
+        "fat": 0.3,
+        "fiber": 0,
+        "sugars": 99.8,
+        "saturatedFat": 0,
+        "sodium": 1,
+        "potassium": 2,
+        "calcium": 1,
+        "iron": 0.1,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tsp (4.2 g)",
+          "grams": 4.2
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "snack"
+      ]
+    },
+    {
+      "id": "1af95ac8-0b1f-5c88-8d7d-72414e70e0e9",
+      "slug": "soy_sauce",
+      "name": "Soy sauce",
+      "category": "prepared",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "high_protein",
+        "vegetarian",
+        "vegan",
+        "condiment"
+      ],
+      "usda": {
+        "fdcId": 2707442,
+        "dataType": "survey_fndds",
+        "description": "Soy sauce",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 53,
+        "protein": 8.1,
+        "carbs": 4.9,
+        "fat": 0.6,
+        "fiber": 0.8,
+        "sugars": 0.4,
+        "saturatedFat": 0.1,
+        "sodium": 5493,
+        "potassium": 435,
+        "calcium": 33,
+        "iron": 1.5,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (16 g)",
+          "grams": 16
+        }
+      ],
+      "allergens": [
+        "wheat",
+        "gluten",
+        "soy"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "545ada14-34fe-51e9-b392-f2a27f633c1b",
+      "slug": "mustard",
+      "name": "Mustard",
+      "category": "prepared",
+      "tags": [
+        "no_cook",
+        "quick",
+        "budget",
+        "vegetarian",
+        "vegan",
+        "condiment"
+      ],
+      "usda": {
+        "fdcId": 2710085,
+        "dataType": "survey_fndds",
+        "description": "Mustard",
+        "match": "exact"
+      },
+      "per100g": {
+        "calories": 69,
+        "protein": 4.3,
+        "carbs": 5.3,
+        "fat": 3.4,
+        "fiber": 4.3,
+        "sugars": 1.4,
+        "saturatedFat": 0.3,
+        "sodium": 1100,
+        "potassium": 150,
+        "calcium": 63,
+        "iron": 1.6,
+        "vitaminC": 0.4,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 tbsp (15 g)",
+          "grams": 15
+        }
+      ],
+      "allergens": [],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": true
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "lunch",
+        "dinner"
+      ]
+    },
+    {
+      "id": "2c8dc353-5892-5265-a795-fb717b0f539d",
+      "slug": "white_cheese",
+      "name": "White cheese (gvina levana)",
+      "category": "dairy",
+      "tags": [
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705756,
+        "dataType": "survey_fndds",
+        "description": "Cheese, cottage, low fat",
+        "match": "proxy",
+        "note": "USDA low-fat cottage cheese; Israeli soft white cheese (5%) is similar in protein, slightly higher in fat."
+      },
+      "per100g": {
+        "calories": 82,
+        "protein": 11,
+        "carbs": 4.3,
+        "fat": 2.3,
+        "fiber": 0,
+        "sugars": 4.1,
+        "saturatedFat": 1.3,
+        "sodium": 321,
+        "potassium": 120,
+        "calcium": 103,
+        "iron": 0.1,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 serving (113 g)",
+          "grams": 113
+        },
+        {
+          "label": "1 cup (226 g)",
+          "grams": 226
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
+        "snack"
+      ]
+    },
+    {
+      "id": "fba44517-33d1-52b0-b654-de923209446a",
+      "slug": "labneh",
+      "name": "Labneh",
+      "category": "dairy",
+      "tags": [
+        "mediterranean",
+        "israeli",
+        "no_cook",
+        "quick",
+        "budget",
+        "high_protein",
+        "vegetarian"
+      ],
+      "usda": {
+        "fdcId": 2705422,
+        "dataType": "survey_fndds",
+        "description": "Yogurt, Greek, whole milk, plain",
+        "match": "proxy",
+        "note": "USDA plain whole-milk Greek yogurt; strained labneh is thicker and usually higher in fat."
+      },
+      "per100g": {
+        "calories": 94,
+        "protein": 8.8,
+        "carbs": 4.8,
+        "fat": 4.4,
+        "fiber": 0,
+        "sugars": 3.3,
+        "saturatedFat": 2.4,
+        "sodium": 34,
+        "potassium": 147,
+        "calcium": 111,
+        "iron": 0,
+        "vitaminC": 0,
+        "vitaminD": 0
+      },
+      "servings": [
+        {
+          "label": "1 serving (150 g)",
+          "grams": 150
+        },
+        {
+          "label": "1 cup (245 g)",
+          "grams": 245
+        }
+      ],
+      "allergens": [
+        "milk"
+      ],
+      "dietFlags": {
+        "vegetarian": true,
+        "vegan": false
+      },
+      "prepMinutes": 0,
+      "requiresCooking": false,
+      "costTier": 1,
+      "mealTypes": [
+        "breakfast",
+        "lunch",
         "snack"
       ]
     }

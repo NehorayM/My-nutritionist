@@ -10,7 +10,7 @@ export const DAIRY: Readonly<Record<string, string>> = {
   'משקה סויה': 'soy milk',
   'גבינה': 'cheese',
   'גבינות': 'cheese',
-  'גבינה לבנה': 'quark cheese',
+  'גבינה לבנה': 'white cheese',
   'גבינה צהובה': 'yellow cheese',
   'גבינה בולגרית': 'bulgarian cheese',
   'בולגרית': 'bulgarian cheese',

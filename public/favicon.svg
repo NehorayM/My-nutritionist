@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="My-nutritionist">
   <title>My-nutritionist</title>
-  <rect width="64" height="64" rx="16" fill="#1d6447"/>
-  <path d="M12 33h40a20 20 0 0 1-40 0Z" fill="#faf6ef"/>
-  <path d="M22 29c0-11 8-18 21-19-1 12-7 19-17 19Z" fill="#f5ac69"/>
-  <path d="M26.5 29c3-6.2 7.5-10.8 13.5-14" fill="none" stroke="#1d6447" stroke-width="2.4" stroke-linecap="round"/>
+  <rect width="64" height="64" rx="16" fill="#16a34a"/>
+  <path d="M12 33h40a20 20 0 0 1-40 0Z" fill="#ffffff"/>
+  <path d="M22 29c0-11 8-18 21-19-1 12-7 19-17 19Z" fill="#fb923c"/>
+  <path d="M26.5 29c3-6.2 7.5-10.8 13.5-14" fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
 </svg>

@@ -37,8 +37,12 @@ export function effectivePrepMinutes(food: Pick<FoodItem, 'prepMinutes' | 'requi
   return food.requiresCooking === false ? 0 : null
 }
 
+/** Allergens that are also food groups people dislike by name: "fish" covers tuna and salmon. */
+const DISLIKE_ALLERGENS: readonly Allergen[] = ['fish', 'shellfish']
+
 function searchableText(food: FoodItem): string {
-  return [food.name, food.category ?? '', ...food.tags].join(' ')
+  const groups = (food.allergens ?? []).filter((allergen) => DISLIKE_ALLERGENS.includes(allergen))
+  return [food.name, food.category ?? '', ...food.tags, ...groups].join(' ')
 }
 
 interface Rules {
@@ -60,10 +64,19 @@ export function isOccasionalFood(food: Pick<FoodItem, 'category' | 'per100g'>): 
   return false
 }
 
+/** Condiments go with meals and alcohol is never suggested: neither is recommended or planned as an item. */
+export function nonMealFoodReason(food: Pick<FoodItem, 'tags'>): 'condiment' | 'alcohol' | null {
+  if (food.tags.includes('alcohol')) return 'alcohol'
+  if (food.tags.includes('condiment')) return 'condiment'
+  return null
+}
+
 function exclusionReason(food: FoodItem, { prefs, avoided, mealType, favorites }: Rules): ExclusionReason | null {
   const { calories } = food.per100g
   if (!isKnownAmount(calories) || !CORE_NUTRIENTS.every((key) => isKnownAmount(food.per100g[key]))) return 'incomplete_nutrition'
   if (calories <= 0) return 'no_energy'
+  const nonMeal = nonMealFoodReason(food)
+  if (nonMeal !== null) return nonMeal
   if (isOccasionalFood(food) && !favorites.has(food.id)) return 'occasional'
   if (avoided.size > 0) {
     if (food.allergens === null) return 'allergen_unknown'

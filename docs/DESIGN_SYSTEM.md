@@ -1,16 +1,19 @@
 # Design system
 
-Warm, calm and personal — a kitchen notebook, not an analytics dashboard. Oat/cream surfaces, an
-evergreen primary, an apricot energy accent and one distinct hue per macronutrient. Styles live in
+Bright, fresh and calm — a clean kitchen notebook, not an analytics dashboard. White cards on a light gray
+page, a vivid green primary, a peach accent and one distinct hue per macronutrient. Styles live in
 `src/index.css` (entry + base layer + reduced motion), `src/app/styles/tokens.css` (theme tokens, dark
 overrides, shell geometry) and `src/app/styles/utilities.css`; components in `src/components/ui/*` (barrel
 `@/components/ui`, which also exports a token-aware `cn`). Features compose these; they do not invent colors, radii or shadows.
 
 ## Tokens
 
-Palette (2026-10 refresh): cool sage neutrals, deep emerald primary, apricot accent; light and dark values in
+Palette (2026-10-11, "bright & fresh"): white / light gray `#f5f7f6` surfaces, green `#16a34a` family primary,
+peach `#fb923c` accent, ink `#111827` text; dark theme in neutral graphite grays (no green tint). Values in
 `src/app/styles/tokens.css`. `tests/design/contrast.test.ts` computes WCAG contrast from the OKLCH values and requires
-text ≥ 12:1, muted text ≥ 5.5:1 (≥ 4.5:1 on `surface-2`), button text ≥ 5.5:1 and status colors ≥ 4.5:1 in both themes.
+text ≥ 12:1, muted text ≥ 5.5:1 (≥ 4.5:1 on `surface-2`), button text ≥ 5.5:1, status colors and `accent-ink`
+≥ 4.5:1 in both themes. That is why filled buttons use a deeper green (`#00792b`-ish) than the brand `#16a34a`,
+which is used for the focus ring.
 
 Tailwind CSS 4 `@theme` variables, so every token is also a utility (`bg-surface`, `text-protein-ink`,
 `rounded-card`, `shadow-card`, …). Dark values override the same variables on
@@ -18,23 +21,23 @@ Tailwind CSS 4 `@theme` variables, so every token is also a utility (`bg-surface
 
 | Token | Use | Light | Dark |
 |---|---|---|---|
-| `backdrop` | page behind the framed column (≥ sm) | oat `#eee5d8` | near-black green |
-| `bg` | app/screen background, sticky headers | cream `#faf6ef` | `#111814` |
-| `surface` | cards, sheets, inputs | `#fffdfa` | `#18201c` |
-| `surface-2` | tracks, inset areas, segmented control | warm grey-oat | lifted green-grey |
-| `border` | hairlines, control borders | | |
-| `text` / `text-muted` | body / secondary text (14.6 : 1 and 6.3 : 1 on `bg`) | deep green-ink | warm off-white |
-| `primary` (+ `primary-foreground`) | evergreen: main actions, selection, focus accents | `#1d6447` | mint `#7ccfa7` |
-| `accent` (+ `accent-foreground`, `accent-ink`) | apricot highlights, eyebrow text | | |
-| `success` `warning` `danger` (+ `danger-foreground`) `info` | status; all ≥ 4.9 : 1 on `surface` | | |
-| `energy` | calories (apricot-orange) | | |
+| `backdrop` | page behind the framed column (≥ sm) | `#eef2f0` | `#0b0c0e` |
+| `bg` | app/screen background, sticky headers | `#f5f7f6` | `#111315` |
+| `surface` | cards, sheets, inputs | white | `#1a1d20` |
+| `surface-2` | tracks, inset areas, segmented control | `#eff3f1` | `#23272b` |
+| `border` | hairlines, control borders | `#e2e8e5` | `#30353b` |
+| `text` / `text-muted` | body / secondary text | `#111827` / `#4b5563` | `#f3f4f6` / `#a7afba` |
+| `primary` (+ `primary-foreground`) | main actions, selection, active navigation | deep green, white text | `#22c55e`, dark-green text |
+| `accent` (+ `accent-foreground`, `accent-ink`) | peach highlights; `accent-ink` for eyebrow text | `#fb923c` (ink `#c2410c`) | `#fb923c` (ink `#fdba74`) |
+| `success` `warning` `danger` (+ `danger-foreground`) `info` | status; all ≥ 4.5 : 1 on `surface` | green-700, amber-700, red-600, blue-600 | green-400, amber-400, red-400, blue-400 |
+| `energy` | calories (orange) | | |
 | `protein` `carbs` `fat` `fiber` | macro hues: indigo, amber, rose, green | | |
-| `micro` | micronutrients (teal) | | |
-| `ring` | focus outline | | |
+| `micro` | micronutrients (cyan) | | |
+| `ring` | focus outline | `#16a34a` | `#4ade80` |
 
 **Graphic vs. text colors.** Nutrient hues are *graphic* colors (bars, rings, dots; ≥ 3 : 1 on surface).
-For small text in a nutrient color use the `*-ink` variant (`text-carbs-ink`, ≥ 6 : 1), which mixes the hue
-toward `text` and works in both themes. Color never carries meaning alone: every bar has a label and a
+For small text in a nutrient color use the `*-ink` variant (`text-carbs-ink`), which mixes the hue toward `text`
+and works in both themes (`accent-ink` is an explicit token per theme). Color never carries meaning alone: every bar has a label and a
 number, every badge has words.
 
 **Tones.** `components/ui/tones.ts` maps a `Tone` (`neutral | primary | accent | success | warning |

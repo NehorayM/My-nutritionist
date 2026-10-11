@@ -4,6 +4,7 @@ import { DIET_TYPES, type Profile } from '@/types'
 import { containsPhrase } from './preferences'
 import { FORBIDDEN_COPY, entry, food, localTime, planCopy, planInput, profile, recommendedFoods, systemFood } from './__fixtures__/adaptive'
 import { netCarbsPer100g } from './diets'
+import { effectivePrepMinutes, filterCandidates } from './candidates'
 import { buildAdaptivePlan } from './engine'
 import type { AdaptivePlan } from './types'
 
@@ -63,7 +64,7 @@ describe('diet patterns', () => {
 })
 
 describe('dislikes, meal slots and preparation', () => {
-  it('leaves out disliked foods by name, tag or category', () => {
+  it('leaves out disliked foods by name, tag, category or food group ("fish" covers tuna)', () => {
     const plan = planFor({ dislikes: ['egg', 'Pizza', 'fish', 'hummus'] })
     for (const item of recommendedFoods(plan)) {
       const text = [item.name, item.category ?? '', ...item.tags].join(' ')
@@ -88,8 +89,12 @@ describe('dislikes, meal slots and preparation', () => {
   it('keeps beginner cooks to 20 minutes and leads with quick ideas', () => {
     const plan = planFor({ cookingSkill: 'beginner', maxPrepMinutes: 60 })
     for (const rec of plan.recommendations) expect(rec.prepMinutes).toBeLessThanOrEqual(20)
-    const confident = planFor({ cookingSkill: 'confident', maxPrepMinutes: 60 })
-    expect(Math.max(...confident.recommendations.map((rec) => rec.prepMinutes))).toBeGreaterThan(20)
+    const longest = (cookingSkill: 'beginner' | 'confident') => {
+      const { candidates } = filterCandidates(SYSTEM_FOODS, { profile: profile({ cookingSkill, maxPrepMinutes: 60 }), mealType: 'dinner' })
+      return Math.max(...candidates.map((item) => effectivePrepMinutes(item) ?? 0))
+    }
+    expect(longest('beginner')).toBeLessThanOrEqual(20)
+    expect(longest('confident')).toBeGreaterThan(20)
   })
 
   it('lifts favorites', () => {

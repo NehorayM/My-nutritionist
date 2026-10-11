@@ -85,7 +85,7 @@ describe('Meals: logging a food', () => {
 
   it('rejects amounts that are zero, too small or too large, and saves nothing', async () => {
     const { user } = await renderMeals()
-    const sheet = await openFood(user, 'Dinner', 'apple', /^Apple/)
+    const sheet = await openFood(user, 'Dinner', 'apple', /^Apple(?! juice)/)
     await user.selectOptions(within(sheet).getByRole('combobox', { name: 'Unit' }), 'grams')
     const amount = within(sheet).getByRole('textbox', { name: /Amount/ })
     const save = within(sheet).getByRole('button', { name: 'Add to Dinner' })

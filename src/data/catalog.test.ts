@@ -105,6 +105,9 @@ describe('system food catalog — servings', () => {
   })
 })
 
+/** Tags set by hand per food (meta.tagRules); every other tag follows a rule. */
+const CURATED_TAGS: readonly string[] = ['mediterranean', 'israeli', 'condiment', 'alcohol']
+
 describe('system food catalog — classification', () => {
   it('uses only known categories, tags, allergens and meal types', () => {
     expect(offenders((food) => outside([food.category], FOOD_CATEGORIES))).toEqual([])
@@ -141,7 +144,7 @@ describe('system food catalog — classification', () => {
 
   it('derives rule-based tags exactly as documented in meta.tagRules', () => {
     const mismatched = offenders((food) => {
-      const derived = food.tags.filter((tag) => tag !== 'mediterranean' && tag !== 'israeli').sort()
+      const derived = food.tags.filter((tag) => !CURATED_TAGS.includes(tag)).sort()
       const expected = expectedRuleTags(food).sort()
       return derived.join() === expected.join() ? [] : [`has [${derived.join()}], rules give [${expected.join()}]`]
     })

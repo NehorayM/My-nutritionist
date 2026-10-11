@@ -74,9 +74,11 @@ Code: `src/services/food/` and `supabase/functions/_shared/usda/` (USDA mapping 
   and `errors` (with `retryAfterMs` when rate-limited). Aborting the caller's signal rejects with an `AbortError`.
 - Successful remote answers are cached in an LRU (50 entries, 10 min) keyed by provider + operation + normalized
   query + page; errors are never cached; local results are never cached.
-- Local ranking: exact name > same words in any order > name prefix > every query word matched (word or prefix)
-  > partial word > substring. Shorter (more specific) names and a matching first word rank higher; the user's own
-  foods get a boost within a tier. Accents, Hebrew niqqud, punctuation and plural/singular are folded, and spelling
+- Local ranking: exact name > name prefix > same words in another order > every query word matched (word or prefix)
+  > partial word > substring ("chocolate milk" → "Chocolate milk (shoko)" before "Milk chocolate"). Shorter (more
+  specific) names and a matching first word rank higher, occasional foods (fast food, sweets, sugary drinks, chips —
+  `isOccasionalFood`) rank after everyday ones within a tier ("potato" → "Potato, boiled" before "Potato chips"), and
+  the user's own foods get a boost within a tier. Accents, Hebrew niqqud, punctuation and plural/singular are folded, and spelling
   aliases are resolved (yoghurt/yogurt, chumus/humus/hummus, felafel/falafel, bourekas/burekas, pitta/pita,
   shwarma/shawarma, tehina/tahini, plus Hebrew spellings).
 
